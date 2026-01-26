@@ -61,6 +61,11 @@
   `app/Models/SubUser.php`,
   `app/Models/SubUserPermission.php`.
 
+## Değişiklik Günlüğü
+- 2026-01-26: Git başlatıldı, ilk commit alındı.
+- 2026-01-26: Super admin layout buton stili `btn` sistemine alındı.
+- 2026-01-26: Public home/pricing butonları `btn` sistemine taşındı.
+
 ## Commands run (optional)
 - php artisan migrate (Nothing to migrate)
 
