@@ -12,6 +12,7 @@ use App\Http\Controllers\SuperAdmin\TicketController as SuperAdminTicketControll
 use App\Http\Controllers\SuperAdmin\ReferralController as SuperAdminReferralController;
 use App\Http\Controllers\SuperAdmin\CustomerController as SuperAdminCustomerController;
 use App\Http\Controllers\SuperAdmin\SubUserController as SuperAdminSubUserController;
+use App\Http\Controllers\SuperAdmin\BannerController as SuperAdminBannerController;
 
 Route::middleware(['auth', 'verified', 'role:super_admin'])
     ->prefix('super-admin')
@@ -30,6 +31,8 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
         Route::get('settings', [SuperAdminSettingsController::class, 'index'])->name('settings.index');
         Route::post('settings/referral', [SuperAdminSettingsController::class, 'updateReferralProgram'])
             ->name('settings.referral');
+        Route::put('settings/client/{user}', [SuperAdminSettingsController::class, 'updateClientSettings'])
+            ->name('settings.client.update');
         Route::get('reports', [SuperAdminReportController::class, 'index'])->name('reports.index');
         Route::get('subscriptions', [SuperAdminSubscriptionController::class, 'index'])->name('subscriptions.index');
         Route::get('subscriptions-export', [SuperAdminSubscriptionController::class, 'exportSubscriptions'])->name('subscriptions.export');
@@ -46,6 +49,7 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
         Route::get('referrals/{referral}', [SuperAdminReferralController::class, 'show'])->name('referrals.show');
         Route::get('referrals-export', [SuperAdminReferralController::class, 'export'])->name('referrals.export');
         Route::get('sub-users', [SuperAdminSubUserController::class, 'index'])->name('sub-users.index');
+        Route::resource('banners', SuperAdminBannerController::class)->except(['show']);
 
         Route::get('tickets', [SuperAdminTicketController::class, 'index'])->name('tickets.index');
         Route::get('tickets/{ticket}', [SuperAdminTicketController::class, 'show'])->name('tickets.show');

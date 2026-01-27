@@ -60,6 +60,63 @@
     </style>
 </head>
 <body class="min-h-screen">
+    @php
+        $publicBanners = \App\Models\Banner::query()
+            ->active()
+            ->forPlacement('public_header')
+            ->orderBy('sort_order')
+            ->get();
+    @endphp
+    @foreach($publicBanners as $banner)
+        <div class="w-full">
+            @if($banner->image_path)
+                @php
+                    $bannerImage = asset('storage/' . $banner->image_path);
+                @endphp
+                @if($banner->link_url)
+                    <a href="{{ $banner->link_url }}" class="block" target="_blank" rel="noopener noreferrer">
+                        <img src="{{ $bannerImage }}" alt="{{ $banner->title ?? 'Banner' }}" class="w-full max-h-40 object-cover">
+                    </a>
+                @else
+                    <img src="{{ $bannerImage }}" alt="{{ $banner->title ?? 'Banner' }}" class="w-full max-h-40 object-cover">
+                @endif
+                @if($banner->show_countdown && $banner->ends_at)
+                    <div class="px-6 md:px-10 py-2 text-xs text-slate-600 bg-white border-b border-slate-200">
+                        Kalan süre:
+                        <span class="banner-countdown" data-ends-at="{{ $banner->ends_at->toIso8601String() }}"></span>
+                    </div>
+                @endif
+            @else
+                @php
+                    $bg = $banner->bg_color ?: '#0f172a';
+                    $fg = $banner->text_color ?: '#ffffff';
+                @endphp
+                <div class="px-6 md:px-10 py-3 text-sm" style="background: {{ $bg }}; color: {{ $fg }};">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                        <div class="flex flex-col">
+                            @if($banner->title)
+                                <span class="font-semibold">{{ $banner->title }}</span>
+                            @endif
+                            @if($banner->message)
+                                <span class="text-xs md:text-sm">{{ $banner->message }}</span>
+                            @endif
+                        </div>
+                        <div class="flex items-center gap-4">
+                            @if($banner->show_countdown && $banner->ends_at)
+                                <span class="text-xs font-semibold banner-countdown" data-ends-at="{{ $banner->ends_at->toIso8601String() }}"></span>
+                            @endif
+                            @if($banner->link_url)
+                                <a href="{{ $banner->link_url }}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold underline">
+                                    {{ $banner->link_text ?: 'Detay' }}
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+    @endforeach
+
     <header class="px-6 md:px-10 py-6 flex items-center justify-between">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-2xl bg-teal-700 text-white flex items-center justify-center font-bold">
@@ -104,5 +161,42 @@
             </div>
         </div>
     </footer>
+    <script>
+        function formatCountdown(diffMs) {
+            if (diffMs <= 0) return 'Sona erdi';
+            const totalSeconds = Math.floor(diffMs / 1000);
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor((totalSeconds % 86400) / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            const parts = [];
+            if (days > 0) parts.push(`${days}g`);
+            parts.push(`${String(hours).padStart(2, '0')}s`);
+            parts.push(`${String(minutes).padStart(2, '0')}d`);
+            parts.push(`${String(seconds).padStart(2, '0')}sn`);
+            return parts.join(' ');
+        }
+
+        function startBannerCountdowns() {
+            const nodes = document.querySelectorAll('.banner-countdown');
+            if (!nodes.length) return;
+
+            function tick() {
+                const now = Date.now();
+                nodes.forEach((node) => {
+                    const endsAt = node.dataset.endsAt;
+                    if (!endsAt) return;
+                    const target = Date.parse(endsAt);
+                    if (Number.isNaN(target)) return;
+                    node.textContent = formatCountdown(target - now);
+                });
+            }
+
+            tick();
+            setInterval(tick, 1000);
+        }
+
+        startBannerCountdowns();
+    </script>
 </body>
 </html>

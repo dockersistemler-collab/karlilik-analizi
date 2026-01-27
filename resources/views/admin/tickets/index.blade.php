@@ -9,14 +9,14 @@
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>
                 <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Destek Merkezi</p>
-                <h3 class="text-2xl font-semibold text-slate-900 mt-2">Sorunlar?n? h?zl?ca ??zelim.</h3>
+                <h3 class="text-2xl font-semibold text-slate-900 mt-2">Sorunlarını hızlıca çözelim.</h3>
                 <p class="text-sm text-slate-500 mt-2 max-w-2xl">
-                    Destek taleplerini buradan y?netebilir, ekibimizle do?rudan ileti?ime ge?ebilirsin.
+                    Destek taleplerini buradan yönetebilir, ekibimizle doğrudan iletişime geçebilirsin.
                 </p>
             </div>
             <div class="flex flex-col sm:flex-row gap-3">
                 <a href="{{ route('admin.tickets.create') }}" class="btn btn-solid-accent">
-                    Destek Talebi Olu?tur
+                    Destek Talebi Oluştur
                 </a>
                 <a href="{{ route('admin.help.support') }}" class="btn btn-outline-accent">
                     Destek Merkezi Rehberi
@@ -26,16 +26,16 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
             <div class="panel-card p-4 border-dashed border-slate-200">
-                <p class="text-xs uppercase text-slate-400">1. Talep Olu?tur</p>
-                <p class="text-sm text-slate-600 mt-2">Konu, ?ncelik ve mesaj?n? yaz. Gerekirse dosya ekle.</p>
+                <p class="text-xs uppercase text-slate-400">1. Talep Oluştur</p>
+                <p class="text-sm text-slate-600 mt-2">Konu, öncelik ve mesajını yaz. Gerekirse dosya ekle.</p>
             </div>
             <div class="panel-card p-4 border-dashed border-slate-200">
                 <p class="text-xs uppercase text-slate-400">2. Takip Et</p>
-                <p class="text-sm text-slate-600 mt-2">Yan?tlar? tek bir ekrandan takip et ve geri bildirim ver.</p>
+                <p class="text-sm text-slate-600 mt-2">Yanıtları tek bir ekrandan takip et ve geri bildirim ver.</p>
             </div>
             <div class="panel-card p-4 border-dashed border-slate-200">
-                <p class="text-xs uppercase text-slate-400">3. ??z?m</p>
-                <p class="text-sm text-slate-600 mt-2">Sorun ??z?ld???nde talep kapan?r, ge?mi?te saklan?r.</p>
+                <p class="text-xs uppercase text-slate-400">3. Çözüm</p>
+                <p class="text-sm text-slate-600 mt-2">Sorun çözüldüğünde talep kapanır, geçmişte saklanır.</p>
             </div>
         </div>
     </div>
@@ -48,12 +48,12 @@
         <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-3">
             <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Konu ara..." class="w-full px-3.5 py-2 text-sm bg-white border border-slate-200 rounded-full text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
             <select name="status" class="w-full px-3.5 py-2 text-sm bg-white border border-slate-200 rounded-full text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                <option value="">T?m?</option>
-                <option value="open" @selected(($filters['status'] ?? '') === 'open')>A??k</option>
+                <option value="">Tümü</option>
+                <option value="open" @selected(($filters['status'] ?? '') === 'open')>Açık</option>
                 <option value="waiting_admin" @selected(($filters['status'] ?? '') === 'waiting_admin')>Destek Bekleniyor</option>
-                <option value="waiting_customer" @selected(($filters['status'] ?? '') === 'waiting_customer')>M??teri Bekleniyor</option>
-                <option value="resolved" @selected(($filters['status'] ?? '') === 'resolved')>??z?ld?</option>
-                <option value="closed" @selected(($filters['status'] ?? '') === 'closed')>Kapat?ld?</option>
+                <option value="waiting_customer" @selected(($filters['status'] ?? '') === 'waiting_customer')>Müşteri Bekleniyor</option>
+                <option value="resolved" @selected(($filters['status'] ?? '') === 'resolved')>Çözüldü</option>
+                <option value="closed" @selected(($filters['status'] ?? '') === 'closed')>Kapatıldı</option>
             </select>
             <button class="btn btn-solid-accent">Filtrele</button>
             <a href="{{ route('admin.tickets.index') }}" class="btn btn-outline-accent">Temizle</a>
@@ -75,7 +75,7 @@
             <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
                 <tr>
                     <th class="px-4 py-3 text-left">Konu</th>
-                    <th class="px-4 py-3 text-left">?ncelik</th>
+                    <th class="px-4 py-3 text-left">Öncelik</th>
                     <th class="px-4 py-3 text-left">Durum</th>
                     <th class="px-4 py-3 text-left">Son Aktivite</th>
                     <th class="px-4 py-3"></th>
@@ -112,12 +112,12 @@
                         </td>
                         <td class="px-4 py-3">{{ optional($ticket->last_activity_at)->diffForHumans() }}</td>
                         <td class="px-4 py-3 text-right">
-                            <a href="{{ route('admin.tickets.show', $ticket) }}" class="text-blue-600 hover:text-blue-800">G?r?nt?le</a>
+                            <a href="{{ route('admin.tickets.show', $ticket) }}" class="text-blue-600 hover:text-blue-800">Görüntüle</a>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-4 py-8 text-center text-slate-500">Hen?z destek talebi yok.</td>
+                        <td colspan="5" class="px-4 py-8 text-center text-slate-500">Henüz destek talebi yok.</td>
                     </tr>
                 @endforelse
             </tbody>

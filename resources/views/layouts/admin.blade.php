@@ -8,6 +8,15 @@
     <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('adminSidebarPinned') === '1') {
+                    document.documentElement.classList.add('admin-sidebar-pinned');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <style>
         :root {
             --panel-ink: #0f172a;
@@ -88,6 +97,9 @@
         .sidebar.is-pinned {
             width: 260px;
         }
+        .admin-sidebar-pinned .sidebar {
+            width: 260px;
+        }
         .sidebar-brand {
             height: 56px;
             border-bottom: 1px solid var(--panel-border);
@@ -113,6 +125,12 @@
         .sidebar.is-pinned .sidebar-label,
         .sidebar.is-pinned .sidebar-section,
         .sidebar.is-pinned .sidebar-action-text {
+            opacity: 1;
+            width: auto;
+        }
+        .admin-sidebar-pinned .sidebar-label,
+        .admin-sidebar-pinned .sidebar-section,
+        .admin-sidebar-pinned .sidebar-action-text {
             opacity: 1;
             width: auto;
         }
@@ -142,6 +160,10 @@
         }
         .sidebar:hover .sidebar-pin,
         .sidebar.is-pinned .sidebar-pin {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .admin-sidebar-pinned .sidebar-pin {
             opacity: 1;
             pointer-events: auto;
         }
@@ -216,6 +238,9 @@
             border-radius: 5px;
             box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
         }
+        .panel-card.table-shell {
+            box-shadow: none;
+        }
         .panel-pill {
             border-radius: 999px;
             padding: 2px 10px;
@@ -237,7 +262,7 @@
             border-color: #94a3b8 !important;
             box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.22) !important;
         }
-        main button {
+        main button:not(.btn):not(.topbar-icon) {
             padding: 0.45rem 1rem !important;
             font-size: 0.85rem !important;
             line-height: 1.2 !important;
@@ -333,8 +358,42 @@
         main table td {
             padding: 0.65rem 0.85rem !important;
         }
+        main table {
+            border-collapse: separate !important;
+            border-spacing: 0 8px !important;
+        }
+        main table thead {
+            background: transparent !important;
+        }
+        main table thead.bg-slate-50 {
+            background: transparent !important;
+        }
+        main table thead th {
+            background: transparent !important;
+            border-bottom: 1px solid var(--panel-border) !important;
+        }
+        main table thead th:first-child {
+            border-top-left-radius: 10px !important;
+            border-bottom-left-radius: 10px !important;
+        }
+        main table thead th:last-child {
+            border-top-right-radius: 10px !important;
+            border-bottom-right-radius: 10px !important;
+        }
+        main table tbody tr {
+            background: #ffffff !important;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+        }
+        main table tbody td:first-child {
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+        main table tbody td:last-child {
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
         main table tbody tr:hover {
-            background: rgba(15, 23, 42, 0.03);
+            background: rgba(15, 23, 42, 0.03) !important;
         }
         main h2 {
             font-size: 1.1rem !important;
@@ -377,12 +436,12 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            color: #475569;
+            color: #475569 !important;
             background: #ffffff;
         }
         .topbar-icon:hover {
             color: #0f172a;
-            border-color: #cbd5f5;
+            border-color: var(--panel-accent);
         }
         main a.text-blue-600,
         main a.text-blue-700,
@@ -614,7 +673,7 @@
         </aside>
 
         <main class="flex-1 flex flex-col">
-            <header class="min-h-[96px] flex items-start justify-between px-6 py-6 border-b border-slate-200/70">
+            <header class="min-h-[96px] flex items-start justify-between px-6 py-6 border-b border-slate-200/70 text-slate-800">
                 <div class="flex-1 flex items-start justify-between gap-6 ml-6 pt-2">
                     <div class="hidden lg:flex items-center gap-4 text-sm">
                         <a href="{{ route('admin.help.training') }}" class="topbar-link">
@@ -649,12 +708,12 @@
                                 @if(auth('subuser')->check())
                                     <a href="{{ route('admin.subuser.password.edit') }}" class="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900">
                                         <i class="fa-solid fa-key"></i>
-                                        Şifre Değiştirme
+                                        Profili Düzenle
                                     </a>
                                 @else
                                     <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900">
                                         <i class="fa-solid fa-key"></i>
-                                        Şifre Değiştirme
+                                        Profili Düzenle
                                     </a>
                                 @endif
                                 @unless(auth('subuser')->check())
@@ -693,6 +752,62 @@
                 </div>
             </header>
 
+            @php
+                $adminBanners = \App\Models\Banner::query()
+                    ->active()
+                    ->forPlacement('admin_header')
+                    ->orderBy('sort_order')
+                    ->get();
+            @endphp
+            @foreach($adminBanners as $banner)
+                <div class="w-full">
+                    @if($banner->image_path)
+                        @php
+                            $bannerImage = asset('storage/' . $banner->image_path);
+                        @endphp
+                        @if($banner->link_url)
+                            <a href="{{ $banner->link_url }}" class="block" target="_blank" rel="noopener noreferrer">
+                                <img src="{{ $bannerImage }}" alt="{{ $banner->title ?? 'Banner' }}" class="w-full max-h-40 object-cover">
+                            </a>
+                        @else
+                            <img src="{{ $bannerImage }}" alt="{{ $banner->title ?? 'Banner' }}" class="w-full max-h-40 object-cover">
+                        @endif
+                        @if($banner->show_countdown && $banner->ends_at)
+                            <div class="px-6 py-2 text-xs text-slate-600 bg-white border-b border-slate-200">
+                                Kalan süre:
+                                <span class="banner-countdown" data-ends-at="{{ $banner->ends_at->toIso8601String() }}"></span>
+                            </div>
+                        @endif
+                    @else
+                        @php
+                            $bg = $banner->bg_color ?: '#0f172a';
+                            $fg = $banner->text_color ?: '#ffffff';
+                        @endphp
+                        <div class="px-6 py-3 text-sm" style="background: {{ $bg }}; color: {{ $fg }};">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                                <div class="flex flex-col">
+                                    @if($banner->title)
+                                        <span class="font-semibold">{{ $banner->title }}</span>
+                                    @endif
+                                    @if($banner->message)
+                                        <span class="text-xs md:text-sm">{{ $banner->message }}</span>
+                                    @endif
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    @if($banner->show_countdown && $banner->ends_at)
+                                        <span class="text-xs font-semibold banner-countdown" data-ends-at="{{ $banner->ends_at->toIso8601String() }}"></span>
+                                    @endif
+                                    @if($banner->link_url)
+                                        <a href="{{ $banner->link_url }}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold underline">
+                                            {{ $banner->link_text ?: 'Detay' }}
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            @endforeach
             <div class="px-6 pb-6 pt-6">
                 <div class="mb-6">
                     <h2 class="text-2xl font-semibold text-slate-900">
@@ -801,6 +916,7 @@
         function setPinnedState(isPinned) {
             sidebar?.classList.toggle('is-pinned', isPinned);
             sidebarPin?.classList.toggle('is-active', isPinned);
+            document.documentElement.classList.toggle('admin-sidebar-pinned', isPinned);
             if (isPinned) {
                 localStorage.setItem(adminPinKey, '1');
             } else {
@@ -816,6 +932,43 @@
             const nextState = !sidebar?.classList.contains('is-pinned');
             setPinnedState(nextState);
         });
+    </script>
+    <script>
+        function formatCountdown(diffMs) {
+            if (diffMs <= 0) return 'Sona erdi';
+            const totalSeconds = Math.floor(diffMs / 1000);
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor((totalSeconds % 86400) / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            const parts = [];
+            if (days > 0) parts.push(`${days}g`);
+            parts.push(`${String(hours).padStart(2, '0')}s`);
+            parts.push(`${String(minutes).padStart(2, '0')}d`);
+            parts.push(`${String(seconds).padStart(2, '0')}sn`);
+            return parts.join(' ');
+        }
+
+        function startBannerCountdowns() {
+            const nodes = document.querySelectorAll('.banner-countdown');
+            if (!nodes.length) return;
+
+            function tick() {
+                const now = Date.now();
+                nodes.forEach((node) => {
+                    const endsAt = node.dataset.endsAt;
+                    if (!endsAt) return;
+                    const target = Date.parse(endsAt);
+                    if (Number.isNaN(target)) return;
+                    node.textContent = formatCountdown(target - now);
+                });
+            }
+
+            tick();
+            setInterval(tick, 1000);
+        }
+
+        startBannerCountdowns();
     </script>
 </body>
 </html>

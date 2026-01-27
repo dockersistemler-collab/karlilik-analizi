@@ -17,6 +17,11 @@
 - Ürün listesinde satırlar arası boşluk ve hafif gölge eklendi (kart görünümlü satırlar).
 - Super admin layout buton stili `btn` sistemine alındı; odak çizgisi nötrleştirildi.
 - Public home/pricing butonları `btn` sistemine taşındı (solid/outline hover uyumlu).
+- Admin/super-admin layout `main button` stili, `.btn` sınıflarını ezmeyecek şekilde güncellendi.
+- Banner sistemi eklendi (super admin yönetimi + admin/public gösterim).
+- Banner için geri sayım (ends_at) desteği eklendi.
+- Ürün listesi arama/pagination AJAX yapıldı, banner yerleşimi header altına alındı.
+- Profil sayfası admin layout içine alındı ve Türkçeleştirildi; destek sayfası Türkçe karakterleri düzeltildi.
 
 ## Next steps
 1) `php artisan migrate` çalıştır (sub_users + desi/vat alanları).
@@ -65,6 +70,11 @@
 - 2026-01-26: Git başlatıldı, ilk commit alındı.
 - 2026-01-26: Super admin layout buton stili `btn` sistemine alındı.
 - 2026-01-26: Public home/pricing butonları `btn` sistemine taşındı.
+- 2026-01-26: Admin/super-admin `main button` kuralı `.btn` hoverlarını ezmeyecek şekilde düzeltildi.
+- 2026-01-26: Banner modülü eklendi (super admin CRUD + admin/public yerleşim).
+- 2026-01-26: Banner geri sayım (countdown) desteği eklendi.
+- 2026-01-27: Ürün listesi AJAX arama ve pagination eklendi; banner header altına alındı.
+- 2026-01-27: Profil sayfası admin layout ile uyumlu hale getirildi ve Türkçeleştirildi; destek sayfası Türkçe karakterleri düzeltildi.
 
 ## Commands run (optional)
 - php artisan migrate (Nothing to migrate)

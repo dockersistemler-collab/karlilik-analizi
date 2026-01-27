@@ -137,7 +137,7 @@
             border-color: #94a3b8 !important;
             box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.22) !important;
         }
-        main button {
+        main button:not(.btn):not(.topbar-icon) {
             padding: 0.45rem 1rem !important;
             font-size: 0.85rem !important;
             line-height: 1.2 !important;
@@ -213,8 +213,42 @@
         main table td {
             padding: 0.65rem 0.85rem !important;
         }
+        main table {
+            border-collapse: separate !important;
+            border-spacing: 0 8px !important;
+        }
+        main table thead {
+            background: transparent !important;
+        }
+        main table thead.bg-slate-50 {
+            background: transparent !important;
+        }
+        main table thead th {
+            background: transparent !important;
+            border-bottom: 1px solid var(--panel-border) !important;
+        }
+        main table thead th:first-child {
+            border-top-left-radius: 10px !important;
+            border-bottom-left-radius: 10px !important;
+        }
+        main table thead th:last-child {
+            border-top-right-radius: 10px !important;
+            border-bottom-right-radius: 10px !important;
+        }
+        main table tbody tr {
+            background: #ffffff !important;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+        }
+        main table tbody td:first-child {
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+        main table tbody td:last-child {
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
         main table tbody tr:hover {
-            background: rgba(15, 23, 42, 0.03);
+            background: rgba(15, 23, 42, 0.03) !important;
         }
         main h2 {
             font-size: 1.1rem !important;
@@ -261,7 +295,7 @@
         }
         .topbar-icon:hover {
             color: #0f172a;
-            border-color: #cbd5f5;
+            border-color: var(--panel-accent);
         }
     </style>
 </head>
@@ -337,6 +371,10 @@
                 <a href="{{ route('super-admin.settings.index') }}" class="sidebar-link">
                     <i class="fa-solid fa-gear w-6"></i>
                     <span class="sidebar-label">Sistem Ayarları</span>
+                </a>
+                <a href="{{ route('super-admin.banners.index') }}" class="sidebar-link">
+                    <i class="fa-solid fa-bullhorn w-6"></i>
+                    <span class="sidebar-label">Bannerlar</span>
                 </a>
             </nav>
 

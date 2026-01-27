@@ -6,47 +6,51 @@
 
 @section('content')
 <div class="mb-4">
-    <h3 class="text-2xl font-semibold text-slate-900 mb-2">Ürün Listesi</h3>
     @include('admin.products.partials.catalog-tabs')
 </div>
 
-<div class="flex flex-col gap-3 mb-4">
-    <div class="flex items-center gap-3">
-        <span class="text-sm font-medium text-slate-700">Ürün Ara</span>
-        <form method="GET" class="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-2 w-full md:w-[520px]">
-            <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm"></i>
-            <input type="text" name="search" placeholder="Barkod, SKU, Ürün adı, Marka..."
-                   class="border-0 focus:ring-0 text-sm w-full"
-                   value="{{ request('search') }}">
-            @foreach(request()->except('search', 'page') as $key => $value)
-                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-            @endforeach
-            <button type="submit" class="text-slate-500 hover:text-slate-700 text-sm">Ara</button>
-        </form>
-    </div>
-    <div class="flex flex-wrap items-center gap-3">
-        <a href="{{ route('admin.products.template') }}" class="btn btn-outline-accent">
-            CSV Şablonu
-        </a>
-        <a href="{{ route('admin.products.export') }}" class="btn btn-outline-accent">
-            CSV Dışa Aktar
-        </a>
-        <form method="POST" action="{{ route('admin.products.import') }}" enctype="multipart/form-data" class="flex items-center gap-2">
-            @csrf
-            <input type="file" name="file" accept=".csv" class="text-sm">
-            <button type="submit" class="btn btn-outline-accent">
-                CSV İçeri Aktar
-            </button>
-        </form>
-        <a href="{{ route('admin.products.create') }}" class="btn btn-solid-accent">
-            <i class="fas fa-plus mr-2"></i> Yeni Ürün
-        </a>
+<div class="panel-card p-4 mb-4">
+    <div class="flex flex-col gap-3">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+            <div class="flex items-center gap-3 w-full lg:w-auto">
+                <span class="text-sm font-medium text-slate-700 whitespace-nowrap">Ürün Ara</span>
+                <form method="GET" id="product-search-form" class="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-2 w-full md:w-[520px]">
+                    <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm"></i>
+                    <input type="text" id="product-search-input" name="search" placeholder="Barkod, SKU, Ürün adı, Marka..."
+                           class="border-0 focus:ring-0 text-sm w-full"
+                           value="{{ request('search') }}">
+                    @foreach(request()->except('search', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+                    <button type="submit" class="text-slate-500 hover:text-slate-700 text-sm">Ara</button>
+                </form>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 justify-start lg:justify-end">
+                <a href="{{ route('admin.products.template') }}" class="btn btn-outline-accent">
+                    CSV Şablonu
+                </a>
+                <a href="{{ route('admin.products.export') }}" class="btn btn-outline-accent">
+                    CSV Dışa Aktar
+                </a>
+                <form method="POST" action="{{ route('admin.products.import') }}" enctype="multipart/form-data" class="flex items-center gap-2">
+                    @csrf
+                    <input type="file" name="file" accept=".csv" class="text-sm">
+                    <button type="submit" class="btn btn-outline-accent">
+                        CSV İçeri Aktar
+                    </button>
+                </form>
+                <a href="{{ route('admin.products.create') }}" class="btn btn-solid-accent">
+                    <i class="fas fa-plus mr-2"></i> Yeni Ürün
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="panel-card overflow-hidden">
-    <table class="min-w-full border-separate border-spacing-y-2">
-        <thead class="bg-slate-50">
+<div id="products-results">
+    <div id="products-table-wrap" class="panel-card table-shell overflow-hidden">
+        <table class="min-w-full border-separate border-spacing-y-2">
+            <thead>
             @php
                 $currentSort = request('sort');
                 $currentDir = request('dir', 'asc');
@@ -225,57 +229,155 @@
             </tr>
             @endforelse
         </tbody>
-    </table>
-</div>
+        </table>
+    </div>
 
-<div class="mt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-    <form method="GET" class="flex items-center gap-2 text-sm">
-        <label for="per-page" class="text-slate-500">Sayfa başına</label>
-        <select id="per-page" name="per_page" class="w-24" onchange="this.form.submit()">
-            @foreach([10, 20, 50, 100] as $size)
-                <option value="{{ $size }}" @selected((int) request('per_page', 20) === $size)>{{ $size }}</option>
+    <div class="mt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <form method="GET" class="flex items-center gap-2 text-sm">
+            <label for="per-page" class="text-slate-500">Sayfa başına</label>
+            <select id="per-page" name="per_page" class="w-24" onchange="this.form.submit()">
+                @foreach([10, 20, 50, 100] as $size)
+                    <option value="{{ $size }}" @selected((int) request('per_page', 20) === $size)>{{ $size }}</option>
+                @endforeach
+            </select>
+            @foreach(request()->except('per_page', 'page') as $key => $value)
+                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
             @endforeach
-        </select>
-        @foreach(request()->except('per_page', 'page') as $key => $value)
-            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-        @endforeach
-    </form>
-    {{ $products->links() }}
+        </form>
+        {{ $products->links() }}
+    </div>
 </div>
 @endsection
 
 @push('scripts')
 <script>
-    const quickSaveButtons = document.querySelectorAll('.quick-save');
+    const searchForm = document.getElementById('product-search-form');
+    const searchInput = document.getElementById('product-search-input');
+    const resultsWrap = document.getElementById('products-results');
+    let searchTimer;
+    let searchAbortController;
 
-    quickSaveButtons.forEach((btn) => {
-        btn.addEventListener('click', async () => {
-            const productId = btn.dataset.productId;
-            const priceInput = document.querySelector(`[data-product-price="${productId}"]`);
-            const stockInput = document.querySelector(`[data-product-stock="${productId}"]`);
-            if (!priceInput || !stockInput) return;
+    function bindQuickSave() {
+        const quickSaveButtons = document.querySelectorAll('.quick-save');
 
-            btn.disabled = true;
-            const response = await fetch(`{{ url('/admin/products') }}/${productId}/quick-update`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    price: priceInput.value,
-                    stock_quantity: stockInput.value,
-                }),
+        quickSaveButtons.forEach((btn) => {
+            btn.addEventListener('click', async () => {
+                const productId = btn.dataset.productId;
+                const priceInput = document.querySelector(`[data-product-price="${productId}"]`);
+                const stockInput = document.querySelector(`[data-product-stock="${productId}"]`);
+                if (!priceInput || !stockInput) return;
+
+                btn.disabled = true;
+                const response = await fetch(`{{ url('/admin/products') }}/${productId}/quick-update`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        price: priceInput.value,
+                        stock_quantity: stockInput.value,
+                    }),
+                });
+                btn.disabled = false;
+
+                if (!response.ok) {
+                    alert('Kaydedilemedi. Lütfen değerleri kontrol edin.');
+                }
             });
-            btn.disabled = false;
+        });
+    }
+
+    async function fetchResults(url) {
+        if (!resultsWrap) return;
+        if (searchAbortController) {
+            searchAbortController.abort();
+        }
+        searchAbortController = new AbortController();
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                signal: searchAbortController.signal,
+            });
 
             if (!response.ok) {
-                alert('Kaydedilemedi. Lütfen değerleri kontrol edin.');
                 return;
             }
+
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const nextResults = doc.getElementById('products-results');
+
+            if (nextResults) {
+                resultsWrap.innerHTML = nextResults.innerHTML;
+                bindQuickSave();
+                if (searchInput) {
+                    searchInput.focus();
+                    searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+                }
+                window.history.replaceState({}, '', url);
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.error(error);
+            }
+        }
+    }
+
+    async function runSearch(value) {
+        if (!searchForm) return;
+
+        const url = new URL(window.location.href);
+        if (value) {
+            url.searchParams.set('search', value);
+        } else {
+            url.searchParams.delete('search');
+        }
+        url.searchParams.delete('page');
+        await fetchResults(url.toString());
+    }
+
+    bindQuickSave();
+
+    if (resultsWrap) {
+        resultsWrap.addEventListener('click', (event) => {
+            const link = event.target.closest('a');
+            if (!link || !resultsWrap.contains(link)) return;
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#')) return;
+
+            const isPagination = href.includes('page=');
+            if (!isPagination) return;
+
+            event.preventDefault();
+            fetchResults(href);
         });
-    });
+
+        resultsWrap.addEventListener('change', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLSelectElement)) return;
+            if (target.id !== 'per-page') return;
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('per_page', target.value);
+            url.searchParams.delete('page');
+            fetchResults(url.toString());
+        });
+    }
+
+    if (searchForm && searchInput) {
+        searchInput.addEventListener('input', () => {
+            window.clearTimeout(searchTimer);
+            searchTimer = window.setTimeout(() => {
+                runSearch(searchInput.value.trim());
+            }, 350);
+        });
+    }
 </script>
 @endpush

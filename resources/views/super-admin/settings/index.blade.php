@@ -5,15 +5,87 @@
 @endsection
 
 @section('content')
-    <div class="bg-white rounded-lg shadow p-6 max-w-3xl mb-6">
-        <h3 class="text-sm font-semibold text-slate-800 mb-2">Genel Ayarlar</h3>
-        <p class="text-sm text-slate-600">
-            Bu bölümde SMTP, ödeme sağlayıcıları, genel branding ve güvenlik ayarları yönetilecek.
-            Şimdilik iskelet yapı hazırlandı.
+    <div class="panel-card p-6 max-w-4xl mb-6">
+        <h3 class="text-sm font-semibold text-slate-800 mb-2">Müşteri Ayarları</h3>
+        <p class="text-sm text-slate-600 mb-4">
+            Seçtiğiniz müşterinin firma ve fatura ayarlarını buradan güncelleyebilirsiniz.
         </p>
+
+        <form method="GET" action="{{ route('super-admin.settings.index') }}" class="mb-6">
+            <label class="block text-sm font-medium text-slate-700 mb-1">Müşteri Seç</label>
+            <select name="user_id" class="w-full max-w-lg" onchange="this.form.submit()">
+                @foreach($users as $user)
+                    <option value="{{ $user->id }}" @selected($selectedUser && $selectedUser->id === $user->id)>
+                        {{ $user->company_name ?: $user->name }} ({{ $user->email }})
+                    </option>
+                @endforeach
+            </select>
+        </form>
+
+        @if($selectedUser)
+            <form class="space-y-4" method="POST" action="{{ route('super-admin.settings.client.update', $selectedUser) }}" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Firma Logosu</label>
+                    <div class="flex items-center gap-4">
+                        @if($selectedUser->company_logo_path)
+                            <img src="{{ asset('storage/' . $selectedUser->company_logo_path) }}" alt="Firma Logosu" class="h-14 w-14 rounded-xl object-cover border border-slate-200">
+                        @else
+                            <div class="h-14 w-14 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-xs text-slate-400">
+                                Logo
+                            </div>
+                        @endif
+                        <div class="flex-1">
+                            <input type="file" name="company_logo" class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-white">
+                            <p class="text-xs text-slate-400 mt-1">Önerilen: 512x512 px, PNG/JPG</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Slogan</label>
+                    <input type="text" name="company_slogan" value="{{ old('company_slogan', $selectedUser->company_slogan) }}" class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Firma Adı</label>
+                    <input type="text" name="company_name" value="{{ old('company_name', $selectedUser->company_name) }}" class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Telefon</label>
+                    <input type="text" name="company_phone" value="{{ old('company_phone', $selectedUser->company_phone) }}" class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Bilgilendirme E-posta Adresi</label>
+                    <input type="email" name="notification_email" value="{{ old('notification_email', $selectedUser->notification_email) }}" class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Kullanıcı Giriş E-posta Adresi</label>
+                    <input type="email" value="{{ $selectedUser->email }}" class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-slate-50" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Firma Adresi</label>
+                    <textarea rows="3" name="company_address" class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-white">{{ old('company_address', $selectedUser->company_address) }}</textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Firma Websitesi</label>
+                    <input type="text" name="company_website" value="{{ old('company_website', $selectedUser->company_website) }}" class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-white">
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" name="invoice_number_tracking" value="1" class="h-4 w-4 text-blue-600 border-slate-300 rounded" @checked(old('invoice_number_tracking', $selectedUser->invoice_number_tracking))>
+                    <label class="text-sm text-slate-700">Fatura No Takibi Yapılsın mı?</label>
+                </div>
+                <div class="pt-2">
+                    <button type="submit" class="btn btn-solid-accent">
+                        Ayarları Kaydet
+                    </button>
+                </div>
+            </form>
+        @else
+            <p class="text-sm text-slate-500">Güncellenecek müşteri bulunamadı.</p>
+        @endif
     </div>
 
-    <div class="bg-white rounded-lg shadow p-6 max-w-3xl">
+    <div class="panel-card p-6 max-w-3xl">
         <h3 class="text-sm font-semibold text-slate-800 mb-2">Tavsiye Programı</h3>
         <p class="text-sm text-slate-600 mb-4">
             Tavsiye programını etkinleştirip dönemsel olarak ödülleri ve limitleri yönetebilirsiniz.
