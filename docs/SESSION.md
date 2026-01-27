@@ -1,8 +1,16 @@
 ﻿# Session Memory
 
-**Last updated:** 2026-01-26
+**Last updated:** 2026-01-27
 
 ## Status
+- Rapor modülleri sıfırdan kuruldu: Çok Satan Ürünler, Satılan Ürünler, Sipariş/Ciro, Kategori, Marka, KDV, Komisyon, Stok Değeri.
+- Yeni servis katmanı eklendi: `app/Services/Reports/*` ve ortak filtre yardımcıları.
+- Rapor exportları CSV/Excel (CSV) olarak eklendi; exportlar için global aç/kapa ayarı (super-admin) ve middleware eklendi.
+- Sipariş/Ciro raporuna tablo + Chart.js grafikler eklendi; faturalı export placeholder olarak bağlandı.
+- Satılan Ürünler raporuna yazdırma (print) sayfası eklendi.
+- Kategori/Marka raporlarında grafik tipi seçimi (Pasta/Yatay/Çubuk) eklendi.
+- Komisyon raporu grafik yerine kartlar ile gösteriliyor.
+- Stok değeri raporu özet kartlar + tablo ile yenilendi.
 - Admin/super-admin panelleri beyaz tema + #ff4439 aksan rengine çekildi.
 - Sidebar hover ile açılır/kapanır yapıldı; yazılar antrasit, hover rengi #ff4439.
 - Fatura oluştur sayfasında arama sonrası “Müşteri Ekle” butonu iyileştirildi (admin + super-admin).
@@ -24,14 +32,32 @@
 - Profil sayfası admin layout içine alındı ve Türkçeleştirildi; destek sayfası Türkçe karakterleri düzeltildi.
 
 ## Next steps
-1) `php artisan migrate` çalıştır (sub_users + desi/vat alanları).
-2) Ürün oluştur/düzenle akışını test et (marka/kategori hızlı ekleme, barkod üret, desi hesaplama, resim yükleme, editor görünümü).
-3) Ürün listesi satır boşluk/gölge görünümünü kontrol et.
-4) Alt kullanıcı girişini ve yetki kısıtlarını test et (dashboard + modül erişimleri).
-5) Super admin alt kullanıcı listesi ve filtreleri test et.
+1) `php artisan migrate` çalıştır (app_settings tablosu eklendi).
+2) Rapor sayfalarını tek tek test et (filtreler, grafikler, tablo verileri).
+3) Exportları dene (CSV/Excel) ve super-admin ayarından aç/kapat kontrolü yap.
+4) Satılan Ürünler yazdırma çıktısını kontrol et.
 
 ## Notes
-- Değişiklikler: `resources/views/admin/invoice-create.blade.php`,
+- Değişiklikler: `app/Services/Reports/*`,
+  `app/Http/Controllers/Admin/ReportController.php`,
+  `routes/customer.php`,
+  `resources/views/admin/reports.blade.php`,
+  `resources/views/admin/reports/top-products.blade.php`,
+  `resources/views/admin/reports/sold-products.blade.php`,
+  `resources/views/admin/reports/sold-products-print.blade.php`,
+  `resources/views/admin/reports/category-sales.blade.php`,
+  `resources/views/admin/reports/brand-sales.blade.php`,
+  `resources/views/admin/reports/vat.blade.php`,
+  `resources/views/admin/reports/commission.blade.php`,
+  `resources/views/admin/reports/stock-value.blade.php`,
+  `app/Models/AppSetting.php`,
+  `app/Http/Middleware/EnsureReportExportsEnabled.php`,
+  `database/migrations/2026_01_27_120000_create_app_settings_table.php`,
+  `app/Http/Controllers/SuperAdmin/SettingsController.php`,
+  `resources/views/super-admin/settings/index.blade.php`,
+  `routes/admin.php`,
+  `bootstrap/app.php`.
+  Önceki değişiklikler: `resources/views/admin/invoice-create.blade.php`,
   `resources/views/layouts/super-admin.blade.php`,
   `resources/views/public/home.blade.php`,
   `resources/views/public/pricing.blade.php`,
@@ -92,4 +118,3 @@
 - app/Http/Controllers/Admin/ProductController.php
 - app/Models/Product.php
 - config/purifier.php
-

@@ -65,13 +65,19 @@ Route::middleware(['client_or_subuser', 'verified', 'subscription', 'subuser.per
         Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
         Route::prefix('reports')->name('reports.')->group(function () {
             Route::get('/', [AdminReportController::class, 'index'])->name('index');
-            Route::view('top-products', 'admin.reports.top-products')->name('top-products');
-            Route::view('sold-products', 'admin.reports.sold-products')->name('sold-products');
-            Route::view('category-sales', 'admin.reports.category-sales')->name('category-sales');
-            Route::view('brand-sales', 'admin.reports.brand-sales')->name('brand-sales');
-            Route::view('vat', 'admin.reports.vat')->name('vat');
-            Route::view('commission', 'admin.reports.commission')->name('commission');
-            Route::view('stock-value', 'admin.reports.stock-value')->name('stock-value');
+            Route::get('top-products', [AdminReportController::class, 'topProducts'])->name('top-products');
+            Route::middleware('reports.export')->group(function () {
+                Route::get('top-products-export', [AdminReportController::class, 'topProductsExport'])->name('top-products.export');
+                Route::get('orders-revenue-export', [AdminReportController::class, 'ordersRevenueExport'])->name('orders-revenue.export');
+                Route::get('orders-revenue-invoiced-export', [AdminReportController::class, 'ordersRevenueInvoicedExport'])->name('orders-revenue.invoiced-export');
+            });
+            Route::get('sold-products', [AdminReportController::class, 'soldProducts'])->name('sold-products');
+            Route::get('sold-products-print', [AdminReportController::class, 'soldProductsPrint'])->name('sold-products.print');
+            Route::get('category-sales', [AdminReportController::class, 'categorySales'])->name('category-sales');
+            Route::get('brand-sales', [AdminReportController::class, 'brandSales'])->name('brand-sales');
+            Route::get('vat', [AdminReportController::class, 'vat'])->name('vat');
+            Route::get('commission', [AdminReportController::class, 'commission'])->name('commission');
+            Route::get('stock-value', [AdminReportController::class, 'stockValue'])->name('stock-value');
         });
         Route::get('integrations', [IntegrationController::class, 'index'])->name('integrations.index');
         Route::get('integrations/{marketplace}', [IntegrationController::class, 'edit'])->name('integrations.edit');

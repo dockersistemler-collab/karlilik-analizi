@@ -1,4 +1,4 @@
-<div class="panel-card p-6">
+﻿<div class="panel-card p-6">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
             <h3 class="text-lg font-semibold text-slate-900">{{ $title }}</h3>

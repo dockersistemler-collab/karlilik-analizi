@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Mews\Purifier\Facades\Purifier;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ProductController extends Controller
 {
@@ -82,96 +85,95 @@ class ProductController extends Controller
             $query->where('user_id', $user->id);
         }
 
-        $filename = 'products-' . now()->format('Ymd-His') . '.csv';
+        $filename = 'products-' . now()->format('Ymd-His') . '.xlsx';
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
         $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Stok Kodu',
+            'Barkod',
+            'Ürün Adı',
+            'Açıklama',
+            'Marka',
+            'Kategori',
+            'Satış Fiyatı',
+            'Alış Maliyeti',
+            'Stok',
+            'Para Birimi',
+            'Ağırlık',
+            'Desi',
+            'KDV Oranı',
+            'Görsel URL',
+            'Aktif',
         ];
 
-        $callback = function () use ($query) {
-            $handle = fopen('php://output', 'w');
-            fputcsv($handle, [
-                'sku',
-                'barcode',
-                'name',
-                'description',
-                'brand',
-                'category',
-                'price',
-                'cost_price',
-                'stock_quantity',
-                'currency',
-                'weight',
-                'desi',
-                'vat_rate',
-                'image_url',
-                'is_active',
-            ]);
+        $sheet->fromArray($headers, null, 'A1');
+        $rowIndex = 2;
 
-            $query->chunk(200, function ($products) use ($handle) {
-                foreach ($products as $product) {
-                    fputcsv($handle, [
-                        $product->sku,
-                        $product->barcode,
-                        $product->name,
-                        $product->description,
-                        $product->brand,
-                        $product->category,
-                        $product->price,
-                        $product->cost_price,
-                        $product->stock_quantity,
-                        $product->currency,
-                        $product->weight,
-                        $product->desi,
-                        $product->vat_rate,
-                        $product->image_url,
-                        $product->is_active ? 1 : 0,
-                    ]);
-                }
-            });
-            fclose($handle);
-        };
+        $query->chunk(200, function ($products) use ($sheet, &$rowIndex) {
+            foreach ($products as $product) {
+                $sheet->fromArray([
+                    $product->sku,
+                    $product->barcode,
+                    $product->name,
+                    $product->description,
+                    $product->brand,
+                    $product->category,
+                    $product->price,
+                    $product->cost_price,
+                    $product->stock_quantity,
+                    $product->currency,
+                    $product->weight,
+                    $product->desi,
+                    $product->vat_rate,
+                    $product->image_url,
+                    $product->is_active ? 1 : 0,
+                ], null, 'A' . $rowIndex);
+                $rowIndex++;
+            }
+        });
 
-        return response()->stream($callback, 200, $headers);
+        $writer = new Xlsx($spreadsheet);
+        $tempFile = tempnam(sys_get_temp_dir(), 'products_');
+        $writer->save($tempFile);
+
+        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
     }
 
     public function exportTemplate()
     {
-        $filename = 'products-template.csv';
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-        ];
+        $filename = 'products-template.xlsx';
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray([
+            'Stok Kodu',
+            'Barkod',
+            'Ürün Adı',
+            'Açıklama',
+            'Marka',
+            'Kategori',
+            'Satış Fiyatı',
+            'Alış Maliyeti',
+            'Stok',
+            'Para Birimi',
+            'Ağırlık',
+            'Desi',
+            'KDV Oranı',
+            'Görsel URL',
+            'Aktif',
+        ], null, 'A1');
 
-        $callback = function () {
-            $handle = fopen('php://output', 'w');
-            fputcsv($handle, [
-                'sku',
-                'barcode',
-                'name',
-                'description',
-                'brand',
-                'category',
-                'price',
-                'cost_price',
-                'stock_quantity',
-                'currency',
-                'weight',
-                'desi',
-                'vat_rate',
-                'image_url',
-                'is_active',
-            ]);
-            fclose($handle);
-        };
+        $writer = new Xlsx($spreadsheet);
+        $tempFile = tempnam(sys_get_temp_dir(), 'products_template_');
+        $writer->save($tempFile);
 
-        return response()->stream($callback, 200, $headers);
+        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
     }
 
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:csv,txt',
+            'file' => 'required|file|mimes:xlsx',
         ]);
 
         $user = $request->user();
@@ -183,33 +185,78 @@ class ProductController extends Controller
         }
 
         $file = $request->file('file');
-        $handle = fopen($file->getRealPath(), 'r');
-        if (!$handle) {
-            return back()->with('info', 'Dosya okunamadı.');
+        $spreadsheet = IOFactory::load($file->getRealPath());
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray(null, true, true, false);
+
+        if (empty($rows)) {
+            return back()->with('info', 'Excel başlığı bulunamadı.');
         }
 
-        $header = fgetcsv($handle);
-        if (!$header) {
-            fclose($handle);
-            return back()->with('info', 'CSV başlığı bulunamadı.');
-        }
-
+        $header = array_shift($rows);
         $header = array_map(function ($value) {
-            return Str::of($value)->trim()->lower()->value();
+            $normalized = Str::of((string) $value)->trim()->lower()->value();
+            $normalized = strtr($normalized, [
+                'ç' => 'c',
+                'ğ' => 'g',
+                'ı' => 'i',
+                'ö' => 'o',
+                'ş' => 's',
+                'ü' => 'u',
+            ]);
+            $normalized = preg_replace('/\s+/', '_', $normalized);
+            return $normalized;
         }, $header);
+
+        $aliases = [
+            'stok_kodu' => 'sku',
+            'sku' => 'sku',
+            'barkod' => 'barcode',
+            'barcode' => 'barcode',
+            'urun_adi' => 'name',
+            'name' => 'name',
+            'aciklama' => 'description',
+            'description' => 'description',
+            'marka' => 'brand',
+            'brand' => 'brand',
+            'kategori' => 'category',
+            'category' => 'category',
+            'satis_fiyati' => 'price',
+            'price' => 'price',
+            'alis_maliyeti' => 'cost_price',
+            'cost_price' => 'cost_price',
+            'stok' => 'stock_quantity',
+            'stock_quantity' => 'stock_quantity',
+            'para_birimi' => 'currency',
+            'currency' => 'currency',
+            'agirlik' => 'weight',
+            'weight' => 'weight',
+            'desi' => 'desi',
+            'kdv_orani' => 'vat_rate',
+            'vat_rate' => 'vat_rate',
+            'gorsel_url' => 'image_url',
+            'image_url' => 'image_url',
+            'aktif' => 'is_active',
+            'is_active' => 'is_active',
+        ];
+
+        $mappedHeader = [];
+        foreach ($header as $col) {
+            $mappedHeader[] = $aliases[$col] ?? $col;
+        }
+        $header = $mappedHeader;
 
         $required = ['sku', 'name', 'price', 'stock_quantity'];
         foreach ($required as $req) {
             if (!in_array($req, $header, true)) {
-                fclose($handle);
-                return back()->with('info', 'CSV başlığında zorunlu alan eksik: ' . $req);
+                return back()->with('info', 'Excel başlığında zorunlu alan eksik: ' . $req);
             }
         }
 
         $imported = 0;
         $skipped = 0;
 
-        while (($row = fgetcsv($handle)) !== false) {
+        foreach ($rows as $row) {
             if (count($row) === 0 || (count($row) === 1 && $row[0] === null)) {
                 continue;
             }
@@ -268,8 +315,6 @@ class ProductController extends Controller
 
             $imported++;
         }
-
-        fclose($handle);
 
         return back()->with('success', "İçe aktarma tamamlandı. Başarılı: {$imported}, Atlanan: {$skipped}");
     }
@@ -464,6 +509,7 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')
             ->with('success', 'Ürün başarıyla silindi.');
     }
+
     private function sanitizeDescription(?string $html): ?string
     {
         if ($html === null || trim($html) === '') {

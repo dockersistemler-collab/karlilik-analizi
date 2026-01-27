@@ -1,4 +1,4 @@
-@extends('layouts.super-admin')
+﻿@extends('layouts.super-admin')
 
 @section('header')
     Sistem Ayarları
@@ -83,6 +83,20 @@
         @else
             <p class="text-sm text-slate-500">Güncellenecek müşteri bulunamadı.</p>
         @endif
+    </div>
+
+    <div class="panel-card p-6 max-w-3xl mb-6">
+        <h3 class="text-sm font-semibold text-slate-800 mb-2">Rapor Dışa Aktarım</h3>
+        <p class="text-sm text-slate-600 mb-4">Tüm rapor sayfalarındaki dışa aktarma butonlarını kontrol eder.</p>
+
+        <form method="POST" action="{{ route('super-admin.settings.report-exports') }}" class="flex items-center justify-between">
+            @csrf
+            <div class="flex items-center gap-3">
+                <input type="checkbox" name="reports_exports_enabled" value="1" class="h-4 w-4 text-blue-600 border-slate-300 rounded" @checked($reportExportsEnabled)>
+                <label class="text-sm text-slate-700">Rapor dışa aktarma açık</label>
+            </div>
+            <button type="submit" class="btn btn-outline">Kaydet</button>
+        </form>
     </div>
 
     <div class="panel-card p-6 max-w-3xl">

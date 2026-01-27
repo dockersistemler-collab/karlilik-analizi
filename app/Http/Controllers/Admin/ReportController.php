@@ -3,119 +3,230 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
-use App\Models\Product;
+use App\Models\AppSetting;
 use App\Models\Marketplace;
+use App\Services\Reports\BrandSalesReportService;
+use App\Services\Reports\CategorySalesReportService;
+use App\Services\Reports\CommissionReportService;
+use App\Services\Reports\OrdersRevenueReportService;
+use App\Services\Reports\ReportFilters;
+use App\Services\Reports\SoldProductsReportService;
+use App\Services\Reports\StockValueReportService;
+use App\Services\Reports\TopProductsReportService;
+use App\Services\Reports\VatReportService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class ReportController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, OrdersRevenueReportService $service): View
     {
-        $user = $request->user();
-        $query = Order::query();
-
-        if ($user && !$user->isSuperAdmin()) {
-            $query->where('user_id', $user->id);
-        }
-
-        if ($request->filled('marketplace_id')) {
-            $query->where('marketplace_id', $request->marketplace_id);
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('date_from')) {
-            $query->whereDate('order_date', '>=', $request->date_from);
-        }
-
-        if ($request->filled('date_to')) {
-            $query->whereDate('order_date', '<=', $request->date_to);
-        }
-
-        $summary = (clone $query)
-            ->selectRaw('COUNT(*) as orders_count')
-            ->selectRaw('COALESCE(SUM(total_amount), 0) as revenue_total')
-            ->selectRaw('COALESCE(SUM(commission_amount), 0) as commission_total')
-            ->selectRaw('COALESCE(SUM(net_amount), 0) as net_total')
-            ->first();
-
-        $ordersByStatus = (clone $query)
-            ->select('status', DB::raw('COUNT(*) as total'))
-            ->groupBy('status')
-            ->orderBy('status')
-            ->get();
-
-        $ordersByMarketplace = (clone $query)
-            ->select('marketplace_id', DB::raw('COUNT(*) as total'))
-            ->groupBy('marketplace_id')
-            ->orderByDesc('total')
-            ->get();
-
-        $marketplaceMap = Marketplace::whereIn('id', $ordersByMarketplace->pluck('marketplace_id'))
-            ->pluck('name', 'id');
-
-        $topProducts = (clone $query)
-            ->whereNotNull('items')
-            ->select('items')
-            ->get()
-            ->flatMap(function ($order) {
-                return is_array($order->items) ? $order->items : [];
-            })
-            ->groupBy(function ($item) {
-                return $item['sku'] ?? $item['name'] ?? 'Bilinmeyen';
-            })
-            ->map(function ($items) {
-                $first = $items->first();
-                $name = $first['name'] ?? 'Ürün';
-                $qty = $items->sum(function ($item) {
-                    return (int) ($item['quantity'] ?? 0);
-                });
-                $total = $items->sum(function ($item) {
-                    return (float) ($item['price'] ?? 0) * (int) ($item['quantity'] ?? 0);
-                });
-                return [
-                    'name' => $name,
-                    'quantity' => $qty,
-                    'total' => $total,
-                ];
-            })
-            ->sortByDesc('quantity')
-            ->values()
-            ->take(10);
-
-        $statusOptions = [
-            'pending' => 'Beklemede',
-            'approved' => 'Onaylandı',
-            'shipped' => 'Kargoda',
-            'delivered' => 'Teslim',
-            'cancelled' => 'İptal',
-            'returned' => 'İade',
-        ];
-
-        $marketplaces = Marketplace::where('is_active', true)->get();
-
-        $productsByStock = Product::query()
-            ->when($user && !$user->isSuperAdmin(), function ($q) use ($user) {
-                $q->where('user_id', $user->id);
-            })
-            ->orderByDesc('stock_quantity')
-            ->take(10)
-            ->get(['name', 'stock_quantity', 'price']);
+        $filters = ReportFilters::fromRequest($request, true);
+        $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
+        $report = $service->get($request->user(), $filters);
 
         return view('admin.reports', [
-            'summary' => $summary,
-            'ordersByStatus' => $ordersByStatus,
-            'ordersByMarketplace' => $ordersByMarketplace,
-            'marketplaceMap' => $marketplaceMap,
-            'topProducts' => $topProducts,
-            'statusOptions' => $statusOptions,
+            'filters' => $filters,
             'marketplaces' => $marketplaces,
-            'productsByStock' => $productsByStock,
+            'quickRanges' => $this->quickRanges(),
+            'report' => $report,
+            'reportExportsEnabled' => $this->reportExportsEnabled(),
         ]);
+    }
+
+    public function topProducts(Request $request, TopProductsReportService $service): View
+    {
+        $filters = ReportFilters::fromRequest($request);
+        $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
+        $rows = $service->get($request->user(), $filters, 100);
+
+        return view('admin.reports.top-products', [
+            'filters' => $filters,
+            'marketplaces' => $marketplaces,
+            'quickRanges' => $this->quickRanges(),
+            'rows' => $rows,
+            'reportExportsEnabled' => $this->reportExportsEnabled(),
+        ]);
+    }
+
+    public function topProductsExport(Request $request, TopProductsReportService $service): Response
+    {
+        $filters = ReportFilters::fromRequest($request);
+        $rows = $service->get($request->user(), $filters, 1000);
+
+        $headers = ['stok_kodu', 'urun_adi', 'satis_adedi', 'toplam_tutar'];
+        $data = $rows->map(function ($row) {
+            return [
+                $row['stock_code'],
+                $row['name'],
+                $row['quantity'],
+                number_format((float) $row['total'], 2, '.', ''),
+            ];
+        })->all();
+
+        return $this->streamCsv('cok-satan-urunler.csv', $headers, $data);
+    }
+
+    public function soldProducts(Request $request, SoldProductsReportService $service): View
+    {
+        $filters = ReportFilters::fromRequest($request);
+        $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
+        $rows = $service->get($request->user(), $filters);
+
+        return view('admin.reports.sold-products', [
+            'filters' => $filters,
+            'marketplaces' => $marketplaces,
+            'quickRanges' => $this->quickRanges(),
+            'rows' => $rows,
+        ]);
+    }
+
+    public function soldProductsPrint(Request $request, SoldProductsReportService $service): View
+    {
+        $filters = ReportFilters::fromRequest($request);
+        $rows = $service->get($request->user(), $filters);
+
+        return view('admin.reports.sold-products-print', [
+            'filters' => $filters,
+            'rows' => $rows,
+        ]);
+    }
+
+    public function categorySales(Request $request, CategorySalesReportService $service): View
+    {
+        $filters = ReportFilters::fromRequest($request, true);
+        $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
+        $rows = $service->get($request->user(), $filters);
+        $chartType = $request->input('chart_type', 'bar');
+
+        return view('admin.reports.category-sales', [
+            'filters' => $filters,
+            'marketplaces' => $marketplaces,
+            'quickRanges' => $this->quickRanges(),
+            'rows' => $rows,
+            'chartType' => $chartType,
+        ]);
+    }
+
+    public function brandSales(Request $request, BrandSalesReportService $service): View
+    {
+        $filters = ReportFilters::fromRequest($request, true);
+        $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
+        $report = $service->get($request->user(), $filters, $marketplaces);
+        $chartType = $request->input('chart_type', 'bar');
+
+        return view('admin.reports.brand-sales', [
+            'filters' => $filters,
+            'marketplaces' => $marketplaces,
+            'quickRanges' => $this->quickRanges(),
+            'report' => $report,
+            'chartType' => $chartType,
+        ]);
+    }
+
+    public function vat(Request $request, VatReportService $service): View
+    {
+        $filters = ReportFilters::fromRequest($request, true);
+        $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
+        $chart = $service->get($request->user(), $filters);
+
+        return view('admin.reports.vat', [
+            'filters' => $filters,
+            'marketplaces' => $marketplaces,
+            'quickRanges' => $this->quickRanges(),
+            'chart' => $chart,
+        ]);
+    }
+
+    public function commission(Request $request, CommissionReportService $service): View
+    {
+        $filters = ReportFilters::fromRequest($request, true);
+        $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
+        $report = $service->get($request->user(), $filters);
+
+        return view('admin.reports.commission', [
+            'filters' => $filters,
+            'marketplaces' => $marketplaces,
+            'quickRanges' => $this->quickRanges(),
+            'report' => $report,
+        ]);
+    }
+
+    public function stockValue(Request $request, StockValueReportService $service): View
+    {
+        $report = $service->get($request->user());
+
+        return view('admin.reports.stock-value', [
+            'summary' => $report['summary'],
+            'rows' => $report['table'],
+        ]);
+    }
+
+    public function ordersRevenueExport(Request $request, OrdersRevenueReportService $service): Response
+    {
+        $filters = ReportFilters::fromRequest($request, true);
+        $report = $service->get($request->user(), $filters);
+
+        $headers = ['tarih'];
+        foreach ($report['marketplaces'] as $marketplace) {
+            $headers[] = $marketplace->name;
+        }
+        $headers[] = 'toplam';
+
+        $data = [];
+        foreach ($report['table'] as $row) {
+            $line = [$row['period']];
+            foreach ($report['marketplaces'] as $marketplace) {
+                $line[] = number_format((float) $row['mp_' . $marketplace->id], 2, '.', '');
+            }
+            $line[] = number_format((float) $row['total'], 2, '.', '');
+            $data[] = $line;
+        }
+
+        return $this->streamCsv('siparis-ciro.csv', $headers, $data);
+    }
+
+    public function ordersRevenueInvoicedExport(Request $request): Response
+    {
+        return response()->streamDownload(function () {
+            $handle = fopen('php://output', 'wb');
+            fputcsv($handle, ['Bu rapor, fatura modülü tamamlandığında bağlanacaktır.']);
+            fclose($handle);
+        }, 'faturali-siparisler.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    private function quickRanges(): array
+    {
+        return [
+            'today' => 'Bugün',
+            'this_week' => 'Bu Hafta',
+            'this_month' => 'Bu Ay',
+            'last_month' => 'Geçen Ay',
+            'last_7_days' => 'Son 7 Gün',
+            'last_30_days' => 'Son 30 Gün',
+        ];
+    }
+
+    private function streamCsv(string $filename, array $headers, array $rows): Response
+    {
+        return response()->streamDownload(function () use ($headers, $rows) {
+            $handle = fopen('php://output', 'wb');
+            fprintf($handle, "\xEF\xBB\xBF");
+            fputcsv($handle, $headers);
+            foreach ($rows as $row) {
+                fputcsv($handle, $row);
+            }
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    private function reportExportsEnabled(): bool
+    {
+        return (bool) AppSetting::getValue('reports_exports_enabled', true);
     }
 }

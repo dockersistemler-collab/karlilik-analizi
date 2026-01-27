@@ -27,16 +27,16 @@
             </div>
             <div class="flex flex-wrap items-center gap-3 justify-start lg:justify-end">
                 <a href="{{ route('admin.products.template') }}" class="btn btn-outline-accent">
-                    CSV Şablonu
+                    Excel Şablonu
                 </a>
                 <a href="{{ route('admin.products.export') }}" class="btn btn-outline-accent">
-                    CSV Dışa Aktar
+                    Excel Dışa Aktar
                 </a>
                 <form method="POST" action="{{ route('admin.products.import') }}" enctype="multipart/form-data" class="flex items-center gap-2">
                     @csrf
-                    <input type="file" name="file" accept=".csv" class="text-sm">
+                    <input type="file" name="file" accept=".xlsx" class="text-sm">
                     <button type="submit" class="btn btn-outline-accent">
-                        CSV İçeri Aktar
+                        Excel İçeri Aktar
                     </button>
                 </form>
                 <a href="{{ route('admin.products.create') }}" class="btn btn-solid-accent">

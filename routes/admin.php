@@ -31,6 +31,8 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
         Route::get('settings', [SuperAdminSettingsController::class, 'index'])->name('settings.index');
         Route::post('settings/referral', [SuperAdminSettingsController::class, 'updateReferralProgram'])
             ->name('settings.referral');
+        Route::post('settings/report-exports', [SuperAdminSettingsController::class, 'updateReportExports'])
+            ->name('settings.report-exports');
         Route::put('settings/client/{user}', [SuperAdminSettingsController::class, 'updateClientSettings'])
             ->name('settings.client.update');
         Route::get('reports', [SuperAdminReportController::class, 'index'])->name('reports.index');

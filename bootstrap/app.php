@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'subscription' => \App\Http\Middleware\EnsureActiveSubscription::class,
             'client_or_subuser' => \App\Http\Middleware\EnsureClientOrSubUser::class,
             'subuser.permission' => \App\Http\Middleware\EnsureSubUserPermission::class,
+            'reports.export' => \App\Http\Middleware\EnsureReportExportsEnabled::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

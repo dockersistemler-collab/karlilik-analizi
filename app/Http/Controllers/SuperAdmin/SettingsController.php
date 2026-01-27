@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AppSetting;
 use App\Models\ReferralProgram;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -33,7 +34,9 @@ class SettingsController extends Controller
             $selectedUser = $users->first();
         }
 
-        return view('super-admin.settings.index', compact('program', 'users', 'selectedUser'));
+        $reportExportsEnabled = (bool) AppSetting::getValue('reports_exports_enabled', true);
+
+        return view('super-admin.settings.index', compact('program', 'users', 'selectedUser', 'reportExportsEnabled'));
     }
 
     public function updateReferralProgram(Request $request): RedirectResponse
@@ -92,5 +95,14 @@ class SettingsController extends Controller
 
         return redirect()->route('super-admin.settings.index', ['user_id' => $user->id])
             ->with('success', 'Müşteri ayarları güncellendi.');
+    }
+
+    public function updateReportExports(Request $request): RedirectResponse
+    {
+        $enabled = $request->boolean('reports_exports_enabled');
+        AppSetting::setValue('reports_exports_enabled', $enabled);
+
+        return redirect()->route('super-admin.settings.index')
+            ->with('success', 'Rapor dışa aktarma ayarı güncellendi.');
     }
 }
