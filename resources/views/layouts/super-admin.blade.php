@@ -23,7 +23,14 @@
         .sidebar {
             width: 76px;
             background: #ffffff;
-            border-right: 1px solid var(--panel-border);
+            border-radius: 16px;
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            height: calc(100vh - 24px);
+            overflow-y: auto;
             transition: width 220ms ease;
         }
         .sidebar:hover {
@@ -168,6 +175,27 @@
             background: var(--panel-accent);
             color: #ffffff;
         }
+        .btn-outline {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.45rem !important;
+            padding: 0.45rem 1rem !important;
+            min-height: 36px !important;
+            border-radius: 6px !important;
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+            border-width: 1px !important;
+            border-style: dashed !important;
+            border-color: var(--panel-accent) !important;
+            color: var(--panel-accent) !important;
+            background: transparent !important;
+        }
+        .btn-outline:hover {
+            background: #fff1f0 !important;
+            color: var(--panel-accent) !important;
+            border-color: var(--panel-accent) !important;
+        }
         .btn-solid-accent {
             border: 1px solid var(--panel-accent);
             background: var(--panel-accent);
@@ -202,6 +230,14 @@
         main .shadow,
         main .shadow-sm {
             box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06) !important;
+        }
+        main {
+            padding-left: 100px;
+            transition: padding-left 220ms ease;
+        }
+        .sidebar:hover ~ main,
+        .sidebar.is-pinned ~ main {
+            padding-left: 284px;
         }
         .panel-card {
             background: #ffffff;

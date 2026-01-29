@@ -88,7 +88,14 @@
         .sidebar {
             width: 76px;
             background: #ffffff;
-            border-right: 1px solid var(--panel-border);
+            border-radius: 16px;
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            height: calc(100vh - 24px);
+            overflow-y: auto;
             transition: width 220ms ease;
         }
         .sidebar:hover {
@@ -201,6 +208,10 @@
         .sidebar-submenu.is-open {
             display: block;
         }
+        .sidebar:not(:hover):not(.is-pinned) .sidebar-submenu,
+        .admin-sidebar-pinned .sidebar:not(:hover) .sidebar-submenu {
+            display: none;
+        }
         .sidebar-submenu .sidebar-link {
             padding: 0.5rem 0.75rem;
             border-radius: 12px;
@@ -231,6 +242,15 @@
             color: var(--panel-accent);
             border-color: #ffd4d1;
             background: #fff1f0;
+        }
+        main {
+            padding-left: 100px;
+            transition: padding-left 220ms ease;
+        }
+        .sidebar:hover ~ main,
+        .sidebar.is-pinned ~ main,
+        .admin-sidebar-pinned main {
+            padding-left: 284px;
         }
         .panel-card {
             background: var(--panel-card);
@@ -292,6 +312,27 @@
         .btn-outline-accent:hover {
             background: var(--panel-accent);
             color: #ffffff;
+        }
+        .btn-outline {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.45rem !important;
+            padding: 0.45rem 1rem !important;
+            min-height: 36px !important;
+            border-radius: 6px !important;
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+            border-width: 1px !important;
+            border-style: dashed !important;
+            border-color: var(--panel-accent) !important;
+            color: var(--panel-accent) !important;
+            background: transparent !important;
+        }
+        .btn-outline:hover {
+            background: #fff1f0 !important;
+            color: var(--panel-accent) !important;
+            border-color: var(--panel-accent) !important;
         }
         .btn-solid-accent {
             border: 1px solid var(--panel-accent);
@@ -442,6 +483,72 @@
         .topbar-icon:hover {
             color: #0f172a;
             border-color: var(--panel-accent);
+        }
+        .quick-actions {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 60;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+        .quick-actions-toggle {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: none;
+            background: var(--panel-accent);
+            color: #ffffff;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: transform 160ms ease, box-shadow 160ms ease;
+        }
+        .quick-actions-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 32px rgba(15, 23, 42, 0.22);
+        }
+        .quick-actions-menu {
+            background: #ffffff;
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 10px;
+            min-width: 200px;
+            box-shadow: 0 18px 30px rgba(15, 23, 42, 0.12);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .quick-actions-menu[hidden] {
+            display: none !important;
+        }
+        .quick-actions-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 12px;
+            color: #0f172a;
+            transition: background 150ms ease, color 150ms ease;
+        }
+        .quick-actions-item:hover {
+            background: #fff1f0;
+            color: var(--panel-accent);
+        }
+        .quick-actions-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: #f8fafc;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--panel-accent);
+            border: 1px solid #f1f5f9;
         }
         main a.text-blue-600,
         main a.text-blue-700,
@@ -831,6 +938,71 @@
         </main>
     </div>
 
+    @php
+        $quickActionOptions = [
+            'invoices.create' => [
+                'label' => 'Fatura Ekle',
+                'route' => 'admin.invoices.create',
+                'icon' => 'fa-file-invoice',
+            ],
+            'categories.create' => [
+                'label' => 'Kategori Ekle',
+                'route' => 'admin.categories.create',
+                'icon' => 'fa-tags',
+            ],
+            'brands.create' => [
+                'label' => 'Marka Ekle',
+                'route' => 'admin.brands.create',
+                'icon' => 'fa-certificate',
+            ],
+            'products.create' => [
+                'label' => 'Ürün Ekle',
+                'route' => 'admin.products.create',
+                'icon' => 'fa-box',
+            ],
+        ];
+        $quickActionsRaw = \App\Models\AppSetting::getValue('admin_quick_actions_v2', '[]');
+        $quickActionsConfig = json_decode($quickActionsRaw, true);
+        if (!is_array($quickActionsConfig)) {
+            $quickActionsConfig = [];
+        }
+        $userRole = auth('subuser')->check() ? 'subuser' : 'client';
+        $quickActions = collect($quickActionsConfig)
+            ->filter(fn ($item) => ($item['enabled'] ?? false) && in_array($userRole, $item['roles'] ?? [], true))
+            ->filter(fn ($item) => array_key_exists($item['key'] ?? '', $quickActionOptions))
+            ->sortBy(fn ($item) => $item['order'] ?? 0)
+            ->map(function ($item) use ($quickActionOptions) {
+                $base = $quickActionOptions[$item['key']];
+                return [
+                    'label' => $base['label'],
+                    'route' => $base['route'],
+                    'icon' => $item['icon'] ?? $base['icon'],
+                    'color' => $item['color'] ?? '#ff4439',
+                ];
+            })
+            ->values();
+    @endphp
+    @php
+        $hideQuickActions = request()->routeIs('admin.invoices.create');
+    @endphp
+    @if($quickActions->isNotEmpty() && !$hideQuickActions)
+        <div class="quick-actions">
+            <button type="button" id="quick-actions-toggle" class="quick-actions-toggle">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+            <div id="quick-actions-menu" class="quick-actions-menu hidden" hidden>
+                @foreach($quickActions as $action)
+                    <a href="{{ route($action['route']) }}" class="quick-actions-item" data-quick-link>
+                        <span class="quick-actions-icon" style="color: {{ $action['color'] }};">
+                            <i class="fa-solid {{ $action['icon'] }}"></i>
+                        </span>
+                        <span class="text-sm font-semibold text-slate-700">{{ $action['label'] }}</span>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     @stack('scripts')
     <script>
         const profileMenuButton = document.getElementById('profile-menu-button');
@@ -862,20 +1034,13 @@
     <script>
         const productsMenuToggle = document.getElementById('products-menu-toggle');
         const productsSubmenu = document.getElementById('products-submenu');
-        const productsMenuKey = 'adminProductsMenuOpen';
 
         function setProductsMenu(open) {
             productsSubmenu?.classList.toggle('is-open', open);
-            if (open) {
-                localStorage.setItem(productsMenuKey, '1');
-            } else {
-                localStorage.removeItem(productsMenuKey);
-            }
         }
 
         if (productsSubmenu) {
-            const storedOpen = localStorage.getItem(productsMenuKey) === '1';
-            setProductsMenu(storedOpen);
+            setProductsMenu(false);
         }
 
         productsMenuToggle?.addEventListener('click', () => {
@@ -886,21 +1051,13 @@
     <script>
         const reportsMenuToggle = document.getElementById('reports-menu-toggle');
         const reportsSubmenu = document.getElementById('reports-submenu');
-        const reportsMenuKey = 'adminReportsMenuOpen';
-        const reportsMenuDefaultOpen = @json(request()->routeIs('admin.reports.*'));
 
         function setReportsMenu(open) {
             reportsSubmenu?.classList.toggle('is-open', open);
-            if (open) {
-                localStorage.setItem(reportsMenuKey, '1');
-            } else {
-                localStorage.removeItem(reportsMenuKey);
-            }
         }
 
         if (reportsSubmenu) {
-            const storedOpen = localStorage.getItem(reportsMenuKey) === '1';
-            setReportsMenu(storedOpen || reportsMenuDefaultOpen);
+            setReportsMenu(false);
         }
 
         reportsMenuToggle?.addEventListener('click', () => {
@@ -970,6 +1127,53 @@
 
         startBannerCountdowns();
     </script>
+    <script>
+        const quickActionsToggle = document.getElementById('quick-actions-toggle');
+        const quickActionsMenu = document.getElementById('quick-actions-menu');
+
+        function closeQuickActions() {
+            quickActionsMenu?.classList.add('hidden');
+            quickActionsMenu?.setAttribute('hidden', '');
+        }
+
+        function toggleQuickActions() {
+            const willOpen = quickActionsMenu?.classList.contains('hidden');
+            if (!quickActionsMenu) return;
+            quickActionsMenu.classList.toggle('hidden', !willOpen);
+            if (willOpen) {
+                quickActionsMenu.removeAttribute('hidden');
+            } else {
+                quickActionsMenu.setAttribute('hidden', '');
+            }
+        }
+
+        quickActionsToggle?.addEventListener('click', (event) => {
+            event.stopPropagation();
+            toggleQuickActions();
+        });
+
+        document.addEventListener('click', (event) => {
+            const isToggle = event.target.closest('#quick-actions-toggle');
+            const isMenu = event.target.closest('#quick-actions-menu');
+            if (!isToggle && !isMenu) {
+                closeQuickActions();
+            }
+        }, true);
+
+        quickActionsMenu?.addEventListener('click', (event) => {
+            const target = event.target.closest('[data-quick-link]');
+            if (target) {
+                closeQuickActions();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            closeQuickActions();
+        });
+
+        window.addEventListener('pageshow', () => {
+            closeQuickActions();
+        });
+    </script>
 </body>
 </html>
-

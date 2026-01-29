@@ -1,6 +1,6 @@
 ﻿# Session Memory
 
-**Last updated:** 2026-01-27
+**Last updated:** 2026-01-29
 
 ## Status
 - Rapor modülleri sıfırdan kuruldu: Çok Satan Ürünler, Satılan Ürünler, Sipariş/Ciro, Kategori, Marka, KDV, Komisyon, Stok Değeri.
@@ -30,12 +30,25 @@
 - Banner için geri sayım (ends_at) desteği eklendi.
 - Ürün listesi arama/pagination AJAX yapıldı, banner yerleşimi header altına alındı.
 - Profil sayfası admin layout içine alındı ve Türkçeleştirildi; destek sayfası Türkçe karakterleri düzeltildi.
+- Ürün import/ekleme için SKU boşsa otomatik üretim eklendi; SKU eşsizliği kullanıcı bazına taşındı (migrasyon eklendi).
+- Ürün import sonucuna detaylı atlama nedenleri eklendi (boş/invalid/eksik/limit/aynı SKU).
+- Sidebar üst ve sağ kenarları #ff4439 aksan rengiyle vurgulandı; sağ kenarlar ovalleştirildi (admin/super-admin).
+- Sidebar sabit (fixed) hale getirildi; içeriğe sol boşluk ve hover/pin genişleme paddingi eklendi (admin/super-admin).
+- KDV raporu pazaryeri bazlı kartlara çevrildi; renkler super-admin ayarlarından yönetilebilir hale getirildi.
+- Dashboard’ta harita tabı büyütülüp Leaflet + Türkiye GeoJSON ile çiziliyor; il bazlı sipariş adedi tooltip’te gösteriliyor, il isimleri harita üzerinde sabit yazıyor (map verisi `/public/maps/turkey-provinces.geojson`, Leaflet assets local `public/vendor/leaflet`).
+- Admin paneline sabit hızlı menü (floating + butonu) eklendi; seçenekler super-admin ayarlarından yönetilebiliyor.
+- Hızlı menüde sıralama sürükle-bırak, ikon/renk seçimi ve rol bazlı görünürlük ayarları eklendi.
+- Hızlı menü sayfa yüklenişinde otomatik kapanacak şekilde güvence eklendi (DOMContentLoaded/pageshow).
+- Admin/super-admin için `.btn-outline` butonlar güçlendirildi (dashed border + zorlayan stiller), rapor sayfalarında görünür.
+- Hızlı menü kapalı başlatma/hidden davranışı sağlamlaştırıldı (menu hidden attribute + CSS override).
 
 ## Next steps
 1) `php artisan migrate` çalıştır (app_settings tablosu eklendi).
 2) Rapor sayfalarını tek tek test et (filtreler, grafikler, tablo verileri).
 3) Exportları dene (CSV/Excel) ve super-admin ayarından aç/kapat kontrolü yap.
 4) Satılan Ürünler yazdırma çıktısını kontrol et.
+5) `php artisan migrate` çalıştır (products SKU unique artık user_id + sku).
+6) Ürün importu iki farklı kullanıcıyla test et (aynı SKU'lar + boş SKU).
 
 ## Notes
 - Değişiklikler: `app/Services/Reports/*`,
@@ -57,6 +70,25 @@
   `resources/views/super-admin/settings/index.blade.php`,
   `routes/admin.php`,
   `bootstrap/app.php`.
+  Yeni değişiklikler: `app/Http/Controllers/Admin/ProductController.php`,
+  `database/migrations/2026_01_28_000000_make_products_sku_unique_per_user.php`.
+  Yeni değişiklikler: `resources/views/layouts/admin.blade.php`,
+  `resources/views/layouts/super-admin.blade.php`.
+  KDV renk ayarları: `app/Services/Reports/VatReportService.php`,
+  `app/Http/Controllers/Admin/ReportController.php`,
+  `app/Http/Controllers/SuperAdmin/SettingsController.php`,
+  `routes/admin.php`,
+  `resources/views/admin/reports/vat.blade.php`,
+  `resources/views/super-admin/settings/index.blade.php`.
+  Dashboard harita: `app/Http/Controllers/Admin/DashboardController.php`,
+  `resources/views/admin/dashboard.blade.php`,
+  `public/maps/turkey-provinces.geojson`.
+  Hızlı menü: `resources/views/layouts/admin.blade.php`,
+  `app/Http/Controllers/SuperAdmin/SettingsController.php`,
+  `resources/views/super-admin/settings/index.blade.php`,
+  `routes/admin.php`.
+  Buton/menü düzeltmeleri: `resources/views/layouts/admin.blade.php`,
+  `resources/views/layouts/super-admin.blade.php`.
   Önceki değişiklikler: `resources/views/admin/invoice-create.blade.php`,
   `resources/views/layouts/super-admin.blade.php`,
   `resources/views/public/home.blade.php`,
