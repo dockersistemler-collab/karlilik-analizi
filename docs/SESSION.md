@@ -138,7 +138,7 @@
   Kategori eşitleme: `database/migrations/2026_01_30_*`, `app/Services/Marketplace/Category/*`, `app/Http/Controllers/Admin/MarketplaceCategoryController.php`, `app/Http/Controllers/Admin/CategoryMappingController.php`, `resources/views/admin/products/categories/index.blade.php`, `routes/customer.php`.
   Ürün kategori alanı: `database/migrations/2026_01_30_000003_add_category_id_to_products_table.php`, `app/Http/Controllers/Admin/ProductController.php`, `app/Models/Product.php`, `resources/views/admin/products/create.blade.php`, `resources/views/admin/products/edit.blade.php`, `resources/views/admin/products/show.blade.php`.
 
-## Değişiklik Günlüğü
+## Değişiklik Günlüğü\n- 2026-01-31: Commit: d1cff25 (plan module gating + theme + queue hardening)
 - 2026-01-26: Git başlatıldı, ilk commit alındı.
 - 2026-01-26: Super admin layout buton stili `btn` sistemine alındı.
 - 2026-01-26: Public home/pricing butonları `btn` sistemine taşındı.
@@ -164,3 +164,4 @@
 - app/Http/Controllers/Admin/ProductController.php
 - app/Models/Product.php
 - config/purifier.php
+
