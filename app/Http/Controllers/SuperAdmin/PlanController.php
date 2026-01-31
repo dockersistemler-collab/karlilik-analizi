@@ -3,12 +3,65 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Marketplace;
 use App\Models\Plan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class PlanController extends Controller
 {
+    private function moduleGroups(): array
+    {
+        $marketplaces = Marketplace::query()
+            ->orderBy('name')
+            ->get(['name', 'code', 'is_active']);
+
+        $marketplaceItems = [];
+        foreach ($marketplaces as $marketplace) {
+            if (!$marketplace->code) {
+                continue;
+            }
+            $marketplaceItems['integrations.marketplace.' . $marketplace->code] = $marketplace->name;
+        }
+
+        return [
+            [
+                'key' => 'core',
+                'label' => 'Genel Modüller',
+                'items' => Plan::MODULES,
+            ],
+            [
+                'key' => 'reports',
+                'label' => 'Raporlar',
+                'items' => Plan::REPORT_MODULES,
+            ],
+            [
+                'key' => 'exports',
+                'label' => 'Exportlar',
+                'items' => Plan::EXPORT_MODULES,
+            ],
+            [
+                'key' => 'integrations',
+                'label' => 'Entegrasyon Pazaryerleri',
+                'items' => $marketplaceItems,
+            ],
+        ];
+    }
+
+    private function moduleOptionsFlat(): array
+    {
+        $flat = [];
+        foreach ($this->moduleGroups() as $group) {
+            foreach (($group['items'] ?? []) as $key => $label) {
+                $flat[$key] = $label;
+            }
+        }
+        ksort($flat);
+
+        return $flat;
+    }
+
     public function index()
     {
         $plans = Plan::orderBy('sort_order')->orderBy('price')->get();
@@ -18,7 +71,10 @@ class PlanController extends Controller
 
     public function create()
     {
-        return view('super-admin.plans.create');
+        $moduleGroups = $this->moduleGroups();
+        $selectedModules = array_keys($this->moduleOptionsFlat());
+
+        return view('super-admin.plans.create', compact('moduleGroups', 'selectedModules'));
     }
 
     public function store(Request $request)
@@ -39,6 +95,8 @@ class PlanController extends Controller
             'custom_integrations' => 'boolean',
             'is_active' => 'boolean',
             'sort_order' => 'nullable|integer|min:0',
+            'modules' => 'nullable|array',
+            'modules.*' => ['string', Rule::in(array_keys($this->moduleOptionsFlat()))],
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -48,6 +106,12 @@ class PlanController extends Controller
         $validated['custom_integrations'] = $request->boolean('custom_integrations');
         $validated['is_active'] = $request->boolean('is_active');
 
+        $modules = $validated['modules'] ?? array_keys($this->moduleOptionsFlat());
+        unset($validated['modules']);
+
+        $plan = new Plan();
+        $validated['features'] = $plan->withModules($modules);
+
         Plan::create($validated);
 
         return redirect()->route('super-admin.plans.index')
@@ -56,7 +120,10 @@ class PlanController extends Controller
 
     public function edit(Plan $plan)
     {
-        return view('super-admin.plans.edit', compact('plan'));
+        $moduleGroups = $this->moduleGroups();
+        $selectedModules = $plan->enabledModules() ?? array_keys($this->moduleOptionsFlat());
+
+        return view('super-admin.plans.edit', compact('plan', 'moduleGroups', 'selectedModules'));
     }
 
     public function update(Request $request, Plan $plan)
@@ -77,6 +144,8 @@ class PlanController extends Controller
             'custom_integrations' => 'boolean',
             'is_active' => 'boolean',
             'sort_order' => 'nullable|integer|min:0',
+            'modules' => 'nullable|array',
+            'modules.*' => ['string', Rule::in(array_keys($this->moduleOptionsFlat()))],
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -85,6 +154,10 @@ class PlanController extends Controller
         $validated['priority_support'] = $request->boolean('priority_support');
         $validated['custom_integrations'] = $request->boolean('custom_integrations');
         $validated['is_active'] = $request->boolean('is_active');
+
+        $modules = $validated['modules'] ?? array_keys($this->moduleOptionsFlat());
+        unset($validated['modules']);
+        $validated['features'] = $plan->withModules($modules);
 
         $plan->update($validated);
 

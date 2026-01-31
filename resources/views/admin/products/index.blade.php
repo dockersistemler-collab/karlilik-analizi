@@ -5,6 +5,10 @@
 @endsection
 
 @section('content')
+@php
+    $activePlan = auth()->user()?->getActivePlan();
+    $canExport = !$activePlan || $activePlan->hasModule('exports.products');
+@endphp
 <div class="mb-4">
     @include('admin.products.partials.catalog-tabs')
 </div>
@@ -26,12 +30,14 @@
                 </form>
             </div>
             <div class="flex flex-wrap items-center gap-3 justify-start lg:justify-end">
+                @if($canExport)
                 <a href="{{ route('admin.products.template') }}" class="btn btn-outline-accent">
                     Excel Şablonu
                 </a>
                 <a href="{{ route('admin.products.export') }}" class="btn btn-outline-accent">
                     Excel Dışa Aktar
                 </a>
+                @endif
                 <form method="POST" action="{{ route('admin.products.import') }}" enctype="multipart/form-data" class="flex items-center gap-2">
                     @csrf
                     <input type="file" name="file" accept=".xlsx" class="text-sm">

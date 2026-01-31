@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\SubUserController as AdminSubUserController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\BrandController as AdminBrandController;
+use App\Http\Controllers\Admin\CategoryMappingController as AdminCategoryMappingController;
+use App\Http\Controllers\Admin\MarketplaceCategoryController as AdminMarketplaceCategoryController;
 use App\Http\Controllers\Customer\TicketController as CustomerTicketController;
 use App\Http\Controllers\SubUser\PasswordController as SubUserPasswordController;
 
@@ -33,7 +35,9 @@ Route::middleware(['client_or_subuser', 'verified', 'subuser.permission'])
         Route::post('invoices', [SubscriptionController::class, 'storeInvoice'])->name('invoices.store');
         Route::get('invoices/customers', [SubscriptionController::class, 'searchInvoiceCustomers'])->name('invoices.customers');
         Route::get('invoices/{invoice}', [SubscriptionController::class, 'showInvoice'])->name('invoices.show');
-        Route::get('invoices-export', [SubscriptionController::class, 'exportInvoices'])->name('invoices.export');
+        Route::get('invoices-export', [SubscriptionController::class, 'exportInvoices'])
+            ->middleware('plan.module:exports.invoices')
+            ->name('invoices.export');
 
         Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
         Route::get('customers/create', [CustomerController::class, 'create'])->name('customers.create');
@@ -53,38 +57,63 @@ Route::middleware(['client_or_subuser', 'verified', 'subscription', 'subuser.per
         Route::post('products/{product}/quick-update', [ProductController::class, 'quickUpdate'])
             ->name('products.quick-update');
         Route::resource('categories', AdminCategoryController::class)->except(['show']);
+        Route::post('categories/import', [AdminCategoryController::class, 'importFromMarketplace'])->name('categories.import');
+        Route::middleware('plan.module:category_mapping')->group(function () {
+            Route::get('categories/{category}/mappings-status', [AdminCategoryMappingController::class, 'status'])
+                ->name('categories.mappings.status');
+            Route::post('categories/{category}/mappings/{marketplace}', [AdminCategoryMappingController::class, 'upsert'])
+                ->name('categories.mappings.upsert');
+            Route::delete('categories/{category}/mappings/{marketplace}', [AdminCategoryMappingController::class, 'destroy'])
+                ->name('categories.mappings.destroy');
+            Route::post('marketplace-categories/{marketplace}/sync', [AdminMarketplaceCategoryController::class, 'sync'])
+                ->name('marketplace-categories.sync');
+            Route::get('marketplace-categories/{marketplace}/search', [AdminMarketplaceCategoryController::class, 'search'])
+                ->name('marketplace-categories.search');
+        });
         Route::resource('brands', AdminBrandController::class)->except(['show']);
-        Route::get('products-export', [ProductController::class, 'export'])->name('products.export');
+        Route::get('products-export', [ProductController::class, 'export'])
+            ->middleware('plan.module:exports.products')
+            ->name('products.export');
         Route::get('products-template', [ProductController::class, 'exportTemplate'])->name('products.template');
         Route::post('products-import', [ProductController::class, 'import'])->name('products.import');
         Route::resource('orders', OrderController::class)->only(['index', 'show', 'update']);
         Route::post('orders/bulk-update', [OrderController::class, 'bulkUpdate'])->name('orders.bulk-update');
         Route::post('orders/bulk-ship', [OrderController::class, 'bulkShip'])->name('orders.bulk-ship');
-        Route::get('orders-export', [OrderController::class, 'export'])->name('orders.export');
+        Route::get('orders-export', [OrderController::class, 'export'])
+            ->middleware('plan.module:exports.orders')
+            ->name('orders.export');
         Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
-        Route::prefix('reports')->name('reports.')->group(function () {
-            Route::get('/', [AdminReportController::class, 'index'])->name('index');
-            Route::get('top-products', [AdminReportController::class, 'topProducts'])->name('top-products');
+        Route::prefix('reports')->name('reports.')->middleware('plan.module:reports')->group(function () {
+            Route::get('/', [AdminReportController::class, 'index'])->middleware('plan.module:reports.orders')->name('index');
+            Route::get('top-products', [AdminReportController::class, 'topProducts'])->middleware('plan.module:reports.top_products')->name('top-products');
             Route::middleware('reports.export')->group(function () {
-                Route::get('top-products-export', [AdminReportController::class, 'topProductsExport'])->name('top-products.export');
-                Route::get('orders-revenue-export', [AdminReportController::class, 'ordersRevenueExport'])->name('orders-revenue.export');
-                Route::get('orders-revenue-invoiced-export', [AdminReportController::class, 'ordersRevenueInvoicedExport'])->name('orders-revenue.invoiced-export');
+                Route::get('top-products-export', [AdminReportController::class, 'topProductsExport'])
+                    ->middleware('plan.module:exports.reports.top_products')
+                    ->name('top-products.export');
+                Route::get('orders-revenue-export', [AdminReportController::class, 'ordersRevenueExport'])
+                    ->middleware('plan.module:exports.reports.orders')
+                    ->name('orders-revenue.export');
+                Route::get('orders-revenue-invoiced-export', [AdminReportController::class, 'ordersRevenueInvoicedExport'])
+                    ->middleware('plan.module:exports.reports.orders')
+                    ->name('orders-revenue.invoiced-export');
             });
-            Route::get('sold-products', [AdminReportController::class, 'soldProducts'])->name('sold-products');
-            Route::get('sold-products-print', [AdminReportController::class, 'soldProductsPrint'])->name('sold-products.print');
-            Route::get('category-sales', [AdminReportController::class, 'categorySales'])->name('category-sales');
-            Route::get('brand-sales', [AdminReportController::class, 'brandSales'])->name('brand-sales');
-            Route::get('vat', [AdminReportController::class, 'vat'])->name('vat');
-            Route::get('commission', [AdminReportController::class, 'commission'])->name('commission');
-            Route::get('stock-value', [AdminReportController::class, 'stockValue'])->name('stock-value');
+            Route::get('sold-products', [AdminReportController::class, 'soldProducts'])->middleware('plan.module:reports.sold_products')->name('sold-products');
+            Route::get('sold-products-print', [AdminReportController::class, 'soldProductsPrint'])->middleware('plan.module:reports.sold_products')->name('sold-products.print');
+            Route::get('category-sales', [AdminReportController::class, 'categorySales'])->middleware('plan.module:reports.category_sales')->name('category-sales');
+            Route::get('brand-sales', [AdminReportController::class, 'brandSales'])->middleware('plan.module:reports.brand_sales')->name('brand-sales');
+            Route::get('vat', [AdminReportController::class, 'vat'])->middleware('plan.module:reports.vat')->name('vat');
+            Route::get('commission', [AdminReportController::class, 'commission'])->middleware('plan.module:reports.commission')->name('commission');
+            Route::get('stock-value', [AdminReportController::class, 'stockValue'])->middleware('plan.module:reports.stock_value')->name('stock-value');
         });
-        Route::get('integrations', [IntegrationController::class, 'index'])->name('integrations.index');
-        Route::get('integrations/{marketplace}', [IntegrationController::class, 'edit'])->name('integrations.edit');
-        Route::put('integrations/{marketplace}', [IntegrationController::class, 'update'])->name('integrations.update');
-        Route::post('integrations/{marketplace}/test', [IntegrationController::class, 'test'])->name('integrations.test');
+        Route::middleware('plan.module:integrations')->group(function () {
+            Route::get('integrations', [IntegrationController::class, 'index'])->name('integrations.index');
+            Route::get('integrations/{marketplace}', [IntegrationController::class, 'edit'])->middleware('plan.marketplace')->name('integrations.edit');
+            Route::put('integrations/{marketplace}', [IntegrationController::class, 'update'])->middleware('plan.marketplace')->name('integrations.update');
+            Route::post('integrations/{marketplace}/test', [IntegrationController::class, 'test'])->middleware('plan.marketplace')->name('integrations.test');
+        });
         Route::view('addons', 'admin.addons')->name('addons.index');
-        Route::resource('sub-users', AdminSubUserController::class)->except(['show']);
+        Route::resource('sub-users', AdminSubUserController::class)->middleware('plan.module:sub_users')->except(['show']);
 
         Route::post('marketplace-products/assign', [MarketplaceProductController::class, 'assign'])
             ->name('marketplace-products.assign');
@@ -99,11 +128,13 @@ Route::middleware(['client_or_subuser', 'verified', 'subscription', 'subuser.per
         Route::post('marketplace-products/{marketplaceProduct}/sync', [MarketplaceProductController::class, 'sync'])
             ->name('marketplace-products.sync');
 
-        Route::get('tickets', [CustomerTicketController::class, 'index'])->name('tickets.index');
-        Route::get('tickets/create', [CustomerTicketController::class, 'create'])->name('tickets.create');
-        Route::post('tickets', [CustomerTicketController::class, 'store'])->name('tickets.store');
-        Route::get('tickets/{ticket}', [CustomerTicketController::class, 'show'])->name('tickets.show');
-        Route::post('tickets/{ticket}/reply', [CustomerTicketController::class, 'reply'])->name('tickets.reply');
+        Route::middleware('plan.module:tickets')->group(function () {
+            Route::get('tickets', [CustomerTicketController::class, 'index'])->name('tickets.index');
+            Route::get('tickets/create', [CustomerTicketController::class, 'create'])->name('tickets.create');
+            Route::post('tickets', [CustomerTicketController::class, 'store'])->name('tickets.store');
+            Route::get('tickets/{ticket}', [CustomerTicketController::class, 'show'])->name('tickets.show');
+            Route::post('tickets/{ticket}/reply', [CustomerTicketController::class, 'reply'])->name('tickets.reply');
+        });
 
         Route::view('help/training', 'admin.help.training')->name('help.training');
         Route::view('help/support', 'admin.help.support')->name('help.support');

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SyncMarketplaceCategoriesJob;
+use App\Models\AppSetting;
 use App\Models\Marketplace;
 use App\Models\MarketplaceCredential;
 use Illuminate\Http\Request;
@@ -18,6 +20,13 @@ class IntegrationController extends Controller
                 $q->where('user_id', $user->id);
             }])
             ->get();
+
+        $plan = $user?->getActivePlan();
+        if ($plan) {
+            $marketplaces = $marketplaces
+                ->filter(fn ($marketplace) => $plan->hasModule('integrations.marketplace.' . ($marketplace->code ?? '')))
+                ->values();
+        }
 
         return view('admin.integrations.index', compact('marketplaces'));
     }
@@ -65,8 +74,10 @@ class IntegrationController extends Controller
             ->where('marketplace_id', $marketplace->id)
             ->first();
 
-        $wasActive = $credential?->is_active ?? false;
-        $wantsActive = $request->boolean('is_active');
+        $wasActive = (bool) ($credential?->is_active ?? false);
+        $wantsActive = (bool) $request->boolean('is_active');
+        $hadCredential = (bool) $credential;
+        $original = $credential ? $credential->only(['api_key', 'api_secret', 'supplier_id', 'store_id', 'is_active']) : null;
 
         if ($wantsActive && !$wasActive && $user && !$user->isSuperAdmin()) {
             $subscription = $user->subscription;
@@ -114,14 +125,33 @@ class IntegrationController extends Controller
             }
         }
 
+        if ($wantsActive) {
+            $categoryMappingEnabled = (bool) AppSetting::getValue('category_mapping_enabled', true);
+            $autoSyncEnabled = (bool) AppSetting::getValue('category_mapping_auto_sync_enabled', true);
+
+            $changedCredentials = false;
+            if (!$hadCredential) {
+                $changedCredentials = true;
+            } elseif ($original) {
+                $changedCredentials =
+                    ($original['api_key'] ?? null) !== ($credential->api_key ?? null) ||
+                    ($original['api_secret'] ?? null) !== ($credential->api_secret ?? null) ||
+                    ($original['supplier_id'] ?? null) !== ($credential->supplier_id ?? null) ||
+                    ($original['store_id'] ?? null) !== ($credential->store_id ?? null) ||
+                    (bool) ($original['is_active'] ?? false) !== (bool) ($credential->is_active ?? false);
+            }
+
+            if ($categoryMappingEnabled && $autoSyncEnabled && $changedCredentials) {
+                SyncMarketplaceCategoriesJob::dispatch($credential->id);
+            }
+        }
+
         return redirect()->route('admin.integrations.index')
             ->with('success', 'Pazaryeri bağlantısı güncellendi.');
     }
 
     public function test(Marketplace $marketplace)
     {
-        // Entegrasyon servisleri ileride eklenecek.
         return back()->with('info', 'Bağlantı testi yakında eklenecek.');
     }
 }
-

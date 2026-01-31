@@ -23,6 +23,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if ($this->app->environment('production') && config('queue.default') === 'sync') {
+            throw new \RuntimeException('QUEUE_CONNECTION=sync production ortamında kullanılamaz. Redis/Database queue + worker zorunlu.');
+        }
+
         Gate::policy(Ticket::class, TicketPolicy::class);
 
         Gate::before(function (User $user): ?bool {

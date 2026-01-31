@@ -130,12 +130,33 @@ class ReportController extends Controller
         $filters = ReportFilters::fromRequest($request, true);
         $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
         $chart = $service->get($request->user(), $filters);
+        $vatColorsRaw = AppSetting::getValue('vat_report_marketplace_colors', '{}');
+        $vatColors = json_decode($vatColorsRaw, true);
+        if (!is_array($vatColors)) {
+            $vatColors = [];
+        }
+        $selectedMarketplaceId = $filters['marketplace_id'] ?? null;
+        $marketplaceList = $selectedMarketplaceId
+            ? $marketplaces->where('id', $selectedMarketplaceId)
+            : $marketplaces;
+        $cards = $marketplaceList->map(function ($marketplace) use ($chart, $vatColors) {
+            $total = $chart['totals_by_marketplace'][$marketplace->id] ?? 0.0;
+            $color = $vatColors[$marketplace->id] ?? '#ff4439';
+
+            return [
+                'id' => $marketplace->id,
+                'name' => $marketplace->name,
+                'total' => $total,
+                'color' => $color,
+            ];
+        })->values();
 
         return view('admin.reports.vat', [
             'filters' => $filters,
             'marketplaces' => $marketplaces,
             'quickRanges' => $this->quickRanges(),
             'chart' => $chart,
+            'cards' => $cards,
         ]);
     }
 

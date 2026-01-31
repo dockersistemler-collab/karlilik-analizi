@@ -17,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'client_or_subuser' => \App\Http\Middleware\EnsureClientOrSubUser::class,
             'subuser.permission' => \App\Http\Middleware\EnsureSubUserPermission::class,
             'reports.export' => \App\Http\Middleware\EnsureReportExportsEnabled::class,
+            'plan.module' => \App\Http\Middleware\EnsurePlanModule::class,
+            'plan.marketplace' => \App\Http\Middleware\EnsurePlanMarketplace::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

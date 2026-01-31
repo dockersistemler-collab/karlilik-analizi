@@ -9,6 +9,32 @@ class Plan extends Model
 {
     use HasFactory;
 
+    public const MODULES = [
+        'category_mapping' => 'Kategori Eşitleme',
+        'sub_users' => 'Alt Kullanıcılar',
+        'tickets' => 'Destek (Ticket)',
+        'quick_actions' => 'Hızlı Menü',
+    ];
+
+    public const REPORT_MODULES = [
+        'reports.top_products' => 'Çok Satan Ürünler',
+        'reports.sold_products' => 'Satılan Ürünler',
+        'reports.orders' => 'Sipariş ve Ciro',
+        'reports.category_sales' => 'Kategori Bazlı Satış',
+        'reports.brand_sales' => 'Marka Bazlı Satış',
+        'reports.vat' => 'KDV Raporu',
+        'reports.commission' => 'Komisyon Raporu',
+        'reports.stock_value' => 'Stok Değeri',
+    ];
+
+    public const EXPORT_MODULES = [
+        'exports.products' => 'Ürünler Export',
+        'exports.orders' => 'Siparişler Export',
+        'exports.invoices' => 'Faturalar Export',
+        'exports.reports.orders' => 'Raporlar: Sipariş ve Ciro Export',
+        'exports.reports.top_products' => 'Raporlar: Çok Satan Ürünler Export',
+    ];
+
     protected $fillable = [
         'name',
         'slug',
@@ -65,5 +91,72 @@ class Plan extends Model
     public function hasUnlimitedTickets()
     {
         return $this->max_tickets_per_month === 0;
+    }
+
+    public function enabledModules(): ?array
+    {
+        $features = $this->features;
+        if (!is_array($features)) {
+            return null;
+        }
+
+        if (array_key_exists('modules', $features) && is_array($features['modules'])) {
+            $modules = array_values(array_filter($features['modules'], fn ($m) => is_string($m) && $m !== ''));
+            return array_values(array_unique($modules));
+        }
+
+        // Legacy: features array is used for marketing bullets (list). In that case we don't enforce module gating.
+        if (function_exists('array_is_list') && array_is_list($features)) {
+            return null;
+        }
+
+        return null;
+    }
+
+    public function hasModule(string $moduleKey): bool
+    {
+        $modules = $this->enabledModules();
+        if ($modules === null) {
+            return true;
+        }
+
+        foreach ($modules as $module) {
+            if (!is_string($module) || $module === '') {
+                continue;
+            }
+            if ($module === $moduleKey) {
+                return true;
+            }
+            if (str_starts_with($module, $moduleKey . '.')) {
+                return true;
+            }
+            if (str_starts_with($moduleKey, $module . '.')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function withModules(array $modules): array
+    {
+        $normalized = array_values(array_unique(array_values(array_filter($modules, fn ($m) => is_string($m) && $m !== ''))));
+
+        $current = $this->features;
+        if (is_array($current) && function_exists('array_is_list') && array_is_list($current)) {
+            return [
+                'marketing' => $current,
+                'modules' => $normalized,
+            ];
+        }
+
+        if (is_array($current)) {
+            $current['modules'] = $normalized;
+            return $current;
+        }
+
+        return [
+            'modules' => $normalized,
+        ];
     }
 }

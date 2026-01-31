@@ -36,7 +36,7 @@
             </div>
             <div>
                 <dt class="text-sm text-gray-500">Kategori</dt>
-                <dd>{{ $product->category ?? '-' }}</dd>
+                <dd>{{ $product->categoryRelation?->name ?? $product->category ?? '-' }}</dd>
             </div>
         </dl>
     </div>
@@ -268,5 +268,4 @@
     </div>
 </div>
 @endsection
-
 

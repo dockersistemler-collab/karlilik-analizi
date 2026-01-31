@@ -42,34 +42,22 @@
         </form>
     </div>
 
-    <div class="panel-card p-6">
-        <h3 class="text-sm font-semibold text-slate-700 mb-4">Aylık KDV Toplamı</h3>
-        <div class="h-64">
-            <canvas id="vat-chart"></canvas>
+    @php
+        $vatTotal = $cards->sum('total');
+    @endphp
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        @foreach($cards as $card)
+            <div class="panel-card p-5 border" style="border-color: {{ $card['color'] }};">
+                <p class="text-xs text-slate-500">{{ $card['name'] }}</p>
+                <p class="text-2xl font-semibold text-slate-800">
+                    {{ number_format((float) $card['total'], 2, ',', '.') }} ₺
+                </p>
+            </div>
+        @endforeach
+        <div class="panel-card p-5 border-dashed border-slate-200">
+            <p class="text-xs text-slate-500">Toplam KDV</p>
+            <p class="text-2xl font-semibold text-slate-800">{{ number_format((float) $vatTotal, 2, ',', '.') }} ₺</p>
         </div>
     </div>
 @endsection
-
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const vatLabels = @json($chart['labels']);
-        const vatValues = @json($chart['values']);
-
-        new Chart(document.getElementById('vat-chart'), {
-            type: 'bar',
-            data: {
-                labels: vatLabels,
-                datasets: [{
-                    label: 'KDV',
-                    data: vatValues,
-                    backgroundColor: '#ff4439',
-                }]
-            },
-            options: {
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true } }
-            }
-        });
-    </script>
-@endpush

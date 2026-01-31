@@ -5,6 +5,10 @@
 @endsection
 
 @section('content')
+    @php
+        $activePlan = auth()->user()?->getActivePlan();
+        $canExport = !$activePlan || $activePlan->hasModule('exports.reports.top_products');
+    @endphp
     <div class="panel-card p-6 mb-6">
         <form method="GET" class="flex flex-wrap lg:flex-nowrap items-end gap-3">
             <div class="min-w-[180px]">
@@ -39,7 +43,7 @@
                 <button type="submit" class="btn btn-solid-accent">Filtrele</button>
                 <a href="{{ route('admin.reports.top-products') }}" class="btn btn-outline">Temizle</a>
             </div>
-            @if($reportExportsEnabled)
+            @if($reportExportsEnabled && $canExport)
                 <details class="relative">
                     <summary class="btn btn-outline list-none cursor-pointer">Dışa Aktar</summary>
                     <div class="absolute right-0 mt-2 w-44 bg-white border border-slate-200 rounded-lg shadow-lg p-2 z-10">

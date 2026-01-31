@@ -33,6 +33,14 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
             ->name('settings.referral');
         Route::post('settings/report-exports', [SuperAdminSettingsController::class, 'updateReportExports'])
             ->name('settings.report-exports');
+        Route::post('settings/vat-colors', [SuperAdminSettingsController::class, 'updateVatColors'])
+            ->name('settings.vat-colors');
+        Route::post('settings/quick-actions', [SuperAdminSettingsController::class, 'updateQuickActions'])
+            ->name('settings.quick-actions');
+        Route::post('settings/category-mapping', [SuperAdminSettingsController::class, 'updateCategoryMappingSettings'])
+            ->name('settings.category-mapping');
+        Route::post('settings/theme', [SuperAdminSettingsController::class, 'updateTheme'])
+            ->name('settings.theme');
         Route::put('settings/client/{user}', [SuperAdminSettingsController::class, 'updateClientSettings'])
             ->name('settings.client.update');
         Route::get('reports', [SuperAdminReportController::class, 'index'])->name('reports.index');

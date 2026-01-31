@@ -4,8 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pazaryeri Paneli</title>
+    @php
+        $panelThemeFont = \App\Models\AppSetting::getValue('panel_theme_font', 'poppins');
+        $panelThemeAccent = \App\Models\AppSetting::getValue('panel_theme_accent', '#ff4439');
+        $panelThemeRadius = (int) \App\Models\AppSetting::getValue('panel_theme_radius', 5);
+
+        $panelFonts = [
+            'poppins' => ['family' => 'Poppins', 'bunny' => 'poppins:300,400,500,600,700'],
+            'manrope' => ['family' => 'Manrope', 'bunny' => 'manrope:400,500,600,700'],
+            'space_grotesk' => ['family' => 'Space Grotesk', 'bunny' => 'space-grotesk:400,500,600,700'],
+            'system' => ['family' => 'system-ui', 'bunny' => null],
+        ];
+
+        if (!array_key_exists($panelThemeFont, $panelFonts)) {
+            $panelThemeFont = 'poppins';
+        }
+
+        if (!is_string($panelThemeAccent) || !preg_match('/^#[0-9a-fA-F]{6}$/', $panelThemeAccent)) {
+            $panelThemeAccent = '#ff4439';
+        }
+
+        if ($panelThemeRadius < 0) {
+            $panelThemeRadius = 0;
+        }
+        if ($panelThemeRadius > 16) {
+            $panelThemeRadius = 16;
+        }
+
+        $panelFontFamily = $panelFonts[$panelThemeFont]['family'];
+        $panelFontBunny = $panelFonts[$panelThemeFont]['bunny'];
+        $panelCssFontStack = $panelThemeFont === 'system'
+            ? 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif'
+            : '"' . $panelFontFamily . '", system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
+    @endphp
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700&display=swap" rel="stylesheet" />
+    @if($panelFontBunny)
+        <link href="https://fonts.bunny.net/css?family={{ $panelFontBunny }}&display=swap" rel="stylesheet" />
+    @endif
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -26,10 +61,12 @@
             --panel-border: #e2e8f0;
             --panel-primary: #0f172a;
             --panel-primary-dark: #0b1220;
-            --panel-accent: #ff4439;
+            --panel-accent: {{ $panelThemeAccent }};
+            --panel-radius: {{ $panelThemeRadius }}px;
+            --panel-font-family: {!! $panelCssFontStack !!};
         }
         body {
-            font-family: "Manrope", sans-serif;
+            font-family: var(--panel-font-family);
             background: radial-gradient(circle at 10% 10%, #eff6ff 0%, transparent 45%),
                         radial-gradient(circle at 90% 5%, #ecfeff 0%, transparent 40%),
                         var(--panel-bg);
@@ -83,7 +120,7 @@
         .rounded-xl,
         .rounded-lg,
         .rounded-md {
-            border-radius: 5px !important;
+            border-radius: var(--panel-radius) !important;
         }
         .sidebar {
             width: 76px;
@@ -208,8 +245,7 @@
         .sidebar-submenu.is-open {
             display: block;
         }
-        .sidebar:not(:hover):not(.is-pinned) .sidebar-submenu,
-        .admin-sidebar-pinned .sidebar:not(:hover) .sidebar-submenu {
+        html:not(.admin-sidebar-pinned) .sidebar:not(:hover):not(.is-pinned) .sidebar-submenu.is-open {
             display: none;
         }
         .sidebar-submenu .sidebar-link {
@@ -255,7 +291,7 @@
         .panel-card {
             background: var(--panel-card);
             border: 1px solid var(--panel-border);
-            border-radius: 5px;
+            border-radius: var(--panel-radius);
             box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
         }
         .panel-card.table-shell {
@@ -270,7 +306,7 @@
         main textarea {
             background: #ffffff !important;
             border: 1px solid var(--panel-border) !important;
-            border-radius: 5px !important;
+            border-radius: var(--panel-radius) !important;
             padding: 0.5rem 0.75rem !important;
             font-size: 0.9rem !important;
             color: var(--panel-ink) !important;
@@ -286,7 +322,7 @@
             padding: 0.45rem 1rem !important;
             font-size: 0.85rem !important;
             line-height: 1.2 !important;
-            border-radius: 5px !important;
+            border-radius: var(--panel-radius) !important;
             border: 1px solid transparent !important;
             background-color: transparent !important;
             color: inherit !important;
@@ -340,8 +376,7 @@
             color: #ffffff;
         }
         .btn-solid-accent:hover {
-            background: #e83a31;
-            border-color: #e83a31;
+            filter: brightness(0.92);
             color: #ffffff;
         }
         .tox button,
@@ -379,8 +414,8 @@
         main a.bg-teal-600 {
             padding: 0.45rem 0.9rem !important;
             font-size: 0.9rem !important;
-            border-radius: 5px !important;
-            background-color: #ff4439 !important;
+            border-radius: var(--panel-radius) !important;
+            background-color: var(--panel-accent) !important;
         }
         main a.bg-blue-600:hover,
         main a.bg-slate-900:hover,
@@ -389,7 +424,7 @@
         main a.bg-sky-600:hover,
         main a.bg-indigo-600:hover,
         main a.bg-teal-600:hover {
-            background-color: #e83a31 !important;
+            filter: brightness(0.92);
         }
         main .shadow,
         main .shadow-sm {
@@ -472,7 +507,7 @@
         .topbar-icon {
             width: 34px;
             height: 34px;
-            border-radius: 5px;
+            border-radius: var(--panel-radius);
             border: 1px solid var(--panel-border);
             display: inline-flex;
             align-items: center;
@@ -553,12 +588,12 @@
         main a.text-blue-600,
         main a.text-blue-700,
         main a.text-blue-900 {
-            color: #ff4439 !important;
+            color: var(--panel-accent) !important;
         }
         main a.text-blue-600:hover,
         main a.text-blue-700:hover,
         main a.text-blue-900:hover {
-            color: #e83a31 !important;
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -580,19 +615,26 @@
             @php
                 $subUser = auth('subuser')->user();
                 $subPermissions = $subUser ? $subUser->permissions()->pluck('permission_key')->flip() : collect();
+                $ownerUser = $subUser ? $subUser->owner : auth()->user();
+                $activePlan = $ownerUser?->getActivePlan();
+                $hasModule = function (string $moduleKey) use ($activePlan) {
+                    return !$activePlan || $activePlan->hasModule($moduleKey);
+                };
                 $can = function (string $key) use ($subPermissions, $subUser) {
                     return !$subUser || $subPermissions->has($key);
                 };
-                $canReportsAny = !$subUser || $subPermissions->has('reports') || $subPermissions->keys()->contains(function ($key) {
+                $canReportsAny = $hasModule('reports') && (
+                    !$subUser || $subPermissions->has('reports') || $subPermissions->keys()->contains(function ($key) {
                     return str_starts_with($key, 'reports.');
-                });
+                })
+                );
                 $canReports = function (string $key) use ($subPermissions, $subUser) {
                     return !$subUser || $subPermissions->has($key) || $subPermissions->has('reports');
                 };
                 $showStoreSection = $can('products') || $can('orders') || $can('customers');
                 $showSettingsSection = $can('settings') || $canReportsAny;
-                $showSupportSection = $can('tickets');
-                $showIntegrationSection = $can('integrations') || $can('addons');
+                $showSupportSection = $hasModule('tickets') && $can('tickets');
+                $showIntegrationSection = $can('addons') || ($hasModule('integrations') && $can('integrations'));
                 $showSubscriptionSection = $can('subscription') || $can('invoices');
             @endphp
 
@@ -659,12 +701,14 @@
                         <span class="sidebar-label">Genel Ayarlar</span>
                     </a>
                 @endif
-                @unless(auth('subuser')->check())
-                    <a href="{{ route('admin.sub-users.index') }}" class="sidebar-link">
-                        <i class="fa-solid fa-user-shield w-6"></i>
-                        <span class="sidebar-label">Alt Kullanıcılar</span>
-                    </a>
-                @endunless
+                @if($hasModule('sub_users'))
+                    @unless(auth('subuser')->check())
+                        <a href="{{ route('admin.sub-users.index') }}" class="sidebar-link">
+                            <i class="fa-solid fa-user-shield w-6"></i>
+                            <span class="sidebar-label">Alt Kullanıcılar</span>
+                        </a>
+                    @endunless
+                @endif
 
                 @if($canReportsAny)
                     <button id="reports-menu-toggle" type="button" class="sidebar-link w-full text-left">
@@ -673,42 +717,42 @@
                         <i class="fa-solid fa-chevron-down text-xs sidebar-label"></i>
                     </button>
                     <div id="reports-submenu" class="sidebar-submenu">
-                        @if($canReports('reports.top_products'))
+                        @if($hasModule('reports.top_products') && $canReports('reports.top_products'))
                             <a href="{{ route('admin.reports.top-products') }}" class="sidebar-link">
                                 <span class="sidebar-label">Çok Satan Ürünler</span>
                             </a>
                         @endif
-                        @if($canReports('reports.sold_products'))
+                        @if($hasModule('reports.sold_products') && $canReports('reports.sold_products'))
                             <a href="{{ route('admin.reports.sold-products') }}" class="sidebar-link">
                                 <span class="sidebar-label">Satılan Ürün Listesi</span>
                             </a>
                         @endif
-                        @if($canReports('reports.orders'))
+                        @if($hasModule('reports.orders') && $canReports('reports.orders'))
                             <a href="{{ route('admin.reports.index') }}" class="sidebar-link">
                                 <span class="sidebar-label">Sipariş ve Ciro</span>
                             </a>
                         @endif
-                        @if($canReports('reports.category_sales'))
+                        @if($hasModule('reports.category_sales') && $canReports('reports.category_sales'))
                             <a href="{{ route('admin.reports.category-sales') }}" class="sidebar-link">
                                 <span class="sidebar-label">Kategori Bazlı Satış</span>
                             </a>
                         @endif
-                        @if($canReports('reports.brand_sales'))
+                        @if($hasModule('reports.brand_sales') && $canReports('reports.brand_sales'))
                             <a href="{{ route('admin.reports.brand-sales') }}" class="sidebar-link">
                                 <span class="sidebar-label">Marka Bazlı Satış</span>
                             </a>
                         @endif
-                        @if($canReports('reports.vat'))
+                        @if($hasModule('reports.vat') && $canReports('reports.vat'))
                             <a href="{{ route('admin.reports.vat') }}" class="sidebar-link">
                                 <span class="sidebar-label">KDV Raporu</span>
                             </a>
                         @endif
-                        @if($canReports('reports.commission'))
+                        @if($hasModule('reports.commission') && $canReports('reports.commission'))
                             <a href="{{ route('admin.reports.commission') }}" class="sidebar-link">
                                 <span class="sidebar-label">Komisyon Raporu</span>
                             </a>
                         @endif
-                        @if($canReports('reports.stock_value'))
+                        @if($hasModule('reports.stock_value') && $canReports('reports.stock_value'))
                             <a href="{{ route('admin.reports.stock-value') }}" class="sidebar-link">
                                 <span class="sidebar-label">Stoktaki Ürün Tutarları Raporu</span>
                             </a>
@@ -720,7 +764,7 @@
                     <p class="sidebar-section">Destek</p>
                 @endif
 
-                @if($can('tickets'))
+                @if($hasModule('tickets') && $can('tickets'))
                     <a href="{{ route('admin.tickets.index') }}" class="sidebar-link">
                         <i class="fa-solid fa-life-ring w-6"></i>
                         <span class="sidebar-label">Destek</span>
@@ -731,7 +775,7 @@
                     <p class="sidebar-section">Entegrasyon</p>
                 @endif
 
-                @if($can('integrations'))
+                @if($hasModule('integrations') && $can('integrations'))
                     <a href="{{ route('admin.integrations.index') }}" class="sidebar-link">
                         <i class="fa-solid fa-plug w-6"></i>
                         <span class="sidebar-label">Mağaza Bağla</span>
@@ -985,7 +1029,7 @@
     @php
         $hideQuickActions = request()->routeIs('admin.invoices.create');
     @endphp
-    @if($quickActions->isNotEmpty() && !$hideQuickActions)
+    @if($hasModule('quick_actions') && $quickActions->isNotEmpty() && !$hideQuickActions)
         <div class="quick-actions">
             <button type="button" id="quick-actions-toggle" class="quick-actions-toggle">
                 <i class="fa-solid fa-plus"></i>

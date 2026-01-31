@@ -19,9 +19,10 @@ class VatReportService
 
         ReportFilters::applyDateRange($query, 'order_date', $filters['date_from'] ?? null, $filters['date_to'] ?? null);
 
-        $orders = $query->whereNotNull('items')->get(['items', 'order_date']);
+        $orders = $query->whereNotNull('items')->get(['items', 'order_date', 'marketplace_id']);
 
         $grouped = collect();
+        $totalsByMarketplace = [];
 
         foreach ($orders as $order) {
             $period = Carbon::parse($order->order_date)->format('Y-m');
@@ -37,6 +38,12 @@ class VatReportService
             }
 
             $grouped->put($period, $grouped->get($period) + $vatTotal);
+
+            $marketplaceId = $order->marketplace_id;
+            if (!isset($totalsByMarketplace[$marketplaceId])) {
+                $totalsByMarketplace[$marketplaceId] = 0.0;
+            }
+            $totalsByMarketplace[$marketplaceId] += $vatTotal;
         }
 
         $labels = $grouped->keys()->values()->all();
@@ -45,6 +52,7 @@ class VatReportService
         return [
             'labels' => $labels,
             'values' => $values,
+            'totals_by_marketplace' => $totalsByMarketplace,
         ];
     }
 

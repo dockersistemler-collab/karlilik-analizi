@@ -16,6 +16,8 @@
         'returned' => 'İade',
     ];
     $activeTab = request('status') ?: 'all';
+    $activePlan = auth()->user()?->getActivePlan();
+    $canExport = !$activePlan || $activePlan->hasModule('exports.orders');
 @endphp
 
 <div class="panel-card p-4 mb-6">
@@ -99,9 +101,11 @@
         <button type="submit" class="btn btn-solid-accent">
             Seçili Siparişleri Güncelle
         </button>
+        @if($canExport)
         <a href="{{ route('admin.orders.export', request()->query()) }}" class="ml-auto btn btn-outline-accent">
             CSV indir
         </a>
+        @endif
     </div>
 
     <div class="panel-card overflow-hidden">

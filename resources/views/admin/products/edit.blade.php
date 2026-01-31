@@ -76,19 +76,54 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
                 <div class="flex items-center gap-2">
-                    <input id="category-input" type="text" name="category" list="category-options" value="{{ old('category', $product->category) }}"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Kategori ara veya yaz">
-                    <button id="open-category-modal" type="button" class="px-3 py-2 text-xs font-semibold border border-gray-300 rounded-md hover:bg-gray-50 hidden">
+                    <select id="category-select" name="category_id"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Seçiniz</option>
+                        @foreach($categories ?? [] as $category)
+                            <option value="{{ $category->id }}" @selected(old('category_id', $product->category_id) == $category->id)>{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                    <button id="open-category-modal" type="button" class="px-3 py-2 text-xs font-semibold border border-gray-300 rounded-md hover:bg-gray-50">
                         Yeni Ekle
                     </button>
                 </div>
-                <datalist id="category-options">
-                    @foreach($categories ?? [] as $category)
-                        <option value="{{ $category->name }}"></option>
-                    @endforeach
-                </datalist>
-                @error('category')
+                @if(($categoryMappingEnabled ?? true) && ($categoryMappingInlineEnabled ?? true))
+                <div id="category-mapping-panel" class="mt-2 hidden rounded-lg border border-slate-200 bg-gradient-to-r from-rose-50 to-white px-3 py-2">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="inline-flex items-center gap-2 text-xs font-semibold text-slate-700">
+                            <span class="h-7 w-7 rounded-lg bg-white border border-rose-100 text-rose-500 flex items-center justify-center">
+                                <i class="fa-solid fa-link text-[11px]"></i>
+                            </span>
+                            Pazaryeri Eşitleme Durumu
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button id="category-mapping-manage" type="button" class="text-xs font-semibold text-blue-600 hover:text-blue-700 underline">
+                                Kategori Eşitle
+                            </button>
+                            <a id="category-mapping-manage-full" href="{{ route('admin.categories.index') }}" class="text-[11px] text-slate-500 hover:text-slate-700 underline">
+                                Tam sayfa
+                            </a>
+                        </div>
+                    </div>
+                    <div id="category-mapping-badges" class="mt-2 flex flex-wrap gap-2"></div>
+                    <div id="category-mapping-hint" class="mt-2 text-[11px] text-slate-500 hidden">
+                        Eksik eşleşmeler varsa, pazaryerine ürün gönderirken eşitleme istenebilir.
+                    </div>
+                </div>
+                <div id="category-mapping-editor" class="mt-3 hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <div class="text-sm font-semibold text-slate-800">Kategori Eşitleme</div>
+                            <div class="text-xs text-slate-500 mt-1">Seçilen kategori için pazaryeri kategorilerini buradan eşleyin.</div>
+                        </div>
+                        <button id="category-mapping-editor-close" type="button" class="text-slate-400 hover:text-slate-600">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div id="category-mapping-editor-body" class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+                </div>
+                @endif
+                @error('category_id')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>
@@ -466,8 +501,16 @@
         brandForm.reset();
     });
 
-    const categoryInput = document.getElementById('category-input');
-    const categoryOptions = document.getElementById('category-options');
+    const categorySelect = document.getElementById('category-select');
+    const categoryMappingPanel = document.getElementById('category-mapping-panel');
+    const categoryMappingBadges = document.getElementById('category-mapping-badges');
+    const categoryMappingManage = document.getElementById('category-mapping-manage');
+    const categoryMappingManageFull = document.getElementById('category-mapping-manage-full');
+    const categoryMappingHint = document.getElementById('category-mapping-hint');
+    const categoryMappingEditor = document.getElementById('category-mapping-editor');
+    const categoryMappingEditorBody = document.getElementById('category-mapping-editor-body');
+    const categoryMappingEditorClose = document.getElementById('category-mapping-editor-close');
+    const categoryInlineMappingEnabled = Boolean(categoryMappingPanel);
     const categoryModal = document.getElementById('category-modal');
     const categoryOpenBtn = document.getElementById('open-category-modal');
     const categoryCloseBtn = document.getElementById('close-category-modal');
@@ -475,24 +518,12 @@
     const categoryForm = document.getElementById('category-modal-form');
     const categoryError = document.getElementById('category-modal-error');
     const categoryModalName = document.getElementById('category-modal-name');
-    const categoryValues = new Set(Array.from(categoryOptions?.options || []).map((opt) => opt.value.toLowerCase()));
 
     const toggleCategoryModal = (show) => {
         categoryModal?.classList.toggle('hidden', !show);
         categoryModal?.classList.toggle('flex', show);
     };
-    const toggleCategoryButton = () => {
-        const value = (categoryInput?.value || '').trim().toLowerCase();
-        if (categoryOpenBtn) {
-            categoryOpenBtn.classList.toggle('hidden', value === '' || categoryValues.has(value));
-        }
-    };
-    categoryInput?.addEventListener('input', toggleCategoryButton);
-    toggleCategoryButton();
     categoryOpenBtn?.addEventListener('click', () => {
-        if (categoryModalName) {
-            categoryModalName.value = categoryInput?.value || '';
-        }
         categoryError?.classList.add('hidden');
         toggleCategoryModal(true);
     });
@@ -518,16 +549,275 @@
             categoryError.classList.remove('hidden');
             return;
         }
-        const newOption = document.createElement('option');
-        newOption.value = payload.name;
-        categoryOptions?.appendChild(newOption);
-        categoryValues.add(payload.name.toLowerCase());
-        if (categoryInput) {
-            categoryInput.value = payload.name;
+        if (payload?.id && payload?.name) {
+            const newOption = document.createElement('option');
+            newOption.value = String(payload.id);
+            newOption.textContent = payload.name;
+            categorySelect?.appendChild(newOption);
+            if (categorySelect) {
+                categorySelect.value = String(payload.id);
+            }
+            await loadCategoryMappingStatus(String(payload.id));
         }
         toggleCategoryModal(false);
-        toggleCategoryButton();
         categoryForm.reset();
     });
+
+    let lastMappingPayload = null;
+
+    function renderCategoryMapping(items, manageUrl) {
+        if (!categoryMappingPanel || !categoryMappingBadges) return;
+        categoryMappingBadges.innerHTML = '';
+        if (categoryMappingManageFull && manageUrl) categoryMappingManageFull.href = manageUrl;
+
+        let missing = 0;
+        items.forEach((item) => {
+            const badge = document.createElement('span');
+            const isMapped = Boolean(item.is_mapped);
+            if (!isMapped) missing++;
+            badge.className = isMapped
+                ? 'inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs text-emerald-700'
+                : 'inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600';
+            badge.innerHTML = `<span class="h-2 w-2 rounded-full ${isMapped ? 'bg-emerald-500' : 'bg-slate-300'}"></span>${item.marketplace_name}`;
+            categoryMappingBadges.appendChild(badge);
+        });
+
+        if (categoryMappingHint) {
+            categoryMappingHint.classList.toggle('hidden', missing === 0);
+        }
+        categoryMappingPanel.classList.remove('hidden');
+    }
+
+    function toggleMappingEditor(open) {
+        categoryMappingEditor?.classList.toggle('hidden', !open);
+    }
+
+    function escapeHtml(raw) {
+        return String(raw ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    async function syncMarketplaceCategories(marketplaceId) {
+        const response = await fetch(`{{ url('/admin/marketplace-categories') }}/${marketplaceId}/sync`, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+        });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok) {
+            showToast(payload?.message || 'Senkron başarısız.', 'error');
+            return false;
+        }
+        showToast(payload?.message || 'Senkron tamamlandı.', 'success');
+        return true;
+    }
+
+    async function upsertMapping(categoryId, marketplaceId, externalId) {
+        const response = await fetch(`{{ url('/admin/categories') }}/${categoryId}/mappings/${marketplaceId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ external_id: externalId }),
+        });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok) {
+            showToast(payload?.message || 'Eşitleme kaydedilemedi.', 'error');
+            return null;
+        }
+        showToast('Eşitleme kaydedildi.', 'success');
+        return payload?.mapping || null;
+    }
+
+    async function deleteMapping(categoryId, marketplaceId) {
+        const response = await fetch(`{{ url('/admin/categories') }}/${categoryId}/mappings/${marketplaceId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+            },
+        });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok) {
+            showToast(payload?.message || 'Eşitleme kaldırılamadı.', 'error');
+            return false;
+        }
+        showToast('Eşitleme kaldırıldı.', 'success');
+        return true;
+    }
+
+    function renderMappingEditor(payload) {
+        if (!categoryMappingEditorBody) return;
+        categoryMappingEditorBody.innerHTML = '';
+        const items = payload?.items || [];
+        const categoryId = String(payload?.category_id || '');
+
+        items.forEach((item) => {
+            const marketplaceId = String(item.marketplace_id);
+            const isMapped = Boolean(item.is_mapped);
+            const mappedDisplay = item.mapped_path || item.mapped_external_id || '-';
+
+            const card = document.createElement('div');
+            card.className = isMapped
+                ? 'rounded-2xl border border-emerald-200 bg-emerald-50/40 p-4'
+                : 'rounded-2xl border border-slate-200 bg-white p-4';
+            card.dataset.marketplaceId = marketplaceId;
+            card.innerHTML = `
+                <div class="flex items-center justify-between gap-2">
+                    <div class="text-sm font-semibold text-slate-800">
+                        ${escapeHtml(item.marketplace_name)}
+                        <span class="ml-2 text-xs text-slate-500" data-status>
+                            ${isMapped
+                                ? '<span class="inline-flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-emerald-500"></span> Eşlendi</span>'
+                                : '<span class="inline-flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-slate-300"></span> Boş</span>'}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" class="btn btn-outline-accent" data-sync>
+                            <i class="fa-solid fa-rotate text-[11px] mr-2"></i>
+                            Senkronla
+                        </button>
+                        <button type="button" class="btn btn-outline-accent ${isMapped ? '' : 'hidden'}" data-clear>
+                            <i class="fa-solid fa-trash text-[11px] mr-2"></i>
+                            Kaldır
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Pazaryeri Kategorisi Seç</label>
+                    <div class="relative">
+                        <input type="text" class="w-full bg-white" placeholder="Yaz ve ara... (örn: bebek)" data-search autocomplete="off">
+                        <div class="absolute left-0 right-0 mt-1 max-h-56 overflow-auto rounded-xl border border-slate-200 bg-white shadow-xl hidden z-10" data-results></div>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-2" data-current>
+                        Seçili: <span class="font-semibold text-slate-700">${escapeHtml(mappedDisplay)}</span>
+                    </div>
+                </div>
+            `;
+
+            const btnSync = card.querySelector('[data-sync]');
+            const btnClear = card.querySelector('[data-clear]');
+            const input = card.querySelector('[data-search]');
+            const results = card.querySelector('[data-results]');
+
+            btnSync?.addEventListener('click', async () => {
+                btnSync.disabled = true;
+                await syncMarketplaceCategories(marketplaceId);
+                btnSync.disabled = false;
+            });
+
+            btnClear?.addEventListener('click', async () => {
+                btnClear.disabled = true;
+                const ok = await deleteMapping(categoryId, marketplaceId);
+                btnClear.disabled = false;
+                if (!ok) return;
+
+                const status = card.querySelector('[data-status]');
+                if (status) status.innerHTML = '<span class="inline-flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-slate-300"></span> Boş</span>';
+                const current = card.querySelector('[data-current] span');
+                if (current) current.textContent = '-';
+                btnClear.classList.add('hidden');
+                card.className = 'rounded-2xl border border-slate-200 bg-white p-4';
+                item.is_mapped = false;
+                item.mapped_external_id = null;
+                item.mapped_path = null;
+                loadCategoryMappingStatus(categoryId);
+            });
+
+            function hideResults() {
+                results?.classList.add('hidden');
+                if (results) results.innerHTML = '';
+            }
+
+            input?.addEventListener('blur', () => setTimeout(hideResults, 160));
+            input?.addEventListener('input', () => {
+                const q = input.value.trim();
+                if (q.length < 2) {
+                    hideResults();
+                    return;
+                }
+
+                const key = `mp-${categoryId}-${marketplaceId}`;
+                if (!window.__mpDebounce) window.__mpDebounce = new Map();
+                if (window.__mpDebounce.has(key)) clearTimeout(window.__mpDebounce.get(key));
+                window.__mpDebounce.set(key, setTimeout(async () => {
+                    const response = await fetch(`{{ url('/admin/marketplace-categories') }}/${marketplaceId}/search?q=${encodeURIComponent(q)}`, {
+                        headers: { 'Accept': 'application/json' },
+                    });
+                    const payload = await response.json().catch(() => null);
+                    const list = payload?.items || [];
+                    if (!results) return;
+                    if (list.length === 0) {
+                        results.innerHTML = `<div class="px-3 py-2 text-xs text-slate-500">Sonuç yok. Gerekirse "Senkronla" butonuna basın.</div>`;
+                        results.classList.remove('hidden');
+                        return;
+                    }
+                    results.innerHTML = list.map((row) => {
+                        const label = row.path || row.name || row.external_id;
+                        return `<button type="button" class="w-full text-left px-3 py-2 hover:bg-slate-50 border-b border-slate-100 last:border-b-0" data-external="${escapeHtml(row.external_id)}" data-label="${escapeHtml(label)}"><div class="text-sm font-semibold text-slate-800 truncate">${escapeHtml(label)}</div><div class="text-[11px] text-slate-500 mt-1">ID: ${escapeHtml(row.external_id)}</div></button>`;
+                    }).join('');
+                    results.classList.remove('hidden');
+                    results.querySelectorAll('button[data-external]').forEach((b) => b.addEventListener('click', async () => {
+                        hideResults();
+                        const externalId = b.dataset.external;
+                        const label = b.dataset.label;
+                        input.value = '';
+                        const mapping = await upsertMapping(categoryId, marketplaceId, externalId);
+                        if (!mapping) return;
+                        const status = card.querySelector('[data-status]');
+                        if (status) status.innerHTML = '<span class="inline-flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-emerald-500"></span> Eşlendi</span>';
+                        const current = card.querySelector('[data-current] span');
+                        if (current) current.textContent = mapping.path || label || externalId;
+                        btnClear?.classList.remove('hidden');
+                        card.className = 'rounded-2xl border border-emerald-200 bg-emerald-50/40 p-4';
+                        item.is_mapped = true;
+                        item.mapped_external_id = externalId;
+                        item.mapped_path = mapping.path || label || null;
+                        loadCategoryMappingStatus(categoryId);
+                    }));
+                }, 260));
+            });
+
+            categoryMappingEditorBody.appendChild(card);
+        });
+    }
+
+    async function loadCategoryMappingStatus(categoryId) {
+        if (!categoryId) {
+            categoryMappingPanel?.classList.add('hidden');
+            categoryMappingEditor?.classList.add('hidden');
+            return;
+        }
+        const response = await fetch(`{{ url('/admin/categories') }}/${categoryId}/mappings-status`, {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload?.ok) {
+            categoryMappingPanel?.classList.add('hidden');
+            categoryMappingEditor?.classList.add('hidden');
+            return;
+        }
+        lastMappingPayload = payload;
+        renderCategoryMapping(payload.items || [], payload.manage_url);
+    }
+
+    if (categoryInlineMappingEnabled) {
+        categorySelect?.addEventListener('change', () => loadCategoryMappingStatus(categorySelect.value));
+        if (categorySelect?.value) {
+            loadCategoryMappingStatus(categorySelect.value);
+        }
+
+        categoryMappingManage?.addEventListener('click', () => {
+            if (!lastMappingPayload?.ok) return;
+            const isOpen = !(categoryMappingEditor?.classList.contains('hidden') ?? true);
+            toggleMappingEditor(!isOpen);
+            if (!isOpen) {
+                renderMappingEditor(lastMappingPayload);
+            }
+        });
+        categoryMappingEditorClose?.addEventListener('click', () => toggleMappingEditor(false));
+    }
 </script>
 @endpush

@@ -18,4 +18,9 @@ class Category extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function mappings()
+    {
+        return $this->hasMany(CategoryMapping::class);
+    }
 }

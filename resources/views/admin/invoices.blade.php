@@ -5,6 +5,10 @@
 @endsection
 
 @section('content')
+    @php
+        $activePlan = auth()->user()?->getActivePlan();
+        $canExport = !$activePlan || $activePlan->hasModule('exports.invoices');
+    @endphp
     <div class="panel-card p-4 mb-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
             <h3 class="text-sm font-semibold text-slate-800">Filtreler</h3>
@@ -36,9 +40,11 @@
                 <a href="{{ route('admin.invoices.index') }}" class="btn btn-outline-accent">Sıfırla</a>
             </div>
             <div class="md:col-span-4">
-                <a href="{{ route('admin.invoices.export', request()->query()) }}" class="btn btn-outline-accent">
-                    CSV indir
-                </a>
+                @if($canExport)
+                    <a href="{{ route('admin.invoices.export', request()->query()) }}" class="btn btn-outline-accent">
+                        CSV indir
+                    </a>
+                @endif
             </div>
         </form>
     </div>

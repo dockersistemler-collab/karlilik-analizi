@@ -86,6 +86,39 @@
                 </label>
             </div>
 
+            <div class="md:col-span-2 border-t border-slate-200 pt-4">
+                <p class="text-sm font-semibold text-slate-800 mb-3">Paket Modülleri</p>
+
+                <div class="space-y-5">
+                    @foreach($moduleGroups as $group)
+                        <div class="rounded-md border border-slate-200 bg-slate-50/50 p-4">
+                            <div class="flex items-center justify-between gap-2">
+                                <p class="text-sm font-semibold text-slate-800">{{ $group['label'] }}</p>
+                                <div class="flex items-center gap-2">
+                                    <button type="button" class="btn btn-outline text-xs" data-modules-select-all="{{ $group['key'] }}">Hepsini seç</button>
+                                    <button type="button" class="btn btn-outline text-xs" data-modules-clear-all="{{ $group['key'] }}">Kaldır</button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3" data-modules-group="{{ $group['key'] }}">
+                                @forelse(($group['items'] ?? []) as $moduleKey => $moduleLabel)
+                                    <label class="inline-flex items-center gap-2">
+                                        <input type="checkbox"
+                                               name="modules[]"
+                                               value="{{ $moduleKey }}"
+                                               class="rounded"
+                                               @checked(in_array($moduleKey, old('modules', $selectedModules), true))>
+                                        <span class="text-sm text-slate-700">{{ $moduleLabel }}</span>
+                                    </label>
+                                @empty
+                                    <p class="text-xs text-slate-500">Henüz seçenek yok.</p>
+                                @endforelse
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
             <div class="md:col-span-2 flex items-center gap-3 mt-2">
                 <button type="submit" class="btn btn-solid-accent">
                     Kaydet
@@ -97,3 +130,22 @@
         </form>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        function setGroupChecked(groupKey, checked) {
+            const group = document.querySelector(`[data-modules-group="${groupKey}"]`);
+            if (!group) return;
+            group.querySelectorAll('input[type="checkbox"][name="modules[]"]').forEach((cb) => {
+                cb.checked = checked;
+            });
+        }
+
+        document.querySelectorAll('[data-modules-select-all]').forEach((btn) => {
+            btn.addEventListener('click', () => setGroupChecked(btn.dataset.modulesSelectAll, true));
+        });
+        document.querySelectorAll('[data-modules-clear-all]').forEach((btn) => {
+            btn.addEventListener('click', () => setGroupChecked(btn.dataset.modulesClearAll, false));
+        });
+    </script>
+@endpush

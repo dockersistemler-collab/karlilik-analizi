@@ -1,6 +1,6 @@
 ﻿# Session Memory
 
-**Last updated:** 2026-01-29
+**Last updated:** 2026-01-31
 
 ## Status
 - Rapor modülleri sıfırdan kuruldu: Çok Satan Ürünler, Satılan Ürünler, Sipariş/Ciro, Kategori, Marka, KDV, Komisyon, Stok Değeri.
@@ -41,14 +41,26 @@
 - Hızlı menü sayfa yüklenişinde otomatik kapanacak şekilde güvence eklendi (DOMContentLoaded/pageshow).
 - Admin/super-admin için `.btn-outline` butonlar güçlendirildi (dashed border + zorlayan stiller), rapor sayfalarında görünür.
 - Hızlı menü kapalı başlatma/hidden davranışı sağlamlaştırıldı (menu hidden attribute + CSS override).
+- Kategori eşitleme altyapısı eklendi: pazaryeri kategori cache + kategori↔pazaryeri mapping ekranı.
+- Ürünlerde kategori alanı internal kategoriye taşındı (`products.category_id`) ve ürün formu select olarak güncellendi.
+- Admin sidebar: submenu açıkken sidebar kapanınca görünüm bozan durum için CSS güvence eklendi.
+- Super admin ayarlarına “Kategori Eşitleme” sekmesi eklendi (aktif/pasif, auto-sync, ürün ekranında inline panel, içe aktarım varsayılanları).
+- Güvenlik: `.env` repo kökünden kaldırıldı; arşiv dosyaları ignore edildi (zip/rar/7z). Yeni arşiv oluştururken `.env` dahil edilmemeli.
+- Queue: production ortamında `QUEUE_CONNECTION=sync` engellendi; Redis/database queue + worker zorunlu. Marketplace kategori senkronu artık request içinde değil job olarak kuyruklanıyor.
+- Panel görünümü ayarları eklendi (font/aksan rengi/radius) ve varsayılan font Poppins yapıldı (admin + super-admin).
+- Paket bazlı modül aç/kapa altyapısı eklendi: süper admin paket düzenle ekranında modül + alt-modül seçimi (Rapor alt sayfaları, Entegrasyon pazaryerleri dahil) + route middleware ile erişim kontrolü + menü/hızlı menü görünürlüğü.
+- Exportlar paket bazlı aç/kapat yapıldı (ürün/sipariş/fatura + rapor exportları ayrı ayrı).
+- Destek sayfası görsel olarak iyileştirildi (soft gradient arkaplan, dekoratif şekiller, renkli kartlar) ve paketinde “Destek” kapalıysa buton buna göre davranıyor.
+- Ticket ekranları renklendirildi (liste/oluştur/detay): soft gradient header, renkli kartlar ve daha okunur badge/mesaj görünümleri.
 
 ## Next steps
-1) `php artisan migrate` çalıştır (app_settings tablosu eklendi).
-2) Rapor sayfalarını tek tek test et (filtreler, grafikler, tablo verileri).
-3) Exportları dene (CSV/Excel) ve super-admin ayarından aç/kapat kontrolü yap.
-4) Satılan Ürünler yazdırma çıktısını kontrol et.
-5) `php artisan migrate` çalıştır (products SKU unique artık user_id + sku).
-6) Ürün importu iki farklı kullanıcıyla test et (aynı SKU'lar + boş SKU).
+1) Süper admin → Paketler bölümünden her paket için modül seçimlerini yap (ilk kayıtta legacy `features` listesi otomatik olarak `marketing` altına alınır ve `modules` oluşturulur).
+1) `php artisan migrate` çalıştır (marketplace_categories, category_mappings, products.category_id).
+2) Entegrasyon ekranından Trendyol bağla/aktif et → kategorilerin cache’e çekildiğini doğrula (manuel “Senkronla” da var).
+3) Kategoriler ekranında “Pazaryerinden İçe Aktar” ile internal kategori oluştur + eşleme otomatik gelsin.
+4) Ürün ekle/düzenle: kategori seçimi + ürün detayında kategori gösterimi kontrol et.
+5) Diğer pazaryerleri için kategori provider’larını ekle (şu an sadece Trendyol implement edildi).
+6) (Önceki) rapor/export testleri ve SKU unique migrasyonu testleri.
 
 ## Notes
 - Değişiklikler: `app/Services/Reports/*`,
@@ -123,6 +135,8 @@
   `resources/views/layouts/admin.blade.php`,
   `app/Models/SubUser.php`,
   `app/Models/SubUserPermission.php`.
+  Kategori eşitleme: `database/migrations/2026_01_30_*`, `app/Services/Marketplace/Category/*`, `app/Http/Controllers/Admin/MarketplaceCategoryController.php`, `app/Http/Controllers/Admin/CategoryMappingController.php`, `resources/views/admin/products/categories/index.blade.php`, `routes/customer.php`.
+  Ürün kategori alanı: `database/migrations/2026_01_30_000003_add_category_id_to_products_table.php`, `app/Http/Controllers/Admin/ProductController.php`, `app/Models/Product.php`, `resources/views/admin/products/create.blade.php`, `resources/views/admin/products/edit.blade.php`, `resources/views/admin/products/show.blade.php`.
 
 ## Değişiklik Günlüğü
 - 2026-01-26: Git başlatıldı, ilk commit alındı.

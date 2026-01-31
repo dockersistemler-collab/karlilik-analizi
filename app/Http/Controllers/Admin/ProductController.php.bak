@@ -6,11 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Brand;
-use App\Models\AppSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Mews\Purifier\Facades\Purifier;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -92,21 +90,21 @@ class ProductController extends Controller
         $sheet = $spreadsheet->getActiveSheet();
 
         $headers = [
-            'Stok Kodu',
-            'Barkod',
-            'Ürün Adı',
-            'Açıklama',
-            'Marka',
-            'Kategori',
-            'Satış Fiyatı',
-            'Alış Maliyeti',
-            'Stok',
-            'Para Birimi',
-            'Ağırlık',
-            'Desi',
-            'KDV Oranı',
-            'Görsel URL',
-            'Aktif',
+            'stok_kodu',
+            'barkod',
+            'urun_adi',
+            'aciklama',
+            'marka',
+            'kategori',
+            'satis_fiyati',
+            'alis_maliyeti',
+            'stok',
+            'para_birimi',
+            'agirlik',
+            'desi',
+            'kdv_orani',
+            'gorsel_url',
+            'aktif',
         ];
 
         $sheet->fromArray($headers, null, 'A1');
@@ -148,21 +146,21 @@ class ProductController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->fromArray([
-            'Stok Kodu',
-            'Barkod',
-            'Ürün Adı',
-            'Açıklama',
-            'Marka',
-            'Kategori',
-            'Satış Fiyatı',
-            'Alış Maliyeti',
-            'Stok',
-            'Para Birimi',
-            'Ağırlık',
-            'Desi',
-            'KDV Oranı',
-            'Görsel URL',
-            'Aktif',
+            'stok_kodu',
+            'barkod',
+            'urun_adi',
+            'aciklama',
+            'marka',
+            'kategori',
+            'satis_fiyati',
+            'alis_maliyeti',
+            'stok',
+            'para_birimi',
+            'agirlik',
+            'desi',
+            'kdv_orani',
+            'gorsel_url',
+            'aktif',
         ], null, 'A1');
 
         $writer = new Xlsx($spreadsheet);
@@ -256,21 +254,16 @@ class ProductController extends Controller
         }
 
         $imported = 0;
-        $skippedEmpty = 0;
-        $skippedInvalid = 0;
-        $skippedMissing = 0;
-        $skippedLimit = 0;
-        $skippedDuplicate = 0;
+        $skipped = 0;
 
         foreach ($rows as $row) {
             if (count($row) === 0 || (count($row) === 1 && $row[0] === null)) {
-                $skippedEmpty++;
                 continue;
             }
 
             $data = array_combine($header, array_pad($row, count($header), null));
             if (!$data) {
-                $skippedInvalid++;
+                $skipped++;
                 continue;
             }
 
@@ -279,38 +272,22 @@ class ProductController extends Controller
             $price = $data['price'] ?? null;
             $stock = $data['stock_quantity'] ?? null;
 
-            if ($name === '' || $price === null || $stock === null) {
-                $skippedMissing++;
+            if ($sku === '' || $name === '' || $price === null || $stock === null) {
+                $skipped++;
                 continue;
-            }
-            if ($sku === '') {
-                $sku = $this->generateSku($user);
             }
 
             if ($user && !$user->isSuperAdmin()) {
                 if (!$user->subscription?->canAddProduct()) {
-                    $skippedLimit++;
+                    $skipped++;
                     continue;
                 }
             }
 
-            $existsQuery = Product::where('sku', $sku);
-            if ($user && !$user->isSuperAdmin()) {
-                $existsQuery->where('user_id', $user->id);
-            }
-            $exists = $existsQuery->exists();
+            $exists = Product::where('sku', $sku)->exists();
             if ($exists) {
-                $skippedDuplicate++;
+                $skipped++;
                 continue;
-            }
-
-            $categoryName = isset($data['category']) ? trim((string) $data['category']) : '';
-            $categoryId = null;
-            if ($categoryName !== '' && $user && !$user->isSuperAdmin()) {
-                $categoryId = \App\Models\Category::query()
-                    ->where('user_id', $user->id)
-                    ->where('name', $categoryName)
-                    ->value('id');
             }
 
             $product = Product::create([
@@ -320,8 +297,7 @@ class ProductController extends Controller
                 'name' => $name,
                 'description' => $this->sanitizeDescription($data['description'] ?? null),
                 'brand' => $data['brand'] ?? null,
-                'category' => $categoryName !== '' ? $categoryName : null,
-                'category_id' => $categoryId,
+                'category' => $data['category'] ?? null,
                 'price' => (float) $price,
                 'cost_price' => isset($data['cost_price']) && $data['cost_price'] !== '' ? (float) $data['cost_price'] : null,
                 'stock_quantity' => (int) $stock,
@@ -340,23 +316,12 @@ class ProductController extends Controller
             $imported++;
         }
 
-        $skipped = $skippedEmpty + $skippedInvalid + $skippedMissing + $skippedLimit + $skippedDuplicate;
-        $details = [
-            "boş satır: {$skippedEmpty}",
-            "geçersiz satır: {$skippedInvalid}",
-            "eksik zorunlu alan: {$skippedMissing}",
-            "abonelik limiti: {$skippedLimit}",
-            "aynı SKU: {$skippedDuplicate}",
-        ];
-
-        return back()->with('success', "İçe aktarma tamamlandı. Başarılı: {$imported}, Atlanan: {$skipped} (" . implode(', ', $details) . ")");
+        return back()->with('success', "İçe aktarma tamamlandı. Başarılı: {$imported}, Atlanan: {$skipped}");
     }
 
     public function create()
     {
         $user = auth()->user();
-        $categoryMappingEnabled = (bool) AppSetting::getValue('category_mapping_enabled', true);
-        $categoryMappingInlineEnabled = (bool) AppSetting::getValue('category_mapping_inline_enabled', true);
         $categories = Category::query()
             ->where('user_id', $user->id)
             ->orderBy('name')
@@ -366,28 +331,18 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('admin.products.create', compact('categories', 'brands', 'categoryMappingEnabled', 'categoryMappingInlineEnabled'));
+        return view('admin.products.create', compact('categories', 'brands'));
     }
 
     public function store(Request $request)
     {
-        $user = $request->user();
-        $skuRule = ['nullable', 'string'];
-        if ($user && !$user->isSuperAdmin()) {
-            $skuRule[] = Rule::unique('products', 'sku')->where('user_id', $user->id);
-        }
-
         $validated = $request->validate([
-            'sku' => $skuRule,
+            'sku' => 'required|string|unique:products,sku',
             'barcode' => 'nullable|string',
             'name' => 'required|string|max:150',
             'description' => 'nullable|string',
             'brand' => 'nullable|string',
-            'category_id' => [
-                'nullable',
-                'integer',
-                Rule::exists('categories', 'id')->where('user_id', $user?->id),
-            ],
+            'category' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'cost_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
@@ -399,19 +354,8 @@ class ProductController extends Controller
         ]);
 
         $validated['description'] = $this->sanitizeDescription($validated['description'] ?? null);
-        if (empty($validated['sku'])) {
-            $validated['sku'] = $this->generateSku($user);
-        }
-        if (!empty($validated['category_id'])) {
-            $categoryName = \App\Models\Category::query()
-                ->where('user_id', $user?->id)
-                ->whereKey($validated['category_id'])
-                ->value('name');
-            $validated['category'] = $categoryName;
-        } else {
-            $validated['category'] = null;
-        }
 
+        $user = $request->user();
         if ($user && !$user->isSuperAdmin()) {
             $subscription = $user->subscription;
             if (!$subscription || !$subscription->isActive() || !$subscription->canAddProduct()) {
@@ -447,7 +391,7 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $this->ensureOwner($product);
-        $product->load('marketplaceProducts.marketplace', 'categoryRelation');
+        $product->load('marketplaceProducts.marketplace');
 
         $user = auth()->user();
         if ($user && $user->isSuperAdmin()) {
@@ -468,8 +412,6 @@ class ProductController extends Controller
     {
         $this->ensureOwner($product);
         $user = auth()->user();
-        $categoryMappingEnabled = (bool) AppSetting::getValue('category_mapping_enabled', true);
-        $categoryMappingInlineEnabled = (bool) AppSetting::getValue('category_mapping_inline_enabled', true);
         $categories = Category::query()
             ->where('user_id', $user->id)
             ->orderBy('name')
@@ -479,35 +421,19 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('admin.products.edit', compact('product', 'categories', 'brands', 'categoryMappingEnabled', 'categoryMappingInlineEnabled'));
+        return view('admin.products.edit', compact('product', 'categories', 'brands'));
     }
 
     public function update(Request $request, Product $product)
     {
         $this->ensureOwner($product);
-        $user = $request->user();
-        $skuRule = ['required', 'string'];
-        if ($user && !$user->isSuperAdmin()) {
-            $skuRule[] = Rule::unique('products', 'sku')
-                ->where('user_id', $user->id)
-                ->ignore($product->id);
-        } elseif ($product->user_id) {
-            $skuRule[] = Rule::unique('products', 'sku')
-                ->where('user_id', $product->user_id)
-                ->ignore($product->id);
-        }
-
         $validated = $request->validate([
-            'sku' => $skuRule,
+            'sku' => 'required|string|unique:products,sku,' . $product->id,
             'barcode' => 'nullable|string',
             'name' => 'required|string|max:150',
             'description' => 'nullable|string',
             'brand' => 'nullable|string',
-            'category_id' => [
-                'nullable',
-                'integer',
-                Rule::exists('categories', 'id')->where('user_id', $product->user_id ?? $user?->id),
-            ],
+            'category' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'cost_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
@@ -519,15 +445,6 @@ class ProductController extends Controller
         ]);
 
         $validated['description'] = $this->sanitizeDescription($validated['description'] ?? null);
-        if (!empty($validated['category_id'])) {
-            $categoryName = \App\Models\Category::query()
-                ->where('user_id', $product->user_id ?? $user?->id)
-                ->whereKey($validated['category_id'])
-                ->value('name');
-            $validated['category'] = $categoryName;
-        } else {
-            $validated['category'] = null;
-        }
 
         $uploadedImages = [];
         if ($request->hasFile('images')) {
@@ -600,18 +517,5 @@ class ProductController extends Controller
         }
 
         return Purifier::clean($html, 'product_description');
-    }
-
-    private function generateSku($user = null): string
-    {
-        do {
-            $sku = 'AUTO-' . now()->format('Ymd') . '-' . Str::upper(Str::random(6));
-            $existsQuery = Product::where('sku', $sku);
-            if ($user && !$user->isSuperAdmin()) {
-                $existsQuery->where('user_id', $user->id);
-            }
-        } while ($existsQuery->exists());
-
-        return $sku;
     }
 }

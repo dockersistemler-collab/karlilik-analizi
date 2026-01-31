@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class EnsurePlanMarketplace
+{
+    /**
+     * Handle an incoming request.
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        $user = $request->user();
+
+        if (!$user && auth('subuser')->check()) {
+            $subUser = auth('subuser')->user();
+            $user = $subUser?->owner;
+        }
+
+        if (!$user) {
+            abort(401);
+        }
+
+        if ($user->isSuperAdmin()) {
+            return $next($request);
+        }
+
+        $plan = $user->getActivePlan();
+        if (!$plan) {
+            return redirect()
+                ->route('pricing')
+                ->with('info', 'Devam etmek için aktif bir abonelik gerekiyor.');
+        }
+
+        $marketplace = $request->route('marketplace');
+        $code = is_object($marketplace) ? ($marketplace->code ?? null) : null;
+        if (!$code) {
+            abort(404);
+        }
+
+        if ($plan->hasModule('integrations.marketplace.' . $code)) {
+            return $next($request);
+        }
+
+        return redirect()
+            ->route('admin.addons.index')
+            ->with('info', 'Bu pazaryeri paketinizde aktif değil.');
+    }
+}
+
