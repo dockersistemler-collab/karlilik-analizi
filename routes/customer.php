@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\MarketplaceProductController;
 use App\Http\Controllers\Admin\IntegrationController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\ModuleUpsellController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\SubUserController as AdminSubUserController;
@@ -53,6 +54,7 @@ Route::middleware(['client_or_subuser', 'verified', 'subscription', 'subuser.per
     ->name('admin.')
     ->group(function () {
         Route::get('/', [ClientDashboardController::class, 'index'])->name('dashboard');
+        Route::get('modules/upsell/{code}', [ModuleUpsellController::class, 'show'])->name('modules.upsell');
         Route::resource('products', ProductController::class);
         Route::post('products/{product}/quick-update', [ProductController::class, 'quickUpdate'])
             ->name('products.quick-update');

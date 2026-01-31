@@ -13,6 +13,8 @@ use App\Http\Controllers\SuperAdmin\ReferralController as SuperAdminReferralCont
 use App\Http\Controllers\SuperAdmin\CustomerController as SuperAdminCustomerController;
 use App\Http\Controllers\SuperAdmin\SubUserController as SuperAdminSubUserController;
 use App\Http\Controllers\SuperAdmin\BannerController as SuperAdminBannerController;
+use App\Http\Controllers\SuperAdmin\ModuleController as SuperAdminModuleController;
+use App\Http\Controllers\SuperAdmin\ModulePurchaseController as SuperAdminModulePurchaseController;
 
 Route::middleware(['auth', 'verified', 'role:super_admin'])
     ->prefix('super-admin')
@@ -60,6 +62,22 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
         Route::get('referrals-export', [SuperAdminReferralController::class, 'export'])->name('referrals.export');
         Route::get('sub-users', [SuperAdminSubUserController::class, 'index'])->name('sub-users.index');
         Route::resource('banners', SuperAdminBannerController::class)->except(['show']);
+
+        Route::resource('modules', SuperAdminModuleController::class)->except(['show']);
+        Route::post('modules/{module}/assign', [SuperAdminModuleController::class, 'assignToUser'])
+            ->name('modules.assign');
+        Route::post('user-modules/{userModule}/toggle', [SuperAdminModuleController::class, 'toggleUserModule'])
+            ->name('user-modules.toggle');
+        Route::delete('user-modules/{userModule}', [SuperAdminModuleController::class, 'removeUserModule'])
+            ->name('user-modules.destroy');
+
+        Route::resource('module-purchases', SuperAdminModulePurchaseController::class)->only(['index', 'show', 'create', 'store']);
+        Route::post('module-purchases/{modulePurchase}/mark-paid', [SuperAdminModulePurchaseController::class, 'markPaid'])
+            ->name('module-purchases.mark-paid');
+        Route::post('module-purchases/{modulePurchase}/mark-cancelled', [SuperAdminModulePurchaseController::class, 'markCancelled'])
+            ->name('module-purchases.mark-cancelled');
+        Route::post('module-purchases/{modulePurchase}/mark-refunded', [SuperAdminModulePurchaseController::class, 'markRefunded'])
+            ->name('module-purchases.mark-refunded');
 
         Route::get('tickets', [SuperAdminTicketController::class, 'index'])->name('tickets.index');
         Route::get('tickets/{ticket}', [SuperAdminTicketController::class, 'show'])->name('tickets.show');

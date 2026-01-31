@@ -55,6 +55,18 @@ class User extends Authenticatable
         return $this->hasMany(Subscription::class);
     }
 
+    public function userModules()
+    {
+        return $this->hasMany(UserModule::class);
+    }
+
+    public function modules()
+    {
+        return $this->belongsToMany(Module::class, 'user_modules')
+            ->withPivot(['status', 'starts_at', 'ends_at', 'meta'])
+            ->withTimestamps();
+    }
+
     public function subscription()
     {
         // En güncel abonelik

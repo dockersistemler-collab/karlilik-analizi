@@ -93,31 +93,41 @@ class Plan extends Model
         return $this->max_tickets_per_month === 0;
     }
 
-    public function enabledModules(): ?array
+    public function enabledModules(): array
     {
         $features = $this->features;
         if (!is_array($features)) {
-            return null;
+            return [];
         }
 
-        if (array_key_exists('modules', $features) && is_array($features['modules'])) {
-            $modules = array_values(array_filter($features['modules'], fn ($m) => is_string($m) && $m !== ''));
-            return array_values(array_unique($modules));
+        if (!array_key_exists('modules', $features) || !is_array($features['modules'])) {
+            return [];
         }
 
-        // Legacy: features array is used for marketing bullets (list). In that case we don't enforce module gating.
-        if (function_exists('array_is_list') && array_is_list($features)) {
-            return null;
+        $modules = array_values(array_filter($features['modules'], fn ($m) => is_string($m) && trim($m) !== ''));
+        $modules = array_values(array_unique(array_map('trim', $modules)));
+        $modules = array_values(array_filter($modules, fn ($m) => $m !== ''));
+
+        if (empty($modules)) {
+            return [];
         }
 
-        return null;
+        if (in_array('*', $modules, true)) {
+            return ['*'];
+        }
+
+        return $modules;
     }
 
     public function hasModule(string $moduleKey): bool
     {
         $modules = $this->enabledModules();
-        if ($modules === null) {
+        if ($modules === ['*']) {
             return true;
+        }
+
+        if (empty($modules)) {
+            return false;
         }
 
         foreach ($modules as $module) {

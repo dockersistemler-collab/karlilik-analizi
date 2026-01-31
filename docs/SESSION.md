@@ -52,8 +52,19 @@
 - Exportlar paket bazlı aç/kapat yapıldı (ürün/sipariş/fatura + rapor exportları ayrı ayrı).
 - Destek sayfası görsel olarak iyileştirildi (soft gradient arkaplan, dekoratif şekiller, renkli kartlar) ve paketinde “Destek” kapalıysa buton buna göre davranıyor.
 - Ticket ekranları renklendirildi (liste/oluştur/detay): soft gradient header, renkli kartlar ve daha okunur badge/mesaj görünümleri.
+- Admin → Genel Ayarlar ekranı sekmeli hale getirildi (Firma/Fatura/Bildirim aktif; diğerleri placeholder + ilgili sayfaya yönlendirme).
+- “Müşteri bazlı modül satışı” altyapısı eklendi: `modules` + `user_modules`, `EntitlementService`, `EnsureModuleEnabled` middleware ve super-admin için modül CRUD/atama ekranları.
+- EntitlementService’e satın alma sonrası yönetim metodları eklendi: `grantModule/revokeModule/setModuleStatus`.
+- Modül satın alma akışı için `module_purchases` tablosu + servis eklendi (manual + iyzico webhook). Super-admin panelde “Modül Satışları” ekranı üzerinden onay/iptal/iade yapılabiliyor.
 
 ## Next steps
+1) Genel Ayarlar: placeholder sekmelerde (Ürün Listesi / Kargo Etiket / Fatura Açıklama Alanları / Ürün Ayarları) hangi alanların olacağını netleştirip formları ekle.
+2) `php artisan migrate` (modules + user_modules).
+2) `php artisan migrate` (module_purchases).
+3) Super admin → Modüller: temel modülleri oluştur (`integration.*`, `feature.*`) ve müşterilere atamayı dene.
+4) Super admin → Modül Satışları: manuel satış oluştur → “Ödendi Onayla” ile entitlement açıldığını doğrula.
+5) Iyzico webhook: `/webhooks/iyzico/payment` endpointine test payload gönder (IYZICO_WEBHOOK_SECRET set edersen `x-webhook-secret` header’ı gerekli).
+4) Entegrasyon aktifleştirme: `integration.{code}` modülü yoksa/aktif değilse upsell ekranına gittiğini doğrula.
 1) Süper admin → Paketler bölümünden her paket için modül seçimlerini yap (ilk kayıtta legacy `features` listesi otomatik olarak `marketing` altına alınır ve `modules` oluşturulur).
 1) `php artisan migrate` çalıştır (marketplace_categories, category_mappings, products.category_id).
 2) Entegrasyon ekranından Trendyol bağla/aktif et → kategorilerin cache’e çekildiğini doğrula (manuel “Senkronla” da var).
@@ -63,6 +74,9 @@
 6) (Önceki) rapor/export testleri ve SKU unique migrasyonu testleri.
 
 ## Notes
+- Genel Ayarlar sekmeleri: `resources/views/admin/settings.blade.php`, `app/Http/Controllers/Admin/SettingsController.php`.
+- Mevcut paket bazlı gating: `app/Models/Plan.php` (`hasModule`) + `app/Http/Middleware/EnsurePlanModule.php` / `EnsurePlanMarketplace.php` ve `bootstrap/app.php` alias `plan.module`.
+- Add-on entitlement altyapısı: `app/Services/Entitlements/EntitlementService.php`, `app/Http/Middleware/EnsureModuleEnabled.php`, `database/migrations/2026_01_31_120000_create_modules_table.php`, `database/migrations/2026_01_31_120010_create_user_modules_table.php`.
 - Değişiklikler: `app/Services/Reports/*`,
   `app/Http/Controllers/Admin/ReportController.php`,
   `routes/customer.php`,

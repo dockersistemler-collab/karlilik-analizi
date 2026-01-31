@@ -13,7 +13,24 @@ class SettingsController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
-        return view('admin.settings', compact('user'));
+
+        $allowedTabs = [
+            'company',
+            'invoice',
+            'product_list',
+            'marketplaces',
+            'shipping_label',
+            'invoice_description_fields',
+            'notifications',
+            'products',
+        ];
+
+        $activeTab = (string) $request->query('tab', 'company');
+        if (!in_array($activeTab, $allowedTabs, true)) {
+            $activeTab = 'company';
+        }
+
+        return view('admin.settings', compact('user', 'activeTab'));
     }
 
     public function update(Request $request): RedirectResponse
@@ -21,6 +38,9 @@ class SettingsController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
+            'billing_name' => 'nullable|string|max:255',
+            'billing_email' => 'nullable|email|max:255',
+            'billing_address' => 'nullable|string|max:2000',
             'company_name' => 'nullable|string|max:255',
             'company_slogan' => 'nullable|string|max:255',
             'company_phone' => 'nullable|string|max:50',
@@ -39,7 +59,9 @@ class SettingsController extends Controller
             $validated['company_logo_path'] = $path;
         }
 
-        $validated['invoice_number_tracking'] = $request->boolean('invoice_number_tracking');
+        if ($request->has('invoice_number_tracking')) {
+            $validated['invoice_number_tracking'] = $request->boolean('invoice_number_tracking');
+        }
 
         $user->update($validated);
 

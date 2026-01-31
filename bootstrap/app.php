@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'reports.export' => \App\Http\Middleware\EnsureReportExportsEnabled::class,
             'plan.module' => \App\Http\Middleware\EnsurePlanModule::class,
             'plan.marketplace' => \App\Http\Middleware\EnsurePlanMarketplace::class,
+            'module' => \App\Http\Middleware\EnsureModuleEnabled::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

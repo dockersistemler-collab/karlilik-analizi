@@ -426,6 +426,16 @@
                     <span class="sidebar-label">Abonelik Paketleri</span>
                 </a>
 
+                <a href="{{ route('super-admin.modules.index') }}" class="sidebar-link">
+                    <i class="fa-solid fa-puzzle-piece w-6"></i>
+                    <span class="sidebar-label">Modüller</span>
+                </a>
+
+                <a href="{{ route('super-admin.module-purchases.index') }}" class="sidebar-link">
+                    <i class="fa-solid fa-cash-register w-6"></i>
+                    <span class="sidebar-label">Modül Satışları</span>
+                </a>
+
                 <a href="{{ route('super-admin.subscriptions.index') }}" class="sidebar-link">
                     <i class="fa-solid fa-file-invoice w-6"></i>
                     <span class="sidebar-label">Abonelikler</span>

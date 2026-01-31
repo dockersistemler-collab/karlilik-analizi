@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\Webhooks\IyzicoPaymentWebhookController;
 
 Route::get('/', [PublicController::class, 'home'])->name('public.home');
 Route::get('/pricing', [PublicController::class, 'pricing'])->name('pricing');
@@ -23,5 +24,7 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/customer.php';
 require __DIR__.'/admin.php';
+
+Route::post('/webhooks/iyzico/payment', IyzicoPaymentWebhookController::class);
 
 require __DIR__.'/auth.php';

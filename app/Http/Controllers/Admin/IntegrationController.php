@@ -7,11 +7,16 @@ use App\Jobs\SyncMarketplaceCategoriesJob;
 use App\Models\AppSetting;
 use App\Models\Marketplace;
 use App\Models\MarketplaceCredential;
+use App\Services\Entitlements\EntitlementService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class IntegrationController extends Controller
 {
+    public function __construct(private readonly EntitlementService $entitlements)
+    {
+    }
+
     public function index(): View
     {
         $user = auth()->user();
@@ -78,6 +83,15 @@ class IntegrationController extends Controller
         $wantsActive = (bool) $request->boolean('is_active');
         $hadCredential = (bool) $credential;
         $original = $credential ? $credential->only(['api_key', 'api_secret', 'supplier_id', 'store_id', 'is_active']) : null;
+
+        if ($wantsActive) {
+            $moduleCode = 'integration.' . ($marketplace->code ?? '');
+            if (!$this->entitlements->hasModule($user, $moduleCode)) {
+                return redirect()
+                    ->route('admin.modules.upsell', ['code' => $moduleCode])
+                    ->with('info', 'Bu pazaryeri entegrasyonu hesabınız için aktif değil. Satın alarak açabilirsiniz.');
+            }
+        }
 
         if ($wantsActive && !$wasActive && $user && !$user->isSuperAdmin()) {
             $subscription = $user->subscription;

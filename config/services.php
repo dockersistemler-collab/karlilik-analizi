@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'iyzico' => [
+        // Webhook verification placeholder (signature verification to be implemented later).
+        'webhook_secret' => env('IYZICO_WEBHOOK_SECRET'),
+    ],
+
 ];
