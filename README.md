@@ -82,3 +82,5 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - Test DB config: .env.testing (MySQL) 
 - Create DB: mysql -e CREATE DATABASE IF NOT EXISTS pazaryeri_entegrasyon_test; 
 - Run: php artisan test
+
+- Session domain: SESSION_DOMAIN=null (host-only cookie). This avoids session leakage between app.* and sa.* subdomains.

@@ -25,6 +25,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'correlation' => \App\Http\Middleware\CorrelationIdMiddleware::class,
         ]);
 
+        $middleware->prependToGroup('web', \App\Http\Middleware\SetSessionCookieForSubdomain::class);
+
         $middleware->prependToPriorityList(
             \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
             \App\Http\Middleware\EnsureApiTokenValid::class
