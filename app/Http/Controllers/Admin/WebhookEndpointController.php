@@ -51,7 +51,7 @@ class WebhookEndpointController extends Controller
         $endpointMetrics = \App\Models\WebhookDelivery::query()
             ->where('user_id', $user->id)
             ->where('created_at', '>=', $since)
-            ->selectRaw('webhook_endpoint_id, COUNT(*) as attempts, SUM(CASE WHEN status = \"failed\" THEN 1 ELSE 0 END) as fails')
+            ->selectRaw('webhook_endpoint_id, COUNT(*) as attempts, SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as fails', ['failed'])
             ->groupBy('webhook_endpoint_id')
             ->get()
             ->keyBy('webhook_endpoint_id')

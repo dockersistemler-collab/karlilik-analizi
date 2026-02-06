@@ -19,15 +19,6 @@ class WebhookServiceDispatchTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        if (!extension_loaded('pdo_sqlite')) {
-            $this->markTestSkipped('pdo_sqlite is not available in this environment.');
-        }
-
-        parent::setUp();
-    }
-
     private function makeSubscribedUserWithModules(array $modules): User
     {
         $user = User::factory()->create(['role' => 'client']);
@@ -115,7 +106,7 @@ class WebhookServiceDispatchTest extends TestCase
         $payload = $delivery->payload_json;
         $this->assertIsArray($payload);
         $this->assertSame('einvoice.created', $payload['event'] ?? null);
-        $this->assertSame((string) $delivery->id, $payload['id'] ?? null);
+        $this->assertSame((string) $delivery->delivery_uuid, $payload['id'] ?? null);
 
         Bus::assertDispatched(SendWebhookDeliveryJob::class, function (SendWebhookDeliveryJob $job) use ($delivery) {
             return $job->deliveryId === $delivery->id && $job->attempt === 0;

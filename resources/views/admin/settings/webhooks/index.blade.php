@@ -178,7 +178,7 @@
 
                                         @php
 
-                                            $metric = $endpointMetrics[$e->id]   ['attempts' => 0, 'fails' => 0];
+                                            $metric = $endpointMetrics[$e->id] ?? ['attempts' => 0, 'fails' => 0];
 
                                             $disabledReason = $e->disabled_reason;
 

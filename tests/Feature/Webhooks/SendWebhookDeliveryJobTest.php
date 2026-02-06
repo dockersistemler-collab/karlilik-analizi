@@ -15,15 +15,6 @@ class SendWebhookDeliveryJobTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        if (!extension_loaded('pdo_sqlite')) {
-            $this->markTestSkipped('pdo_sqlite is not available in this environment.');
-        }
-
-        parent::setUp();
-    }
-
     public function test_job_success_marks_delivery_success(): void
     {
         Http::fake([
@@ -145,15 +136,15 @@ class SendWebhookDeliveryJobTest extends TestCase
 
         $this->assertNotNull($captured);
 
-        $sig = $captured->header('X-Webhook-Signature');
-        $ts = $captured->header('X-Webhook-Timestamp');
+        $sig = $this->headerValue($captured->header('X-Webhook-Signature'));
+        $ts = $this->headerValue($captured->header('X-Webhook-Timestamp'));
         $this->assertIsString($sig);
         $this->assertIsString($ts);
 
         $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $sig);
-        $this->assertSame('einvoice.created', $captured->header('X-Webhook-Event'));
-        $this->assertMatchesRegularExpression('/^[0-9a-f\\-]{36}$/i', (string) $captured->header('X-Webhook-Id'));
-        $this->assertSame('abc', $captured->header('X-Customer'));
+        $this->assertSame('einvoice.created', $this->headerValue($captured->header('X-Webhook-Event')));
+        $this->assertMatchesRegularExpression('/^[0-9a-f\\-]{36}$/i', (string) $this->headerValue($captured->header('X-Webhook-Id')));
+        $this->assertSame('abc', $this->headerValue($captured->header('X-Customer')));
 
         $t = (int) $ts;
         $v1 = $sig;
@@ -161,5 +152,14 @@ class SendWebhookDeliveryJobTest extends TestCase
         $expected = hash_hmac('sha256', $t.'.'.$captured->body(), 'secret');
         $this->assertSame($expected, $v1);
         $this->assertSame((string) $t, $ts);
+    }
+
+    private function headerValue(array|string|null $value): ?string
+    {
+        if (is_array($value)) {
+            return isset($value[0]) ? (string) $value[0] : null;
+        }
+
+        return $value === null ? null : (string) $value;
     }
 }

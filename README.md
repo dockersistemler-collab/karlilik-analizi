@@ -76,3 +76,9 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 - Support View KVKK notu
 - Support View açıkken yapılan görüntüleme/okuma/ayar değişiklikleri `notification_audit_logs` tablosuna yazılır.
+ 
+## Testing 
+ 
+- Test DB config: .env.testing (MySQL) 
+- Create DB: mysql -e CREATE DATABASE IF NOT EXISTS pazaryeri_entegrasyon_test; 
+- Run: php artisan test

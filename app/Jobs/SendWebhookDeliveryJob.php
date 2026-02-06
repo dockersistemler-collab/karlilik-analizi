@@ -19,14 +19,13 @@ class SendWebhookDeliveryJob implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public string $queue = 'webhooks';
-
     public int $tries = 1;
 
     public int $timeout = 30;
 
     public function __construct(public int $deliveryId, public int $attempt)
     {
+        $this->onQueue('webhooks');
     }
 
     public function uniqueId(): string
