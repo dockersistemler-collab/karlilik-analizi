@@ -81,8 +81,6 @@ Matches:.\docs\SESSION.md:77:- Super-admin Plan create/edit: modÃ¼l whitelist yÃ
 .\docs\legacy-gates.md:69:./app/Models/Plan.php:177:    public function hasPlanModule(string $moduleKey): bool
 .\docs\legacy-gates.md:71:./database/migrations/2026_01_23_060033_create_plans_table.php:26:            $table->boolean('custom_integrations')->default(false);
 .\docs\legacy-gates.md:74:./app/Http/Controllers/Admin/IntegrationController.php:32:                ->filter(fn ($marketplace) => $plan->hasPlanModule('integrations.marketplace.' . ($marketplace->code ?? '')))
-.\docs\legacy-gates.md:76:./resources/views/super-admin/plans/edit.blade.php:80:                    <input type="checkbox" name="custom_integrations" value="1" class="rounded" @checked(old('custom_integrations', $plan->custom_integrations))>
-.\docs\legacy-gates.md:85:./resources/views/super-admin/plans/create.blade.php:79:                    <input type="checkbox" name="custom_integrations" value="1" class="rounded" @checked(old('custom_integrations'))>
 .\database\seeders\PlanSeeder.php:36:                'custom_integrations' => false,
 .\database\seeders\PlanSeeder.php:65:                'custom_integrations' => false,
 .\database\seeders\PlanSeeder.php:105:                'custom_integrations' => true,

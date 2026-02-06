@@ -74,7 +74,10 @@ $validated = $request->validate(['period' => 'nullable|in:monthly,yearly',
 $amount = (float) $amount;
 
         $referer = (string) $request->headers->get('referer', '');
-        $redirectRoute = str_contains($referer, '/portal/settings/api') || $module->code === 'feature.einvoice_api'
+        $refererPath = (string) parse_url($referer, PHP_URL_PATH);
+        $apiSettingsPath = route('portal.settings.api', [], false);
+        $redirectRoute = ($refererPath !== '' && str_starts_with($refererPath, $apiSettingsPath))
+            || $module->code === 'feature.einvoice_api'
             ? 'portal.settings.api'
             : 'portal.modules.mine';
 

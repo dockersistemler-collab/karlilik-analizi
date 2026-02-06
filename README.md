@@ -63,7 +63,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - Routes
 - `admin.notification-hub.notifications.index` => `/admin/notification-hub/notifications`
 - `admin.notification-hub.preferences.index` => `/admin/notification-hub/preferences`
-- `super-admin.notification-hub.notifications.index` => `/super-admin/notification-hub/notifications`
+- `super-admin.notification-hub.notifications.index` => `sa.<root>/notification-hub/notifications`
 
 - Filter parametreleri
 - `type` (critical|operational|info)

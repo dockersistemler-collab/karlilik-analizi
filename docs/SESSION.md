@@ -157,10 +157,10 @@ Not:
   - resources/views/admin/notification-hub/partials/_filters.blade.php
   - resources/views/admin/notification-hub/partials/_item.blade.php
   - resources/views/admin/notification-hub/preferences.blade.php
-  - resources/views/super-admin/notification-hub/index.blade.php
+  - super-admin notification hub view
 - Layout include:
   - resources/views/layouts/admin.blade.php
-  - resources/views/layouts/super-admin.blade.php
+  - super-admin layout view
 - Middleware/support izinleri:
   - config/support.php: admin.notification-hub.notifications.index + admin.notification-hub.preferences.index
   - app/Http/Middleware/EnsureSubUserPermission.php: admin.notification-hub.* => settings
@@ -192,7 +192,7 @@ Not:
   - billing_events tablosu + BillingEvent modeli + BillingEventLogger servisi.
   - Iyzico webhook/dunning ve invoice create/paid noktalarında billing event loglama.
 - Customer invoice portal eklendi:
-  - routes/customer.php altında /portal/invoices list/show/download (signed+throttle).
+  - routes/customer.php altında invoices list/show/download (signed+throttle).
   - InvoicePolicy + Customer InvoiceController + customer invoice blade’leri.
 - API token expired davranışı düzeltildi:
   - EnsureApiTokenValid middleware priority auth öncesine alındı (bootstrap/app.php).
@@ -224,7 +224,7 @@ Not:
 - app_notifications hatası için migration çalıştırıldı:
   - php artisan migrate
 - ParseError fix:
-  - resources/views/super-admin/plans/edit.blade.php: fazla @endforeach kaldırıldı.
+  - super-admin plans edit view: fazla @endforeach kaldırıldı.
 - Notification Hub deliverability testleri eklendi:
   - tests/Feature/NotificationHubDeliverabilityTest.php
 - Quiet hours için email job dispatch gecikmesi eklendi:
