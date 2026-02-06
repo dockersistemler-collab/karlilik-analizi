@@ -174,6 +174,9 @@ Not:
   - README.md Notification Hub bölümü eklendi
 
 ## Son İşlemler
+- Prod readiness runbook eklendi:
+  - docs/PROD.md (deployment, queue/scheduler, webhook, monitoring, backups, domain/SSL, smoke test)
+- php artisan test: PASS (242 tests).
 - Portal fatura ekranları terminoloji sadeleştirildi:
   - resources/views/customer/invoices/index.blade.php (Faturalar, kolonlar: Tarih/Tutar/Durum/Dönem, Detay)
   - resources/views/customer/invoices/show.blade.php (Fatura Detayı, PDF İndir vb.)
