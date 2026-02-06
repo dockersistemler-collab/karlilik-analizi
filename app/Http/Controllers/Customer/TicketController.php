@@ -37,8 +37,7 @@ class TicketController extends Controller
 
     public function store(Request $request, CreateTicketAction $action): RedirectResponse
     {
-        $validated = $request->validate([
-            'subject' => 'required|string|max:255',
+        $validated = $request->validate(['subject' => 'required|string|max:255',
             'body' => 'required|string|max:5000',
             'priority' => 'required|in:low,medium,high,urgent',
             'attachments' => 'nullable|array|max:5',
@@ -57,7 +56,7 @@ class TicketController extends Controller
             attachments: $request->file('attachments', []),
         ));
 
-        return redirect()->route('admin.tickets.show', $ticket)
+        return redirect()->route('portal.tickets.show', $ticket)
             ->with('success', 'Destek talebiniz alındı.');
     }
 
@@ -65,8 +64,7 @@ class TicketController extends Controller
     {
         $this->authorize('view', $ticket);
 
-        $ticket->load([
-            'messages' => function ($query) {
+        $ticket->load(['messages' => function ($query) {
                 $query->where('is_internal', false)->with(['attachments', 'sender'])->orderBy('created_at');
             },
             'assignedTo',
@@ -79,8 +77,7 @@ class TicketController extends Controller
     {
         $this->authorize('reply', $ticket);
 
-        $validated = $request->validate([
-            'body' => 'required|string|max:5000',
+        $validated = $request->validate(['body' => 'required|string|max:5000',
             'attachments' => 'nullable|array|max:5',
             'attachments.*' => 'file|max:5120',
         ]);
@@ -97,9 +94,11 @@ class TicketController extends Controller
             attachments: $request->file('attachments', []),
         ));
 
-        return redirect()->route('admin.tickets.show', $ticket)
+        return redirect()->route('portal.tickets.show', $ticket)
             ->with('success', 'Yanıtınız gönderildi.');
     }
 }
+
+
 
 

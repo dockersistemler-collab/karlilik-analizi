@@ -53,8 +53,7 @@ class MarketplaceCategoryController extends Controller
         if ($q === '') {
             return response()->json(['items' => []]);
         }
-
-        $items = MarketplaceCategory::query()
+$items = MarketplaceCategory::query()
             ->where('user_id', $user->id)
             ->where('marketplace_id', $marketplace->id)
             ->where(function ($query) use ($q) {

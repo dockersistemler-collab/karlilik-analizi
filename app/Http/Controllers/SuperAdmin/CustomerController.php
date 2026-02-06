@@ -54,8 +54,7 @@ class CustomerController extends Controller
 
     public function store(Request $request): RedirectResponse|JsonResponse
     {
-        $validated = $request->validate([
-            'user_id' => 'nullable|integer|exists:users,id',
+        $validated = $request->validate(['user_id' => 'nullable|integer|exists:users,id',
             'name' => 'required|string|max:255',
             'email' => [
                 'required',
@@ -131,8 +130,7 @@ class CustomerController extends Controller
 
     public function update(Request $request, Customer $customer): RedirectResponse
     {
-        $validated = $request->validate([
-            'user_id' => 'nullable|integer|exists:users,id',
+        $validated = $request->validate(['user_id' => 'nullable|integer|exists:users,id',
             'name' => 'required|string|max:255',
             'email' => [
                 'required',
@@ -177,3 +175,5 @@ class CustomerController extends Controller
             ->with('success', 'Müşteri silindi.');
     }
 }
+
+

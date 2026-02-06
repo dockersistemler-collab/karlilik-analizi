@@ -23,8 +23,7 @@ class ModulePurchaseController extends Controller
         if (!in_array($status, ['pending', 'paid', 'cancelled', 'refunded'], true)) {
             $status = 'pending';
         }
-
-        $purchases = ModulePurchase::query()
+$purchases = ModulePurchase::query()
             ->with(['user', 'module'])
             ->where('status', $status)
             ->orderByDesc('id')
@@ -57,8 +56,7 @@ class ModulePurchaseController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
+        $validated = $request->validate(['user_id' => 'required|exists:users,id',
             'module_id' => 'required|exists:modules,id',
             'period' => 'required|in:monthly,yearly,one_time',
             'amount' => 'nullable|numeric|min:0',
@@ -70,8 +68,7 @@ class ModulePurchaseController extends Controller
         if (!empty($validated['note'])) {
             $meta['note'] = $validated['note'];
         }
-
-        $purchase = ModulePurchase::create([
+$purchase = ModulePurchase::create([
             'user_id' => (int) $validated['user_id'],
             'module_id' => (int) $validated['module_id'],
             'provider' => 'manual',

@@ -39,5 +39,9 @@ class ModulePurchase extends Model
     {
         return $this->belongsTo(Module::class);
     }
-}
 
+    public function notificationLogs()
+    {
+        return $this->hasMany(NotificationLog::class);
+    }
+}

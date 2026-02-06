@@ -7,7 +7,10 @@ use App\Models\Marketplace;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\MarketplaceProduct;
+use App\Models\BillingEvent;
+use App\Models\BillingSubscription;
 use App\Services\Reports\SoldProductsReportService;
+use App\Support\SupportUser;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -15,7 +18,8 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $user = auth()->user();
+        $user = SupportUser::currentUser();
+        $isPortal = $request->routeIs('portal.dashboard');
 
         $productQuery = Product::query();
         $orderQuery = Order::query();
@@ -28,8 +32,7 @@ class DashboardController extends Controller
                 $query->where('user_id', $user->id);
             });
         }
-
-        $stats = [
+$stats = [
             'total_products' => $productQuery->count(),
             'active_products' => (clone $productQuery)->where('is_active', true)->count(),
             'total_marketplaces' => Marketplace::where('is_active', true)->count(),
@@ -115,15 +118,60 @@ class DashboardController extends Controller
 
         $mapData = $this->buildCityOrderCounts($rangeOrders);
 
-        return view('admin.dashboard', compact(
+        $portalBilling = null;
+        if ($isPortal && $user) {
+            $subscription = BillingSubscription::query()
+                ->where('tenant_id', $user->id)
+                ->orderByDesc('created_at')
+                ->first();
+
+            $status = strtoupper((string) ($subscription?->status ?? ''));
+            $isPastDue = in_array($status, ['PAST_DUE', 'UNPAID', 'FAILURE', 'FAILED'], true);
+            $isCanceled = in_array($status, ['CANCELED', 'CANCELLED'], true);
+
+            $badge = 'unknown';
+            if ($status === 'ACTIVE') {
+                $badge = 'active';
+            } elseif ($isPastDue) {
+                $badge = 'past_due';
+            } elseif ($isCanceled) {
+                $badge = 'canceled';
+            }
+$nextRetryAt = $subscription?->next_payment_at ?? $subscription?->grace_until;
+$failureEvent = BillingEvent::query()
+                ->where('tenant_id', $user->id)
+                ->whereIn('type', ['iyzico.webhook.failed', 'dunning.retry_failed', 'dunning.retry_attempt'])
+                ->orderByDesc('created_at')
+                ->first();
+
+            $lastFailureMessage = $this->extractFailureMessage($failureEvent?->payload ?? null);
+
+            $portalBilling = [
+                'subscription' => $subscription,
+                'badge' => $badge,
+                'status' => $status,
+                'is_past_due' => $isPastDue,
+                'next_retry_at' => $nextRetryAt,
+                'last_failure_message' => $lastFailureMessage,
+            ];
+        }
+$payload = compact(
             'stats',
             'recent_orders',
             'marketplaces',
             'kpis',
             'topProducts',
             'mapData',
-            'range'
-        ));
+            'range',
+            'portalBilling',
+            'isPortal'
+        );
+
+        if ($isPortal) {
+            return view('customer.dashboard', $payload);
+        }
+
+        return view('admin.dashboard', $payload);
     }
 
     private function sumSoldQuantity($orders): int
@@ -159,12 +207,12 @@ class DashboardController extends Controller
             if (!$city) {
                 continue;
             }
-            $normalized = $this->normalizeCity($city);
+$normalized = $this->normalizeCity($city);
             $province = $provinceMap[$normalized] ?? null;
             if (!$province) {
                 continue;
             }
-            $qty = 0;
+$qty = 0;
             $items = is_array($order->items) ? $order->items : [];
             foreach ($items as $item) {
                 $qty += (int) ($item['quantity'] ?? $item['qty'] ?? $item['adet'] ?? 0);
@@ -172,7 +220,7 @@ class DashboardController extends Controller
             if ($qty <= 0) {
                 $qty = 1;
             }
-            $counts[$normalized] = ($counts[$normalized] ?? 0) + $qty;
+$counts[$normalized] = ($counts[$normalized] ?? 0) + $qty;
         }
 
         return $counts;
@@ -183,8 +231,7 @@ class DashboardController extends Controller
         if (!$shippingAddress) {
             return null;
         }
-
-        $raw = is_string($shippingAddress) ? trim($shippingAddress) : $shippingAddress;
+$raw = is_string($shippingAddress) ? trim($shippingAddress) : $shippingAddress;
 
         if (is_string($raw) && str_starts_with($raw, '{')) {
             $decoded = json_decode($raw, true);
@@ -334,5 +381,27 @@ class DashboardController extends Controller
             'Osmaniye' => 'TR-80',
             'Düzce' => 'TR-81',
         ];
+    }
+
+    private function extractFailureMessage(mixed $payload): ?string
+    {
+        if (!is_array($payload)) {
+            return null;
+        }
+$candidates = [
+            $payload['error_message'] ?? null,
+            $payload['errorMessage'] ?? null,
+            $payload['error'] ?? null,
+            $payload['message'] ?? null,
+            $payload['failure_message'] ?? null,
+        ];
+
+        foreach ($candidates as $value) {
+            if (is_string($value) && trim($value) !== '') {
+                return trim($value);
+            }
+        }
+
+        return null;
     }
 }

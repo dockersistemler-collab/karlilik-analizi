@@ -4,15 +4,23 @@ namespace App\Models;
 
 use App\Domain\Tickets\Models\Ticket;
 use App\Models\Customer;
+use App\Models\EInvoiceSetting;
+use App\Models\EInvoiceProviderInstallation;
+use App\Models\CargoProviderInstallation;
+use App\Models\SupportAccessLog;
+use App\Models\WebhookDelivery;
+use App\Models\WebhookEndpoint;
 use App\Models\Referral;
 use App\Models\ReferralProgram;
+use App\Models\Shipment;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
@@ -30,6 +38,9 @@ class User extends Authenticatable
         'invoice_number_tracking',
         'password',
         'role',
+        'plan_code',
+        'plan_started_at',
+        'plan_expires_at',
         'is_active',
         'email_verified_at',
     ];
@@ -46,6 +57,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
             'invoice_number_tracking' => 'boolean',
+            'plan_started_at' => 'datetime',
+            'plan_expires_at' => 'datetime',
         ];
     }
 
@@ -58,6 +71,31 @@ class User extends Authenticatable
     public function userModules()
     {
         return $this->hasMany(UserModule::class);
+    }
+
+    public function einvoiceSetting()
+    {
+        return $this->hasOne(EInvoiceSetting::class);
+    }
+
+    public function einvoiceProviderInstallations()
+    {
+        return $this->hasMany(EInvoiceProviderInstallation::class);
+    }
+
+    public function einvoiceProviderInstallation(string $key)
+    {
+        return $this->einvoiceProviderInstallations()->where('provider_key', $key)->first();
+    }
+
+    public function cargoProviderInstallations()
+    {
+        return $this->hasMany(CargoProviderInstallation::class);
+    }
+
+    public function cargoProviderInstallation(string $key)
+    {
+        return $this->cargoProviderInstallations()->where('provider_key', $key)->first();
     }
 
     public function modules()
@@ -103,9 +141,34 @@ class User extends Authenticatable
         return $this->hasMany(SubUser::class, 'owner_user_id');
     }
 
+    public function webhookEndpoints()
+    {
+        return $this->hasMany(WebhookEndpoint::class);
+    }
+
+    public function webhookDeliveries()
+    {
+        return $this->hasMany(WebhookDelivery::class);
+    }
+
     public function referrals()
     {
         return $this->hasMany(Referral::class, 'referrer_id');
+    }
+
+    public function shipments()
+    {
+        return $this->hasMany(Shipment::class);
+    }
+
+    public function supportAccessLogsAsSuperAdmin()
+    {
+        return $this->hasMany(SupportAccessLog::class, 'super_admin_id');
+    }
+
+    public function supportAccessLogsAsTarget()
+    {
+        return $this->hasMany(SupportAccessLog::class, 'target_user_id');
     }
 
     // Helper metodlar
@@ -129,3 +192,4 @@ class User extends Authenticatable
         return $this->subscription?->plan;
     }
 }
+

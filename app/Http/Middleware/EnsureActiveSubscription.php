@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use App\Support\SupportUser;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureActiveSubscription
@@ -13,18 +14,14 @@ class EnsureActiveSubscription
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user();
-
-        if (!$user && auth('subuser')->check()) {
-            $subUser = auth('subuser')->user();
-            $user = $subUser?->owner;
-        }
+        $user = SupportUser::currentUser();
+        $supportView = SupportUser::isEnabled();
 
         if (!$user) {
             abort(401);
         }
 
-        if ($user->isSuperAdmin()) {
+        if ($user->isSuperAdmin() && !$supportView) {
             return $next($request);
         }
 

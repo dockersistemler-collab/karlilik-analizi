@@ -45,8 +45,7 @@ class CategoryController extends Controller
         if ($search !== '') {
             $categoriesQuery->where('name', 'like', '%' . $search . '%');
         }
-
-        $categories = $categoriesQuery->paginate(25)->withQueryString();
+$categories = $categoriesQuery->paginate(25)->withQueryString();
 
         $categoryIds = $categories->getCollection()->pluck('id');
         $mappingsByCategory = CategoryMapping::query()
@@ -77,8 +76,7 @@ class CategoryController extends Controller
     {
         $user = $request->user();
 
-        $validated = $request->validate([
-            'name' => [
+        $validated = $request->validate(['name' => [
                 'required',
                 'string',
                 'max:255',
@@ -98,7 +96,7 @@ class CategoryController extends Controller
             ], 201);
         }
 
-        return redirect()->route('admin.categories.index')
+        return redirect()->route('portal.categories.index')
             ->with('success', 'Kategori oluşturuldu.');
     }
 
@@ -106,8 +104,7 @@ class CategoryController extends Controller
     {
         $user = $request->user();
 
-        $validated = $request->validate([
-            'marketplace_id' => 'required|integer|exists:marketplaces,id',
+        $validated = $request->validate(['marketplace_id' => 'required|integer|exists:marketplaces,id',
             'only_leaf' => 'nullable|boolean',
             'create_mappings' => 'nullable|boolean',
         ]);
@@ -140,11 +137,10 @@ class CategoryController extends Controller
                 ], 202);
             }
 
-            return redirect()->route('admin.categories.index')
+            return redirect()->route('portal.categories.index')
                 ->with('info', 'Kategori senkronu kuyruğa alındı. Lütfen 1-2 dakika sonra tekrar deneyin.');
         }
-
-        $items = $query->orderBy('path')->get(['id', 'external_id', 'path', 'name']);
+$items = $query->orderBy('path')->get(['id', 'external_id', 'path', 'name']);
 
         $created = 0;
         $mapped = 0;
@@ -154,8 +150,7 @@ class CategoryController extends Controller
             if (!$name) {
                 continue;
             }
-
-            $category = Category::query()->firstOrCreate(
+$category = Category::query()->firstOrCreate(
                 ['user_id' => $user->id, 'name' => $name],
                 ['user_id' => $user->id, 'name' => $name]
             );
@@ -192,7 +187,7 @@ class CategoryController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.categories.index')
+        return redirect()->route('portal.categories.index')
             ->with('success', "İçe aktarma tamamlandı. Yeni kategori: {$created}, eşlenen: {$mapped}.");
     }
 
@@ -208,8 +203,7 @@ class CategoryController extends Controller
         $this->ensureOwner($category);
         $user = $request->user();
 
-        $validated = $request->validate([
-            'name' => [
+        $validated = $request->validate(['name' => [
                 'required',
                 'string',
                 'max:255',
@@ -217,8 +211,7 @@ class CategoryController extends Controller
             ],
         ]);
 
-        $category->update([
-            'name' => $validated['name'],
+        $category->update(['name' => $validated['name'],
         ]);
 
         if ($request->ajax() || $request->expectsJson()) {
@@ -228,7 +221,7 @@ class CategoryController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.categories.index')
+        return redirect()->route('portal.categories.index')
             ->with('success', 'Kategori güncellendi.');
     }
 
@@ -237,7 +230,7 @@ class CategoryController extends Controller
         $this->ensureOwner($category);
         $category->delete();
 
-        return redirect()->route('admin.categories.index')
+        return redirect()->route('portal.categories.index')
             ->with('success', 'Kategori silindi.');
     }
 
@@ -249,3 +242,5 @@ class CategoryController extends Controller
         }
     }
 }
+
+

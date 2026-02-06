@@ -10,29 +10,30 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsureSubUserPermission
 {
     private const ROUTE_PERMISSION_MAP = [
-        'admin.dashboard' => 'dashboard',
-        'admin.products.' => 'products',
-        'admin.marketplace-products.' => 'products',
-        'admin.categories.' => 'products',
-        'admin.brands.' => 'products',
-        'admin.orders.' => 'orders',
-        'admin.customers.' => 'customers',
-        'admin.reports.index' => 'reports.orders',
-        'admin.reports.top-products' => 'reports.top_products',
-        'admin.reports.sold-products' => 'reports.sold_products',
-        'admin.reports.category-sales' => 'reports.category_sales',
-        'admin.reports.brand-sales' => 'reports.brand_sales',
-        'admin.reports.vat' => 'reports.vat',
-        'admin.reports.commission' => 'reports.commission',
-        'admin.reports.stock-value' => 'reports.stock_value',
-        'admin.integrations.' => 'integrations',
-        'admin.addons.' => 'addons',
-        'admin.subscription' => 'subscription',
-        'admin.subscription.' => 'subscription',
-        'admin.settings.' => 'settings',
-        'admin.help.' => 'help',
-        'admin.tickets.' => 'tickets',
-        'admin.invoices.' => 'invoices',
+        'portal.dashboard' => 'dashboard',
+        'portal.products.' => 'products',
+        'portal.marketplace-products.' => 'products',
+        'portal.categories.' => 'products',
+        'portal.brands.' => 'products',
+        'portal.orders.' => 'orders',
+        'portal.customers.' => 'customers',
+        'portal.reports.index' => 'reports.orders',
+        'portal.reports.top-products' => 'reports.top_products',
+        'portal.reports.sold-products' => 'reports.sold_products',
+        'portal.reports.category-sales' => 'reports.category_sales',
+        'portal.reports.brand-sales' => 'reports.brand_sales',
+        'portal.reports.vat' => 'reports.vat',
+        'portal.reports.commission' => 'reports.commission',
+        'portal.reports.stock-value' => 'reports.stock_value',
+        'portal.integrations.' => 'integrations',
+        'portal.addons.' => 'addons',
+        'portal.subscription' => 'subscription',
+        'portal.subscription.' => 'subscription',
+        'portal.settings.' => 'settings',
+        'portal.help.' => 'help',
+        'portal.tickets.' => 'tickets',
+        'portal.invoices.' => 'invoices',
+        'portal.notification-hub.' => 'settings',
     ];
 
     public function handle(Request $request, Closure $next): Response
@@ -40,18 +41,15 @@ class EnsureSubUserPermission
         if (!Auth::guard('subuser')->check()) {
             return $next($request);
         }
-
-        $routeName = $request->route()?->getName();
+$routeName = $request->route()?->getName();
         if (!$routeName) {
             abort(403);
         }
-
-        $permissionKey = $this->resolvePermissionKey($routeName);
+$permissionKey = $this->resolvePermissionKey($routeName);
         if (!$permissionKey) {
             abort(403);
         }
-
-        $subUser = Auth::guard('subuser')->user();
+$subUser = Auth::guard('subuser')->user();
         if (!$subUser || !$subUser->hasPermission($permissionKey)) {
             abort(403);
         }

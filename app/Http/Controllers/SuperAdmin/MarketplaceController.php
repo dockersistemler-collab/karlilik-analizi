@@ -23,8 +23,7 @@ class MarketplaceController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
+        $validated = $request->validate(['name' => 'required|string|max:255',
             'code' => 'required|string|unique:marketplaces,code',
             'api_url' => 'nullable|url',
             'logo_url' => 'nullable|string|max:2048',
@@ -43,7 +42,7 @@ class MarketplaceController extends Controller
             $settings['logo_path'] = $path;
             $settings['logo_url'] = '/storage/' . ltrim($path, '/');
         }
-        $validated['settings'] = empty($settings) ? null : $settings;
+$validated['settings'] = empty($settings) ? null : $settings;
 
         Marketplace::create($validated);
 
@@ -63,8 +62,7 @@ class MarketplaceController extends Controller
 
     public function update(Request $request, Marketplace $marketplace)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
+        $validated = $request->validate(['name' => 'required|string|max:255',
             'code' => 'required|string|unique:marketplaces,code,' . $marketplace->id,
             'api_url' => 'nullable|url',
             'logo_url' => 'nullable|string|max:2048',
@@ -94,11 +92,11 @@ class MarketplaceController extends Controller
             if (!empty($settings['logo_path']) && Storage::disk('public')->exists($settings['logo_path'])) {
                 Storage::disk('public')->delete($settings['logo_path']);
             }
-            $path = $request->file('logo_file')->store('marketplace-logos', 'public');
+$path = $request->file('logo_file')->store('marketplace-logos', 'public');
             $settings['logo_path'] = $path;
             $settings['logo_url'] = '/storage/' . ltrim($path, '/');
         }
-        $validated['settings'] = empty($settings) ? null : $settings;
+$validated['settings'] = empty($settings) ? null : $settings;
 
         $marketplace->update($validated);
 

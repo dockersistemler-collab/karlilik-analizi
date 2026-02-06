@@ -24,10 +24,9 @@ class SubUserAuthenticatedSessionController extends Controller
         if ($subUser) {
             $subUser->forceFill(['last_login_at' => now()])->save();
         }
+$request->session()->regenerate();
 
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('admin.dashboard', absolute: false));
+        return redirect()->intended(route('portal.dashboard', absolute: false));
     }
 
     public function destroy(Request $request): RedirectResponse
@@ -40,3 +39,5 @@ class SubUserAuthenticatedSessionController extends Controller
         return redirect()->route('subuser.login');
     }
 }
+
+

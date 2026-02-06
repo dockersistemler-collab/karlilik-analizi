@@ -37,8 +37,7 @@ class CategorySalesReportService
                         'orders' => 0,
                     ]);
                 }
-
-                $row = $grouped->get($category);
+$row = $grouped->get($category);
                 $row['revenue'] += $revenue;
                 $row['orders'] += $qty;
                 $grouped->put($category, $row);

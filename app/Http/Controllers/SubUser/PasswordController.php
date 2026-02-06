@@ -27,17 +27,14 @@ class PasswordController extends Controller
         if (!$subUser) {
             abort(403);
         }
-
-        $validated = $request->validate([
-            'current_password' => 'required|string',
+$validated = $request->validate(['current_password' => 'required|string',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
         if (!Hash::check($validated['current_password'], $subUser->password)) {
             return back()->withErrors(['current_password' => 'Mevcut şifre yanlış.']);
         }
-
-        $subUser->update([
+$subUser->update([
             'password' => $validated['password'],
         ]);
 

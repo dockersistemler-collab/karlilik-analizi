@@ -38,8 +38,7 @@ class CustomerController extends Controller
     {
         $user = $request->user();
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
+        $validated = $request->validate(['name' => 'required|string|max:255',
             'email' => ['required', 'email', 'max:255', Rule::unique('customers', 'email')],
             'phone' => 'nullable|string|max:30',
             'city' => 'nullable|string|max:100',
@@ -87,7 +86,7 @@ class CustomerController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.customers.index')
+        return redirect()->route('portal.customers.index')
             ->with('success', 'Müşteri eklendi.');
     }
 
@@ -120,9 +119,7 @@ class CustomerController extends Controller
         if ($customer->user_id !== $user->id) {
             abort(403);
         }
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
+$validated = $request->validate(['name' => 'required|string|max:255',
             'email' => ['required', 'email', 'max:255', Rule::unique('customers', 'email')->ignore($customer->id)],
             'phone' => 'nullable|string|max:30',
             'city' => 'nullable|string|max:100',
@@ -148,7 +145,7 @@ class CustomerController extends Controller
 
         $customer->update($validated);
 
-        return redirect()->route('admin.customers.show', $customer)
+        return redirect()->route('portal.customers.show', $customer)
             ->with('success', 'Müşteri güncellendi.');
     }
 
@@ -159,10 +156,13 @@ class CustomerController extends Controller
         if ($customer->user_id !== $user->id) {
             abort(403);
         }
+$customer->delete();
 
-        $customer->delete();
-
-        return redirect()->route('admin.customers.index')
+        return redirect()->route('portal.customers.index')
             ->with('success', 'Müşteri silindi.');
     }
 }
+
+
+
+

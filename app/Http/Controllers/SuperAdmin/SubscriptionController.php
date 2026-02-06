@@ -7,6 +7,7 @@ use App\Models\Subscription;
 use App\Models\Invoice;
 use App\Models\Plan;
 use App\Models\User;
+use App\Services\BillingEventLogger;
 use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
@@ -36,8 +37,7 @@ class SubscriptionController extends Controller
         if ($request->filled('date_to')) {
             $query->whereDate('starts_at', '<=', $request->date_to);
         }
-
-        $subscriptions = $query->paginate(30)->withQueryString();
+$subscriptions = $query->paginate(30)->withQueryString();
         $plans = Plan::orderBy('sort_order')->orderBy('price')->get();
 
         return view('super-admin.subscriptions.index', compact('subscriptions', 'plans'));
@@ -64,8 +64,7 @@ class SubscriptionController extends Controller
         if ($request->filled('date_to')) {
             $query->whereDate('issued_at', '<=', $request->date_to);
         }
-
-        $invoices = $query->paginate(30)->withQueryString();
+$invoices = $query->paginate(30)->withQueryString();
 
         return view('super-admin.invoices.index', compact('invoices'));
     }
@@ -77,10 +76,9 @@ class SubscriptionController extends Controller
         return view('super-admin.invoices.create', compact('clients'));
     }
 
-    public function storeInvoice(Request $request)
+    public function storeInvoice(Request $request, BillingEventLogger $events)
     {
-        $validated = $request->validate([
-            'user_id' => 'required|integer|exists:users,id',
+        $validated = $request->validate(['user_id' => 'required|integer|exists:users,id',
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'required|email|max:255',
             'billing_address' => 'nullable|string|max:1000',
@@ -93,7 +91,7 @@ class SubscriptionController extends Controller
 
         $invoiceNumber = 'INV-' . now()->format('Ymd') . '-' . str_pad((string) random_int(1, 999999), 6, '0', STR_PAD_LEFT);
 
-        Invoice::create([
+        $invoice = Invoice::create([
             'user_id' => $validated['user_id'],
             'subscription_id' => null,
             'invoice_number' => $invoiceNumber,
@@ -107,6 +105,29 @@ class SubscriptionController extends Controller
             'billing_address' => $validated['billing_address'] ?? null,
             'notes' => $validated['notes'] ?? null,
         ]);
+        $events->record(['tenant_id' => (int) $validated['user_id'],
+            'user_id' => (int) $validated['user_id'],
+            'invoice_id' => $invoice->id,
+            'type' => 'invoice.created',
+            'status' => $invoice->status,
+            'amount' => $invoice->amount,
+            'currency' => $invoice->currency,
+            'provider' => 'manual',
+            'payload' => [
+                'invoice_number' => $invoice->invoice_number,
+            ],
+        ]);
+        if ($invoice->status === 'paid') {
+            $events->record(['tenant_id' => (int) $validated['user_id'],
+                'user_id' => (int) $validated['user_id'],
+                'invoice_id' => $invoice->id,
+                'type' => 'invoice.paid',
+                'status' => $invoice->status,
+                'amount' => $invoice->amount,
+                'currency' => $invoice->currency,
+                'provider' => 'manual',
+            ]);
+        }
 
         return redirect()->route('super-admin.invoices.index')
             ->with('success', 'Fatura oluşturuldu.');
@@ -118,8 +139,7 @@ class SubscriptionController extends Controller
         if (mb_strlen($query) < 2) {
             return response()->json([]);
         }
-
-        $users = User::query()
+$users = User::query()
             ->where('role', 'client')
             ->where(function ($builder) use ($query) {
                 $builder->where('name', 'like', '%'.$query.'%')
@@ -153,8 +173,7 @@ class SubscriptionController extends Controller
         if ($request->filled('date_to')) {
             $query->whereDate('issued_at', '<=', $request->date_to);
         }
-
-        $filename = 'invoices-' . now()->format('Ymd-His') . '.csv';
+$filename = 'invoices-' . now()->format('Ymd-His') . '.csv';
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
@@ -167,8 +186,7 @@ class SubscriptionController extends Controller
                 foreach ($invoices as $invoice) {
                     fputcsv($handle, [
                         $invoice->invoice_number,
-                        $invoice->user?->name,
-                        $invoice->user?->email,
+                        $invoice->user?->name, $invoice->user?->email,
                         optional($invoice->issued_at)->format('Y-m-d'),
                         $invoice->amount,
                         $invoice->currency,
@@ -207,8 +225,7 @@ class SubscriptionController extends Controller
         if ($request->filled('date_to')) {
             $query->whereDate('starts_at', '<=', $request->date_to);
         }
-
-        $filename = 'subscriptions-' . now()->format('Ymd-His') . '.csv';
+$filename = 'subscriptions-' . now()->format('Ymd-His') . '.csv';
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
@@ -220,9 +237,7 @@ class SubscriptionController extends Controller
             $query->chunk(200, function ($subs) use ($handle) {
                 foreach ($subs as $subscription) {
                     fputcsv($handle, [
-                        $subscription->user?->name,
-                        $subscription->user?->email,
-                        $subscription->plan?->name,
+                        $subscription->user?->name, $subscription->user?->email, $subscription->plan?->name,
                         optional($subscription->starts_at)->format('Y-m-d'),
                         optional($subscription->ends_at)->format('Y-m-d'),
                         $subscription->amount,

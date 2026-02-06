@@ -8,6 +8,7 @@ use App\Models\AppSetting;
 use App\Models\Marketplace;
 use App\Models\MarketplaceCredential;
 use App\Services\Entitlements\EntitlementService;
+use App\Events\QuotaWarningReached;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -26,10 +27,16 @@ class IntegrationController extends Controller
             }])
             ->get();
 
-        $plan = $user?->getActivePlan();
-        if ($plan) {
+        if ($user) {
             $marketplaces = $marketplaces
-                ->filter(fn ($marketplace) => $plan->hasModule('integrations.marketplace.' . ($marketplace->code ?? '')))
+                ->filter(function ($marketplace) use ($user) {
+                    $code = $marketplace->code ?? null;
+                    if (!is_string($code) || trim($code) === '') {
+                        return false;
+                    }
+
+                    return $this->entitlements->hasModule($user, 'integration.marketplace.' . $code);
+                })
                 ->values();
         }
 
@@ -68,8 +75,7 @@ class IntegrationController extends Controller
         if ($marketplace->code === 'ciceksepeti') {
             $rules['api_key'] = 'required|string|max:255';
         }
-
-        $validated = $request->validate($rules, [
+$validated = $request->validate($rules, [
             'api_key.required' => 'API anahtarı zorunludur.',
             'supplier_id.required' => 'Mağaza ID zorunludur.',
             'store_name.required' => 'Mağaza adı zorunludur.',
@@ -85,10 +91,10 @@ class IntegrationController extends Controller
         $original = $credential ? $credential->only(['api_key', 'api_secret', 'supplier_id', 'store_id', 'is_active']) : null;
 
         if ($wantsActive) {
-            $moduleCode = 'integration.' . ($marketplace->code ?? '');
+            $moduleCode = 'integration.marketplace.' . ($marketplace->code ?? '');
             if (!$this->entitlements->hasModule($user, $moduleCode)) {
                 return redirect()
-                    ->route('admin.modules.upsell', ['code' => $moduleCode])
+                    ->route('portal.modules.upsell', ['code' => $moduleCode])
                     ->with('info', 'Bu pazaryeri entegrasyonu hesabınız için aktif değil. Satın alarak açabilirsiniz.');
             }
         }
@@ -99,19 +105,17 @@ class IntegrationController extends Controller
                 return back()->with('info', 'Abonelik limitiniz doldu. Daha fazla pazaryeri ekleyemezsiniz.');
             }
         }
-
-        $extra = $credential?->extra_credentials ?? [];
+$extra = $credential?->extra_credentials ?? [];
         foreach (['store_name', 'fixed_description'] as $field) {
             if ($request->has($field)) {
                 $extra[$field] = $validated[$field] ?? null;
             }
         }
-        $extra = array_filter($extra ?? [], static fn ($value) => $value !== null && $value !== '');
+$extra = array_filter($extra ?? [], static fn ($value) => $value !== null && $value !== '');
         if (empty($extra)) {
             $extra = null;
         }
-
-        $data = [
+$data = [
             'user_id' => $user->id,
             'marketplace_id' => $marketplace->id,
             'api_key' => $validated['api_key'] ?? null,
@@ -139,6 +143,29 @@ class IntegrationController extends Controller
             }
         }
 
+        if ($user && !$user->isSuperAdmin() && $wantsActive) {
+            $subscription = $user->subscription?->fresh();
+$plan = $subscription?->plan;
+$limit = (int) ($plan?->max_marketplaces ?? 0);
+            if ($limit > 0 && $subscription && $subscription->isActive()) {
+                $used = MarketplaceCredential::query()
+                    ->where('user_id', $user->id)
+                    ->where('is_active', true)
+                    ->count();
+                if ($used >= (int) ceil($limit * 0.8)) {
+                    event(new QuotaWarningReached(
+                        $user->id,
+                        'marketplaces',
+                        $used,
+                        $limit,
+                        80,
+                        null,
+                        now()->toDateTimeString()
+                    ));
+                }
+            }
+        }
+
         if ($wantsActive) {
             $categoryMappingEnabled = (bool) AppSetting::getValue('category_mapping_enabled', true);
             $autoSyncEnabled = (bool) AppSetting::getValue('category_mapping_auto_sync_enabled', true);
@@ -160,7 +187,7 @@ class IntegrationController extends Controller
             }
         }
 
-        return redirect()->route('admin.integrations.index')
+        return redirect()->route('portal.integrations.index')
             ->with('success', 'Pazaryeri bağlantısı güncellendi.');
     }
 
@@ -169,3 +196,5 @@ class IntegrationController extends Controller
         return back()->with('info', 'Bağlantı testi yakında eklenecek.');
     }
 }
+
+

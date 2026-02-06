@@ -1,183 +1,285 @@
 ﻿# Session Memory
 
-**Last updated:** 2026-01-31
+**Last updated:** 2026-02-06
 
-## Status
-- Rapor modülleri sıfırdan kuruldu: Çok Satan Ürünler, Satılan Ürünler, Sipariş/Ciro, Kategori, Marka, KDV, Komisyon, Stok Değeri.
-- Yeni servis katmanı eklendi: `app/Services/Reports/*` ve ortak filtre yardımcıları.
-- Rapor exportları CSV/Excel (CSV) olarak eklendi; exportlar için global aç/kapa ayarı (super-admin) ve middleware eklendi.
-- Sipariş/Ciro raporuna tablo + Chart.js grafikler eklendi; faturalı export placeholder olarak bağlandı.
-- Satılan Ürünler raporuna yazdırma (print) sayfası eklendi.
-- Kategori/Marka raporlarında grafik tipi seçimi (Pasta/Yatay/Çubuk) eklendi.
-- Komisyon raporu grafik yerine kartlar ile gösteriliyor.
-- Stok değeri raporu özet kartlar + tablo ile yenilendi.
-- Admin/super-admin panelleri beyaz tema + #ff4439 aksan rengine çekildi.
-- Sidebar hover ile açılır/kapanır yapıldı; yazılar antrasit, hover rengi #ff4439.
-- Fatura oluştur sayfasında arama sonrası “Müşteri Ekle” butonu iyileştirildi (admin + super-admin).
-- Panel radius/gölge azaltıldı; genel radius 5px’e çekildi; sidebar faturalar “+” kaldırıldı.
-- Müşteri ekleme modalında JSON dönüş problemi ve modal kapanmama takibi için iyileştirmeler yapıldı.
-- Müşteri e‑posta tekilliği doğrulaması eklendi (admin + super-admin).
-- Alt kullanıcı (sub_users) modülü için altyapı ve ekranlar eklendi; super admin için ayrı liste hazır.
-- Admin/super-admin profil dropdown menüleri eklendi, admin sidebar’a “Alt Kullanıcılar” linki geldi.
-- Ürün ekleme/düzenleme ekranına marka/kategori arama + hızlı ekleme, barkod üret, desi hesaplama, KDV oranı, açıklama editörü ve çoklu resim yükleme eklendi; ürün açıklaması HTML olarak gösteriliyor.
-- Desi hesaplama formülü (En x Boy x Yukseklik / 3) ve agirlik karsilastirmasi eklendi; KDV oranina %0 secenegi geldi; desi/barkod butonlari kucultuldu ve modal daha sik hale getirildi.
-- TinyMCE Community (sade/word-benzeri toolbar) aktif; urun aciklamasi whitelist ile sanitize ediliyor; rich content icin CSS normalize edildi; desi modal UI daha zarif hale getirildi.
-- Ürün listesinde satırlar arası boşluk ve hafif gölge eklendi (kart görünümlü satırlar).
-- Super admin layout buton stili `btn` sistemine alındı; odak çizgisi nötrleştirildi.
-- Public home/pricing butonları `btn` sistemine taşındı (solid/outline hover uyumlu).
-- Admin/super-admin layout `main button` stili, `.btn` sınıflarını ezmeyecek şekilde güncellendi.
-- Banner sistemi eklendi (super admin yönetimi + admin/public gösterim).
-- Banner için geri sayım (ends_at) desteği eklendi.
-- Ürün listesi arama/pagination AJAX yapıldı, banner yerleşimi header altına alındı.
-- Profil sayfası admin layout içine alındı ve Türkçeleştirildi; destek sayfası Türkçe karakterleri düzeltildi.
-- Ürün import/ekleme için SKU boşsa otomatik üretim eklendi; SKU eşsizliği kullanıcı bazına taşındı (migrasyon eklendi).
-- Ürün import sonucuna detaylı atlama nedenleri eklendi (boş/invalid/eksik/limit/aynı SKU).
-- Sidebar üst ve sağ kenarları #ff4439 aksan rengiyle vurgulandı; sağ kenarlar ovalleştirildi (admin/super-admin).
-- Sidebar sabit (fixed) hale getirildi; içeriğe sol boşluk ve hover/pin genişleme paddingi eklendi (admin/super-admin).
-- KDV raporu pazaryeri bazlı kartlara çevrildi; renkler super-admin ayarlarından yönetilebilir hale getirildi.
-- Dashboard’ta harita tabı büyütülüp Leaflet + Türkiye GeoJSON ile çiziliyor; il bazlı sipariş adedi tooltip’te gösteriliyor, il isimleri harita üzerinde sabit yazıyor (map verisi `/public/maps/turkey-provinces.geojson`, Leaflet assets local `public/vendor/leaflet`).
-- Admin paneline sabit hızlı menü (floating + butonu) eklendi; seçenekler super-admin ayarlarından yönetilebiliyor.
-- Hızlı menüde sıralama sürükle-bırak, ikon/renk seçimi ve rol bazlı görünürlük ayarları eklendi.
-- Hızlı menü sayfa yüklenişinde otomatik kapanacak şekilde güvence eklendi (DOMContentLoaded/pageshow).
-- Admin/super-admin için `.btn-outline` butonlar güçlendirildi (dashed border + zorlayan stiller), rapor sayfalarında görünür.
-- Hızlı menü kapalı başlatma/hidden davranışı sağlamlaştırıldı (menu hidden attribute + CSS override).
-- Kategori eşitleme altyapısı eklendi: pazaryeri kategori cache + kategori↔pazaryeri mapping ekranı.
-- Ürünlerde kategori alanı internal kategoriye taşındı (`products.category_id`) ve ürün formu select olarak güncellendi.
-- Admin sidebar: submenu açıkken sidebar kapanınca görünüm bozan durum için CSS güvence eklendi.
-- Super admin ayarlarına “Kategori Eşitleme” sekmesi eklendi (aktif/pasif, auto-sync, ürün ekranında inline panel, içe aktarım varsayılanları).
-- Güvenlik: `.env` repo kökünden kaldırıldı; arşiv dosyaları ignore edildi (zip/rar/7z). Yeni arşiv oluştururken `.env` dahil edilmemeli.
-- Queue: production ortamında `QUEUE_CONNECTION=sync` engellendi; Redis/database queue + worker zorunlu. Marketplace kategori senkronu artık request içinde değil job olarak kuyruklanıyor.
-- Panel görünümü ayarları eklendi (font/aksan rengi/radius) ve varsayılan font Poppins yapıldı (admin + super-admin).
-- Paket bazlı modül aç/kapa altyapısı eklendi: süper admin paket düzenle ekranında modül + alt-modül seçimi (Rapor alt sayfaları, Entegrasyon pazaryerleri dahil) + route middleware ile erişim kontrolü + menü/hızlı menü görünürlüğü.
-- Exportlar paket bazlı aç/kapat yapıldı (ürün/sipariş/fatura + rapor exportları ayrı ayrı).
-- Destek sayfası görsel olarak iyileştirildi (soft gradient arkaplan, dekoratif şekiller, renkli kartlar) ve paketinde “Destek” kapalıysa buton buna göre davranıyor.
-- Ticket ekranları renklendirildi (liste/oluştur/detay): soft gradient header, renkli kartlar ve daha okunur badge/mesaj görünümleri.
-- Admin → Genel Ayarlar ekranı sekmeli hale getirildi (Firma/Fatura/Bildirim aktif; diğerleri placeholder + ilgili sayfaya yönlendirme).
-- “Müşteri bazlı modül satışı” altyapısı eklendi: `modules` + `user_modules`, `EntitlementService`, `EnsureModuleEnabled` middleware ve super-admin için modül CRUD/atama ekranları.
-- EntitlementService’e satın alma sonrası yönetim metodları eklendi: `grantModule/revokeModule/setModuleStatus`.
-- Modül satın alma akışı için `module_purchases` tablosu + servis eklendi (manual + iyzico webhook). Super-admin panelde “Modül Satışları” ekranı üzerinden onay/iptal/iade yapılabiliyor.
+## Mail Altyapısı Özeti
+- Akış: Event -> Listener (ShouldQueue) -> MailSender -> mail_logs
+- Policy hook: MailPolicyService + mail_rule_assignments
+- Admin panel: mail logları ve mail template yönetimi
+
+## Tamamlanan Mail Senaryoları (M001-M012)
+- M001: Support view bildirimi
+  - Event: app/Events/SupportViewStarted.php
+  - Listener: app/Listeners/SendSupportViewStartedMail.php
+  - Template: security.support_view_used
+  - Dispatch: app/Services/Admin/SupportViewService.php::start
+  - Dedupe: yok
+  - Test: tests/Feature/Mail/SupportViewStartedMailTest.php
+- M002: Pazaryeri bağlantısı koptu
+  - Event: app/Events/MarketplaceConnectionLost.php
+  - Listener: app/Listeners/SendMarketplaceConnectionLostMail.php
+  - Template: mp.connection_lost
+  - Dispatch: app/Services/Marketplace/Category/TrendyolCategoryProvider.php::fetchCategoryTree
+  - Dedupe: yok
+  - Test: tests/Feature/Mail/MarketplaceConnectionLostMailTest.php
+- M003: Ödeme başarısız
+  - Event: app/Events/PaymentFailed.php
+  - Listener: app/Listeners/SendPaymentFailedMail.php
+  - Template: payment.failed
+  - Dispatch: app/Http/Controllers/Payments/IyzicoCheckoutCallbackController.php::__invoke
+  - Dedupe: error_code bazlı 30 dk
+  - Test: tests/Feature/Mail/PaymentFailedMailTest.php
+- M004: Trial bitti
+  - Event: app/Events/TrialEnded.php
+  - Listener: app/Listeners/SendTrialEndedMail.php
+  - Template: trial.ended
+  - Dispatch: app/Console/Commands/SubscriptionMaintenanceCommand.php::handle
+  - Dedupe: user bazlı 24 saat
+  - Test: tests/Feature/Mail/TrialEndedMailTest.php
+- M005: Kota aşıldı
+  - Event: app/Events/QuotaExceeded.php
+  - Listener: app/Listeners/SendQuotaExceededMail.php
+  - Template: quota.exceeded
+  - Dispatch: app/Http/Controllers/Admin/ProductController.php::store
+  - Dedupe: quota_key + period bazlı 24 saat
+  - Test: tests/Feature/Mail/QuotaExceededMailTest.php
+- M006: Ödeme başarılı
+  - Event: app/Events/PaymentSucceeded.php
+  - Listener: app/Listeners/SendPaymentSucceededMail.php
+  - Template: payment.succeeded
+  - Dispatch: app/Http/Controllers/Payments/IyzicoCheckoutCallbackController.php::__invoke
+  - Dedupe: transaction_id varsa tekrar yok, yoksa occurred_at dakika bazlı
+  - Test: tests/Feature/Mail/PaymentSucceededMailTest.php
+- M007: Kota %80 uyarısı
+  - Event: app/Events/QuotaWarningReached.php
+  - Listener: app/Listeners/SendQuotaWarningMail.php
+  - Template: quota.warning_80
+  - Dispatch: app/Http/Controllers/Admin/ProductController.php::store
+  - Dispatch: app/Http/Controllers/Admin/IntegrationController.php::update
+  - Dispatch: app/Observers/OrderObserver.php::created
+  - Dedupe: user + quota_type + period bazlı 7 gün
+  - Test: tests/Feature/Mail/QuotaWarningReachedMailTest.php
+- M008: Fatura oluşturuldu
+  - Event: app/Events/InvoiceCreated.php
+  - Listener: app/Listeners/SendInvoiceCreatedMail.php
+  - Template: invoice.created
+  - Dispatch: app/Services/EInvoices/EInvoiceService.php::issue
+  - Dedupe: invoice_id bazlı
+  - Test: tests/Feature/Mail/InvoiceCreatedMailTest.php
+- M009: Fatura oluşturulamadı
+  - Event: app/Events/InvoiceFailed.php
+  - Listener: app/Listeners/SendInvoiceFailedMail.php
+  - Template: invoice.failed
+  - Dispatch: app/Services/EInvoices/EInvoiceService.php::issue (catch)
+  - Dedupe: invoice_id bazlı
+  - Test: tests/Feature/Mail/InvoiceFailedMailTest.php
+- M010: Token bitişi yaklaşıyor
+  - Event: app/Events/MarketplaceTokenExpiring.php
+  - Listener: app/Listeners/SendMarketplaceTokenExpiringMail.php
+  - Template: mp.token_expiring
+  - Dispatch: app/Console/Commands/CheckMarketplaceTokenExpirationsCommand.php::handle
+  - Dedupe: marketplace_credential_id + days_left bazlı 24 saat
+  - Test: tests/Feature/Mail/MarketplaceTokenExpiringMailTest.php
+- M011: Abonelik başladı
+  - Event: app/Events/SubscriptionStarted.php
+  - Listener: app/Listeners/SendSubscriptionStartedMail.php
+  - Template: subscription.started
+  - Dispatch: app/Http/Controllers/SubscriptionController.php::store, app/Http/Controllers/SubscriptionController.php::renew
+  - Dedupe: subscription_id bazlı
+  - Test: tests/Feature/Mail/SubscriptionStartedMailTest.php
+- M012: Abonelik yenilendi
+  - Event: app/Events/SubscriptionRenewed.php
+  - Listener: app/Listeners/SendSubscriptionRenewedMail.php
+  - Template: subscription.renewed
+  - Dispatch: app/Http/Controllers/SubscriptionController.php::store
+  - Dedupe: subscription_id + period_end veya renewed_at bazlı
+  - Test: tests/Feature/Mail/SubscriptionRenewedMailTest.php
+
+Not:
+- subscription.cancelled senaryosu ayrıca mevcut.
+  - Event: app/Events/SubscriptionCancelled.php
+  - Listener: app/Listeners/SendSubscriptionCancelledMail.php
+  - Template: subscription.cancelled
+  - Dispatch: app/Http/Controllers/SubscriptionController.php::cancel
+  - Dedupe: subscription_id bazlı
+  - Test: tests/Feature/Mail/SubscriptionCancelledMailTest.php
+
+## Scheduler
+- marketplace:check-token-expirations dailyAt 09:00 Europe/Istanbul
+
+## Bildirim Merkezi (Notification Hub)
+- Tablolar (migration):
+  - app_notifications
+  - notification_preferences
+  - notification_audit_logs
+- Modeller/Enumlar/Servisler:
+  - app/Models/Notification.php
+  - app/Models/NotificationPreference.php
+  - app/Models/NotificationAuditLog.php
+  - app/Enums/NotificationType.php
+  - app/Enums/NotificationChannel.php
+  - app/Enums/NotificationSource.php
+
+## Sistem Ayarları (Super Admin)
+- Mail & Bildirim Ayarları sekmesi eklendi.
+- system_settings tablosu + SettingsRepository ile DB tabanlı mail override ve test mail akışı.
+- Incident & SLA ayarları artık super-admin Sistem Ayarları’ndan yönetilir; incident_sla config defaultları override edilir.
+- Integration Health eşikleri artık super-admin Sistem Ayarları’ndan yönetilir; integration_health config defaultları DB ile override edilir.
+- Feature gating: plan bazli plan_matrix (system_settings: features.plan_matrix), FeatureGate + EnsureFeatureEnabled ve admin upgrade ekranı.
+- Billing MVP eklendi: plan katalogu system_settings billing.plans_catalog; admin billing/plans + checkout stub + success ile tenant plan_code guncellenir (user.plan_code legacy).
+- Iyzico checkout init eklendi: iyzico.enabled true ise checkout iframe formu basiliyor; callback/webhook sonraki adimda.
+- Iyzico callback + webhook eklendi: callback token ile API retrieve dogrular, webhook signature HMAC ile dogrular ve idempotent completion yapar. Webhook secret olmadan 400 doner.
+- Iyzico Subscription MVP eklendi: billing_subscriptions + billing_subscription_events, abonelik webhook'u ile retrieveSubscription dogrular. Subscription ozelligi hesapta aktif olmalidir (sandbox dahil). Upgrade ayni product + ayni interval kurali. Webhook idempotent; downgrade politikasi MVP: canceled/unpaid -> free.
+- Son is: Subscription testleri fixlendi (SDK model method uyumu), webhook imza testinde header gonderimi duzeltildi. Tum ilgili testler PASS.
+- Incident Inbox eklendi: unassigned varsayilan filtre, quick assign/ack aksiyonlari ve SLA filtreleri (incident_sla aciksa).
+  - app/Services/Notifications/NotificationService.php
+  - app/Services/Notifications/PreferenceResolver.php
+  - app/Services/Notifications/DedupeService.php
+  - app/Jobs/SendNotificationEmailJob.php
+  - app/Mail/NotificationHubMail.php
+  - resources/views/emails/notification-hub.blade.php
+- Event -> Listener örnekleri:
+  - app/Events/OrderSyncFailed.php -> app/Listeners/NotificationHub/SendOrderSyncFailedNotification.php
+  - app/Events/StockSyncFailed.php -> app/Listeners/NotificationHub/SendStockSyncFailedNotification.php
+  - app/Events/InvoiceCreationFailed.php -> app/Listeners/NotificationHub/SendInvoiceCreationFailedNotification.php
+  - app/Events/MarketplaceTokenExpired.php -> app/Listeners/NotificationHub/SendMarketplaceTokenExpiredNotification.php
+  - app/Events/WebhookSignatureInvalid.php -> app/Listeners/NotificationHub/SendWebhookSignatureInvalidNotification.php
+- Policy/Composer:
+  - app/Policies/NotificationPolicy.php
+  - app/Policies/NotificationPreferencePolicy.php
+  - app/Providers/AppServiceProvider.php: bildirim sayacı + bell route paylaşımı
+- Routes (notification-hub namespace):
+  - routes/customer.php: admin.notification-hub.*
+  - routes/admin.php: super-admin.notification-hub.*
+- Views:
+  - resources/views/partials/notification-bell.blade.php
+  - resources/views/admin/notification-hub/index.blade.php
+  - resources/views/admin/notification-hub/partials/_filters.blade.php
+  - resources/views/admin/notification-hub/partials/_item.blade.php
+  - resources/views/admin/notification-hub/preferences.blade.php
+  - resources/views/super-admin/notification-hub/index.blade.php
+- Layout include:
+  - resources/views/layouts/admin.blade.php
+  - resources/views/layouts/super-admin.blade.php
+- Middleware/support izinleri:
+  - config/support.php: admin.notification-hub.notifications.index + admin.notification-hub.preferences.index
+  - app/Http/Middleware/EnsureSubUserPermission.php: admin.notification-hub.* => settings
+- Varsayılan filtre:
+  - Son 30 gün (admin + super-admin)
+- Factories & Tests:
+  - database/factories/NotificationFactory.php
+  - database/factories/NotificationPreferenceFactory.php
+  - tests/Feature/Notifications/NotificationHubTest.php
+- README notu:
+  - README.md Notification Hub bölümü eklendi
+
+## Son İşlemler
+- Portal fatura ekranları terminoloji sadeleştirildi:
+  - resources/views/customer/invoices/index.blade.php (Faturalar, kolonlar: Tarih/Tutar/Durum/Dönem, Detay)
+  - resources/views/customer/invoices/show.blade.php (Fatura Detayı, PDF İndir vb.)
+- Portal billing/çeşitli view ve servislerde bozuk ?? ifadeleri temizlendi (parse error fixleri):
+  - NotificationService, BillingEventLogger, IyzicoClient, SettingsController, input-label, register, admin billing/plans, einvoices pdf vb.
+- Queueable çakışması fix:
+  - app/Jobs/SyncMarketplaceCategoriesJob.php: $queue property kaldırıldı, constructor’da onQueue('integrations')
+- php artisan test: PASS (pdo_sqlite olmayan ortamlarda bazı testler WARN/skip).
+- Admin Billing Events izleme ekranı eklendi:
+  - routes/customer.php: /admin/observability/billing-events (super_admin)
+  - app/Http/Controllers/Admin/BillingEventController.php
+  - resources/views/admin/observability/billing_events/index|show.blade.php
+  - tests: BillingEventAdminIndexTest, BillingEventAdminFiltersTest
+- Observability eklendi:
+  - CorrelationIdMiddleware + correlation alias + AppServiceProvider queue/command propagation.
+  - billing_events tablosu + BillingEvent modeli + BillingEventLogger servisi.
+  - Iyzico webhook/dunning ve invoice create/paid noktalarında billing event loglama.
+- Customer invoice portal eklendi:
+  - routes/customer.php altında /portal/invoices list/show/download (signed+throttle).
+  - InvoicePolicy + Customer InvoiceController + customer invoice blade’leri.
+- API token expired davranışı düzeltildi:
+  - EnsureApiTokenValid middleware priority auth öncesine alındı (bootstrap/app.php).
+- Testler eklendi ve çalıştırıldı:
+  - CustomerInvoicePortalTest, InvoiceDownloadSignedTest, BillingCorrelationIdTest.
+  - php artisan test: PASS (sqlite uyarıları bazı webhook testlerinde).
+- Billing dunning/grace period eklendi:
+  - billing_subscriptions: past_due_since, grace_until, last_dunning_sent_at + index
+  - Sistem Ayarları (billing) dunning alanları + UI
+  - Iyzico webhook sync: UNPAID/PAST_DUE grace set, ACTIVE reset, CANCELED downgrade
+  - Command: billing:dunning-run (hourly) + reminder/downgrade notifications
+  - Tests: tests/Feature/SubscriptionDunningTest.php
+- Iyzico catalog auto-create eklendi (super-admin billing plans):
+  - IyzicoSubscriptionClient createProduct/createPricingPlan
+  - Routes: super-admin.system-settings.billing.iyzico.*
+  - UI: billing_plans partial butonlar + JS (product/pricing ref otomatik doldurma)
+  - Test: tests/Feature/SuperAdminIyzicoCatalogAutoCreateTest.php
+- Not: Pricing plan interval MVP olarak MONTHLY sabit.
+- Not: Upgrade stratejisi için tek product + çok pricing plan önerilir.
+- Iyzico card update callback hardening:
+  - token/state zorunlu ve provider_token ile esleme
+  - duplicate callback ignore + BillingEvent log (card_update.callback_duplicate)
+  - bilinmeyen token ignore + BillingEvent log (card_update.callback_unknown_token)
+  - billing_events.tenant_id artik nullable; unknown/duplicate eventlerde tenant_id null yazilir
+- Testler eklendi:
+  - tests/Feature/IyzicoCardUpdateCallbackUnknownTokenTest.php
+  - tests/Feature/IyzicoCardUpdateCallbackDuplicateTest.php
+- php artisan test: PASS (sqlite uyarilari bazı webhook testlerinde).
+- app_notifications hatası için migration çalıştırıldı:
+  - php artisan migrate
+- ParseError fix:
+  - resources/views/super-admin/plans/edit.blade.php: fazla @endforeach kaldırıldı.
+- Notification Hub deliverability testleri eklendi:
+  - tests/Feature/NotificationHubDeliverabilityTest.php
+- Quiet hours için email job dispatch gecikmesi eklendi:
+  - app/Services/Notifications/NotificationService.php
+- Email job retry/backoff ayarları eklendi:
+  - app/Jobs/SendNotificationEmailJob.php
+- Email suppression altyapısı eklendi (DB + servis + admin ekran):
+  - database/migrations/2026_02_05_120000_create_email_suppressions_table.php
+  - app/Models/EmailSuppression.php
+  - app/Services/Notifications/EmailSuppressionService.php
+  - app/Http/Controllers/Admin/NotificationSuppressionController.php
+  - resources/views/admin/notification-hub/suppressions/*
+- Notification audit log action enum genişletildi:
+  - database/migrations/2026_02_05_120010_expand_notification_audit_log_actions.php
+- Suppression + audit log entegrasyonu (dispatch/defer/fail):
+  - app/Services/Notifications/NotificationService.php
+  - app/Jobs/SendNotificationEmailJob.php
+- Email suppression testleri eklendi:
+  - tests/Feature/EmailSuppressionTest.php
+- Integration Health (MVP) eklendi:
+  - config/integration_health.php (stale_minutes, degraded_error_threshold, window_hours)
+  - app/Services/IntegrationHealthService.php (app_notifications + stock last_sync_at + token_expires_at)
+  - resources/views/admin/integrations/health/*
+  - routes: admin.integrations.health
+  - tests/Feature/IntegrationHealthTest.php
+- Integration Health bildirimleri eklendi:
+  - app/Services/IntegrationHealthNotifier.php
+  - app/Console/Commands/IntegrationHealthNotify.php
+  - routes/console.php schedule: integrations:health-notify (10 dk)
+  - tests/Feature/IntegrationHealthNotificationTest.php
+- Incident (Olay) sistemi eklendi:
+  - database/migrations/2026_02_05_150000_create_incidents_table.php
+  - database/migrations/2026_02_05_150010_create_incident_events_table.php
+  - database/migrations/2026_02_05_150020_expand_notification_audit_log_actions_for_incidents.php
+  - app/Models/Incident.php, app/Models/IncidentEvent.php
+  - app/Services/IncidentService.php
+  - app/Services/IntegrationHealthNotifier.php (incident open/touch + event + incident_id data)
+  - resources/views/admin/incidents/*
+  - routes: admin.incidents.*
+  - tests/Feature/IncidentTest.php
+- Incident SLA/Ownership (MVP) eklendi:
+  - config/incident_sla.php (ack/resolve SLA)
+  - incidents: assigned_to_user_id + acknowledged_at
+  - admin UI owner + SLA badge + MTTA/MTTR
+  - tests/Feature/IncidentSlaOwnershipTest.php
+- Audit action artik string; enum kullanilmiyor.
 
 ## Next steps
-1) Genel Ayarlar: placeholder sekmelerde (Ürün Listesi / Kargo Etiket / Fatura Açıklama Alanları / Ürün Ayarları) hangi alanların olacağını netleştirip formları ekle.
-2) `php artisan migrate` (modules + user_modules).
-2) `php artisan migrate` (module_purchases).
-3) Super admin → Modüller: temel modülleri oluştur (`integration.*`, `feature.*`) ve müşterilere atamayı dene.
-4) Super admin → Modül Satışları: manuel satış oluştur → “Ödendi Onayla” ile entitlement açıldığını doğrula.
-5) Iyzico webhook: `/webhooks/iyzico/payment` endpointine test payload gönder (IYZICO_WEBHOOK_SECRET set edersen `x-webhook-secret` header’ı gerekli).
-4) Entegrasyon aktifleştirme: `integration.{code}` modülü yoksa/aktif değilse upsell ekranına gittiğini doğrula.
-1) Süper admin → Paketler bölümünden her paket için modül seçimlerini yap (ilk kayıtta legacy `features` listesi otomatik olarak `marketing` altına alınır ve `modules` oluşturulur).
-1) `php artisan migrate` çalıştır (marketplace_categories, category_mappings, products.category_id).
-2) Entegrasyon ekranından Trendyol bağla/aktif et → kategorilerin cache’e çekildiğini doğrula (manuel “Senkronla” da var).
-3) Kategoriler ekranında “Pazaryerinden İçe Aktar” ile internal kategori oluştur + eşleme otomatik gelsin.
-4) Ürün ekle/düzenle: kategori seçimi + ürün detayında kategori gösterimi kontrol et.
-5) Diğer pazaryerleri için kategori provider’larını ekle (şu an sadece Trendyol implement edildi).
-6) (Önceki) rapor/export testleri ve SKU unique migrasyonu testleri.
-
-## Notes
-- Genel Ayarlar sekmeleri: `resources/views/admin/settings.blade.php`, `app/Http/Controllers/Admin/SettingsController.php`.
-- Mevcut paket bazlı gating: `app/Models/Plan.php` (`hasModule`) + `app/Http/Middleware/EnsurePlanModule.php` / `EnsurePlanMarketplace.php` ve `bootstrap/app.php` alias `plan.module`.
-- Add-on entitlement altyapısı: `app/Services/Entitlements/EntitlementService.php`, `app/Http/Middleware/EnsureModuleEnabled.php`, `database/migrations/2026_01_31_120000_create_modules_table.php`, `database/migrations/2026_01_31_120010_create_user_modules_table.php`.
-- Değişiklikler: `app/Services/Reports/*`,
-  `app/Http/Controllers/Admin/ReportController.php`,
-  `routes/customer.php`,
-  `resources/views/admin/reports.blade.php`,
-  `resources/views/admin/reports/top-products.blade.php`,
-  `resources/views/admin/reports/sold-products.blade.php`,
-  `resources/views/admin/reports/sold-products-print.blade.php`,
-  `resources/views/admin/reports/category-sales.blade.php`,
-  `resources/views/admin/reports/brand-sales.blade.php`,
-  `resources/views/admin/reports/vat.blade.php`,
-  `resources/views/admin/reports/commission.blade.php`,
-  `resources/views/admin/reports/stock-value.blade.php`,
-  `app/Models/AppSetting.php`,
-  `app/Http/Middleware/EnsureReportExportsEnabled.php`,
-  `database/migrations/2026_01_27_120000_create_app_settings_table.php`,
-  `app/Http/Controllers/SuperAdmin/SettingsController.php`,
-  `resources/views/super-admin/settings/index.blade.php`,
-  `routes/admin.php`,
-  `bootstrap/app.php`.
-  Yeni değişiklikler: `app/Http/Controllers/Admin/ProductController.php`,
-  `database/migrations/2026_01_28_000000_make_products_sku_unique_per_user.php`.
-  Yeni değişiklikler: `resources/views/layouts/admin.blade.php`,
-  `resources/views/layouts/super-admin.blade.php`.
-  KDV renk ayarları: `app/Services/Reports/VatReportService.php`,
-  `app/Http/Controllers/Admin/ReportController.php`,
-  `app/Http/Controllers/SuperAdmin/SettingsController.php`,
-  `routes/admin.php`,
-  `resources/views/admin/reports/vat.blade.php`,
-  `resources/views/super-admin/settings/index.blade.php`.
-  Dashboard harita: `app/Http/Controllers/Admin/DashboardController.php`,
-  `resources/views/admin/dashboard.blade.php`,
-  `public/maps/turkey-provinces.geojson`.
-  Hızlı menü: `resources/views/layouts/admin.blade.php`,
-  `app/Http/Controllers/SuperAdmin/SettingsController.php`,
-  `resources/views/super-admin/settings/index.blade.php`,
-  `routes/admin.php`.
-  Buton/menü düzeltmeleri: `resources/views/layouts/admin.blade.php`,
-  `resources/views/layouts/super-admin.blade.php`.
-  Önceki değişiklikler: `resources/views/admin/invoice-create.blade.php`,
-  `resources/views/layouts/super-admin.blade.php`,
-  `resources/views/public/home.blade.php`,
-  `resources/views/public/pricing.blade.php`,
-  `resources/views/super-admin/invoices/create.blade.php`,
-  `app/Http/Controllers/Admin/CustomerController.php`,
-  `app/Http/Controllers/SuperAdmin/CustomerController.php`,
-  `app/Http/Controllers/Admin/SubUserController.php`,
-  `app/Http/Controllers/SuperAdmin/SubUserController.php`,
-  `app/Http/Middleware/EnsureClientOrSubUser.php`,
-  `app/Http/Middleware/EnsureSubUserPermission.php`,
-  `database/migrations/2026_01_25_090000_create_sub_users_table.php`,
-  `database/migrations/2026_01_25_090010_create_sub_user_permissions_table.php`,
-  `database/migrations/2026_01_25_120000_add_desi_vat_to_products_table.php`,
-  `resources/views/admin/sub-users/index.blade.php`,
-  `resources/views/admin/sub-users/create.blade.php`,
-  `resources/views/admin/sub-users/edit.blade.php`,
-  `resources/views/super-admin/sub-users/index.blade.php`,
-  `resources/views/admin/products/create.blade.php`,
-  `resources/views/admin/products/edit.blade.php`,
-  `resources/views/admin/products/show.blade.php`,
-  `resources/views/layouts/admin.blade.php`,
-  `resources/views/layouts/super-admin.blade.php`,
-  `routes/customer.php`,
-  `routes/admin.php`,
-  `routes/auth.php`,
-  `config/auth.php`,
-  `config/purifier.php`,
-  `app/Http/Controllers/Admin/ProductController.php`,
-  `app/Models/Product.php`,
-  `resources/views/admin/products/index.blade.php`,
-  `resources/views/layouts/admin.blade.php`,
-  `app/Models/SubUser.php`,
-  `app/Models/SubUserPermission.php`.
-  Kategori eşitleme: `database/migrations/2026_01_30_*`, `app/Services/Marketplace/Category/*`, `app/Http/Controllers/Admin/MarketplaceCategoryController.php`, `app/Http/Controllers/Admin/CategoryMappingController.php`, `resources/views/admin/products/categories/index.blade.php`, `routes/customer.php`.
-  Ürün kategori alanı: `database/migrations/2026_01_30_000003_add_category_id_to_products_table.php`, `app/Http/Controllers/Admin/ProductController.php`, `app/Models/Product.php`, `resources/views/admin/products/create.blade.php`, `resources/views/admin/products/edit.blade.php`, `resources/views/admin/products/show.blade.php`.
-
-## Değişiklik Günlüğü
-- 2026-01-31: Commit: d1cff25 (plan module gating + theme + queue hardening)
-- 2026-01-26: Git başlatıldı, ilk commit alındı.
-- 2026-01-26: Super admin layout buton stili `btn` sistemine alındı.
-- 2026-01-26: Public home/pricing butonları `btn` sistemine taşındı.
-- 2026-01-26: Admin/super-admin `main button` kuralı `.btn` hoverlarını ezmeyecek şekilde düzeltildi.
-- 2026-01-26: Banner modülü eklendi (super admin CRUD + admin/public yerleşim).
-- 2026-01-26: Banner geri sayım (countdown) desteği eklendi.
-- 2026-01-27: Ürün listesi AJAX arama ve pagination eklendi; banner header altına alındı.
-- 2026-01-27: Profil sayfası admin layout ile uyumlu hale getirildi ve Türkçeleştirildi; destek sayfası Türkçe karakterleri düzeltildi.
-
-## Commands run (optional)
-- php artisan migrate (Nothing to migrate)
-
-## Files touched (optional)
-- resources/views/admin/invoice-create.blade.php
-- resources/views/super-admin/invoices/create.blade.php
-- app/Http/Controllers/Admin/CustomerController.php
-- app/Http/Controllers/SuperAdmin/CustomerController.php
-- resources/views/admin/products/create.blade.php
-- resources/views/admin/products/edit.blade.php
-- resources/views/admin/products/index.blade.php
-- resources/views/admin/products/show.blade.php
-- resources/views/layouts/admin.blade.php
-- app/Http/Controllers/Admin/ProductController.php
-- app/Models/Product.php
-- config/purifier.php
-
-
+- Kullanıcı bildirirse kalan Türkçe karakter/encoding sorunlarını noktasal düzelt.
+- Bildirim merkezi ekranlarında kalan UX/iyileştirmeler varsa toparla.
+- Super-admin panel düzenleme (menü ve sayfa tutarlılığı) için kapsam çıkar.
+- Gerekirse Notification Hub için ek testler (UI route 200) ekle.
+- Yeni deliverability testlerini çalıştır:
+  - php artisan test --filter=NotificationHubDeliverabilityTest
+- Email suppression testlerini çalıştır:
+  - php artisan test --filter=EmailSuppressionTest
+- Integration Health testlerini çalıştır:
+  - php artisan test --filter=IntegrationHealthTest

@@ -14,8 +14,7 @@ class MarketplaceProductController extends Controller
      */
     public function assign(Request $request)
     {
-        $validated = $request->validate([
-            'product_id' => 'required|exists:products,id',
+        $validated = $request->validate(['product_id' => 'required|exists:products,id',
             'marketplace_id' => 'required|exists:marketplaces,id',
             'price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
@@ -35,16 +34,14 @@ class MarketplaceProductController extends Controller
                 return back()->with('info', 'Bu pazaryeri için aktif bağlantınız yok.');
             }
         }
-
-        $exists = MarketplaceProduct::where('product_id', $validated['product_id'])
+$exists = MarketplaceProduct::where('product_id', $validated['product_id'])
             ->where('marketplace_id', $validated['marketplace_id'])
             ->exists();
 
         if ($exists) {
             return back()->with('info', 'Bu ürün zaten seçilen pazaryerine eklenmiş.');
         }
-
-        $marketplaceProduct = MarketplaceProduct::create($validated);
+$marketplaceProduct = MarketplaceProduct::create($validated);
 
         return back()->with('success', 'Ürün pazaryerine başarıyla eklendi.');
     }
@@ -56,8 +53,7 @@ class MarketplaceProductController extends Controller
     {
         $this->ensureOwner($marketplaceProduct->product);
 
-        $validated = $request->validate([
-            'price' => 'required|numeric|min:0',
+        $validated = $request->validate(['price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'status' => 'required|in:draft,active,inactive,rejected',
         ]);
@@ -90,8 +86,7 @@ class MarketplaceProductController extends Controller
 
     public function bulkUpdate(Request $request)
     {
-        $validated = $request->validate([
-            'marketplace_product_ids' => 'required|array',
+        $validated = $request->validate(['marketplace_product_ids' => 'required|array',
             'marketplace_product_ids.*' => 'exists:marketplace_products,id',
             'price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'nullable|integer|min:0',
@@ -101,8 +96,7 @@ class MarketplaceProductController extends Controller
         if ($validated['price'] === null && $validated['stock_quantity'] === null && empty($validated['status'])) {
             return back()->with('info', 'Güncellemek için en az bir alan seçin.');
         }
-
-        $items = MarketplaceProduct::whereIn('id', $validated['marketplace_product_ids'])->get();
+$items = MarketplaceProduct::whereIn('id', $validated['marketplace_product_ids'])->get();
 
         foreach ($items as $item) {
             $this->ensureOwner($item->product);
@@ -126,8 +120,7 @@ class MarketplaceProductController extends Controller
 
     public function bulkSync(Request $request)
     {
-        $validated = $request->validate([
-            'marketplace_product_ids' => 'required|string',
+        $validated = $request->validate(['marketplace_product_ids' => 'required|string',
         ]);
 
         $ids = collect(explode(',', $validated['marketplace_product_ids']))
@@ -139,13 +132,11 @@ class MarketplaceProductController extends Controller
         if ($ids->isEmpty()) {
             return back()->with('info', 'Senkronize edilecek ürün seçilmedi.');
         }
-
-        $items = MarketplaceProduct::whereIn('id', $ids)->get();
+$items = MarketplaceProduct::whereIn('id', $ids)->get();
 
         foreach ($items as $item) {
             $this->ensureOwner($item->product);
-            $item->update([
-                'last_sync_at' => now(),
+            $item->update(['last_sync_at' => now(),
             ]);
         }
 

@@ -122,7 +122,7 @@ class EntitlementServiceTest extends TestCase
         $this->assertFalse($service->hasModule($user, 'feature.expiring'));
     }
 
-    public function test_integration_modules_can_be_enabled_via_plan_modules(): void
+    public function test_integration_modules_can_be_enabled_via_entitlements(): void
     {
         $user = User::factory()->create(['role' => 'client']);
         $plan = Plan::create([
@@ -131,7 +131,7 @@ class EntitlementServiceTest extends TestCase
             'price' => 500,
             'billing_period' => 'monthly',
             'features' => [
-                'modules' => ['integration.trendyol'],
+                'modules' => ['integration.marketplace.trendyol'],
             ],
         ]);
         Subscription::create([
@@ -146,6 +146,6 @@ class EntitlementServiceTest extends TestCase
         $user->refresh();
 
         $service = app(EntitlementService::class);
-        $this->assertTrue($service->hasModule($user, 'integration.trendyol'));
+        $this->assertTrue($service->hasModule($user, 'integration.marketplace.trendyol'));
     }
 }

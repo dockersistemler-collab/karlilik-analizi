@@ -28,7 +28,7 @@ class EnsureModuleEnabledMiddlewareTest extends TestCase
 
         $this->actingAs($user)
             ->get('/__test/module')
-            ->assertRedirect(route('pricing'))
+            ->assertRedirect(route('portal.billing.plans'))
             ->assertSessionHas('warning');
     }
 
@@ -69,7 +69,7 @@ class EnsureModuleEnabledMiddlewareTest extends TestCase
 
         $this->actingAs($user)
             ->get('/__test/module')
-            ->assertRedirect(route('admin.modules.upsell', ['code' => 'feature.api_access']))
+            ->assertRedirect(route('portal.modules.upsell', ['code' => 'feature.api_access']))
             ->assertSessionHas('info');
     }
 
@@ -105,3 +105,4 @@ class EnsureModuleEnabledMiddlewareTest extends TestCase
             ]);
     }
 }
+

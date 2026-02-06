@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Events\QuotaExceeded;
+use App\Events\QuotaWarningReached;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Brand;
@@ -47,8 +49,7 @@ class ProductController extends Controller
                     ->orWhere('brand', 'like', '%'.$term.'%');
             });
         }
-
-        $sortKey = $request->query('sort');
+$sortKey = $request->query('sort');
         $sortDir = $request->query('dir', 'asc');
         $allowedSorts = [
             'sku' => 'sku',
@@ -65,15 +66,13 @@ class ProductController extends Controller
         } else {
             $query->orderBy('name', 'asc');
         }
-
-        $perPageParam = $request->query('per_page', 20);
+$perPageParam = $request->query('per_page', 20);
         $allowed = [10, 20, 50, 100];
         $perPage = (int) $perPageParam;
         if (!in_array($perPage, $allowed, true)) {
             $perPage = 20;
         }
-
-        $products = $query->paginate($perPage)->withQueryString();
+$products = $query->paginate($perPage)->withQueryString();
 
         return view('admin.products.index', compact('products'));
     }
@@ -86,8 +85,7 @@ class ProductController extends Controller
         if ($user && !$user->isSuperAdmin()) {
             $query->where('user_id', $user->id);
         }
-
-        $filename = 'products-' . now()->format('Ymd-His') . '.xlsx';
+$filename = 'products-' . now()->format('Ymd-His') . '.xlsx';
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -114,8 +112,7 @@ class ProductController extends Controller
 
         $query->chunk(200, function ($products) use ($sheet, &$rowIndex) {
             foreach ($products as $product) {
-                $sheet->fromArray([
-                    $product->sku,
+                $sheet->fromArray([$product->sku,
                     $product->barcode,
                     $product->name,
                     $product->description,
@@ -147,8 +144,7 @@ class ProductController extends Controller
         $filename = 'products-template.xlsx';
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->fromArray([
-            'Stok Kodu',
+        $sheet->fromArray(['Stok Kodu',
             'Barkod',
             'Ürün Adı',
             'Açıklama',
@@ -174,8 +170,7 @@ class ProductController extends Controller
 
     public function import(Request $request)
     {
-        $request->validate([
-            'file' => 'required|file|mimes:xlsx',
+        $request->validate(['file' => 'required|file|mimes:xlsx',
         ]);
 
         $user = $request->user();
@@ -185,8 +180,7 @@ class ProductController extends Controller
                 return back()->with('info', 'Ürün içe aktarmak için aktif abonelik gerekiyor.');
             }
         }
-
-        $file = $request->file('file');
+$file = $request->file('file');
         $spreadsheet = IOFactory::load($file->getRealPath());
         $sheet = $spreadsheet->getActiveSheet();
         $rows = $sheet->toArray(null, true, true, false);
@@ -194,8 +188,7 @@ class ProductController extends Controller
         if (empty($rows)) {
             return back()->with('info', 'Excel başlığı bulunamadı.');
         }
-
-        $header = array_shift($rows);
+$header = array_shift($rows);
         $header = array_map(function ($value) {
             $normalized = Str::of((string) $value)->trim()->lower()->value();
             $normalized = strtr($normalized, [
@@ -246,7 +239,7 @@ class ProductController extends Controller
         foreach ($header as $col) {
             $mappedHeader[] = $aliases[$col] ?? $col;
         }
-        $header = $mappedHeader;
+$header = $mappedHeader;
 
         $required = ['sku', 'name', 'price', 'stock_quantity'];
         foreach ($required as $req) {
@@ -254,8 +247,7 @@ class ProductController extends Controller
                 return back()->with('info', 'Excel başlığında zorunlu alan eksik: ' . $req);
             }
         }
-
-        $imported = 0;
+$imported = 0;
         $skippedEmpty = 0;
         $skippedInvalid = 0;
         $skippedMissing = 0;
@@ -267,14 +259,12 @@ class ProductController extends Controller
                 $skippedEmpty++;
                 continue;
             }
-
-            $data = array_combine($header, array_pad($row, count($header), null));
+$data = array_combine($header, array_pad($row, count($header), null));
             if (!$data) {
                 $skippedInvalid++;
                 continue;
             }
-
-            $sku = trim((string) ($data['sku'] ?? ''));
+$sku = trim((string) ($data['sku'] ?? ''));
             $name = trim((string) ($data['name'] ?? ''));
             $price = $data['price'] ?? null;
             $stock = $data['stock_quantity'] ?? null;
@@ -293,18 +283,16 @@ class ProductController extends Controller
                     continue;
                 }
             }
-
-            $existsQuery = Product::where('sku', $sku);
+$existsQuery = Product::where('sku', $sku);
             if ($user && !$user->isSuperAdmin()) {
                 $existsQuery->where('user_id', $user->id);
             }
-            $exists = $existsQuery->exists();
+$exists = $existsQuery->exists();
             if ($exists) {
                 $skippedDuplicate++;
                 continue;
             }
-
-            $categoryName = isset($data['category']) ? trim((string) $data['category']) : '';
+$categoryName = isset($data['category']) ? trim((string) $data['category']) : '';
             $categoryId = null;
             if ($categoryName !== '' && $user && !$user->isSuperAdmin()) {
                 $categoryId = \App\Models\Category::query()
@@ -312,8 +300,7 @@ class ProductController extends Controller
                     ->where('name', $categoryName)
                     ->value('id');
             }
-
-            $product = Product::create([
+$product = Product::create([
                 'user_id' => ($user && !$user->isSuperAdmin()) ? $user->id : null,
                 'sku' => $sku,
                 'barcode' => $data['barcode'] ?? null,
@@ -336,11 +323,9 @@ class ProductController extends Controller
             if ($product && $user && !$user->isSuperAdmin()) {
                 $user->subscription?->incrementProducts();
             }
-
-            $imported++;
+$imported++;
         }
-
-        $skipped = $skippedEmpty + $skippedInvalid + $skippedMissing + $skippedLimit + $skippedDuplicate;
+$skipped = $skippedEmpty + $skippedInvalid + $skippedMissing + $skippedLimit + $skippedDuplicate;
         $details = [
             "boş satır: {$skippedEmpty}",
             "geçersiz satır: {$skippedInvalid}",
@@ -376,9 +361,7 @@ class ProductController extends Controller
         if ($user && !$user->isSuperAdmin()) {
             $skuRule[] = Rule::unique('products', 'sku')->where('user_id', $user->id);
         }
-
-        $validated = $request->validate([
-            'sku' => $skuRule,
+$validated = $request->validate(['sku' => $skuRule,
             'barcode' => 'nullable|string',
             'name' => 'required|string|max:150',
             'description' => 'nullable|string',
@@ -415,12 +398,23 @@ class ProductController extends Controller
         if ($user && !$user->isSuperAdmin()) {
             $subscription = $user->subscription;
             if (!$subscription || !$subscription->isActive() || !$subscription->canAddProduct()) {
+                if ($subscription && $subscription->isActive() && !$subscription->canAddProduct()) {
+                    $plan = $subscription->plan;
+                    event(new QuotaExceeded(
+                        $user->id,
+                        'products',
+                        (int) ($plan?->max_products ?? 0),
+                        (int) $subscription->current_products_count,
+                        'monthly',
+                        null,
+                        now()->toDateTimeString()
+                    ));
+                }
                 return back()->with('info', 'Abonelik limitiniz doldu. Daha fazla ürün ekleyemezsiniz.');
             }
-            $validated['user_id'] = $user->id;
+$validated['user_id'] = $user->id;
         }
-
-        $uploadedImages = [];
+$uploadedImages = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 if ($image && $image->isValid()) {
@@ -433,14 +427,30 @@ class ProductController extends Controller
             $validated['images'] = $uploadedImages;
             $validated['image_url'] = $uploadedImages[0];
         }
-
-        $product = Product::create($validated);
+$product = Product::create($validated);
 
         if ($user && !$user->isSuperAdmin()) {
             $user->subscription?->incrementProducts();
+$subscription = $user->subscription?->fresh();
+$plan = $subscription?->plan;
+$limit = (int) ($plan?->max_products ?? 0);
+            if ($limit > 0 && $subscription && $subscription->isActive()) {
+                $used = (int) ($subscription->current_products_count ?? 0);
+                if ($used >= (int) ceil($limit * 0.8)) {
+                    event(new QuotaWarningReached(
+                        $user->id,
+                        'products',
+                        $used,
+                        $limit,
+                        80,
+                        null,
+                        now()->toDateTimeString()
+                    ));
+                }
+            }
         }
 
-        return redirect()->route('admin.products.index')
+        return redirect()->route('portal.products.index')
             ->with('success', 'Ürün başarıyla oluşturuldu.');
     }
 
@@ -496,9 +506,7 @@ class ProductController extends Controller
                 ->where('user_id', $product->user_id)
                 ->ignore($product->id);
         }
-
-        $validated = $request->validate([
-            'sku' => $skuRule,
+$validated = $request->validate(['sku' => $skuRule,
             'barcode' => 'nullable|string',
             'name' => 'required|string|max:150',
             'description' => 'nullable|string',
@@ -528,8 +536,7 @@ class ProductController extends Controller
         } else {
             $validated['category'] = null;
         }
-
-        $uploadedImages = [];
+$uploadedImages = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 if ($image && $image->isValid()) {
@@ -546,10 +553,9 @@ class ProductController extends Controller
                 $validated['image_url'] = $mergedImages[0];
             }
         }
+$product->update($validated);
 
-        $product->update($validated);
-
-        return redirect()->route('admin.products.index')
+        return redirect()->route('portal.products.index')
             ->with('success', 'Ürün başarıyla güncellendi.');
     }
 
@@ -557,13 +563,11 @@ class ProductController extends Controller
     {
         $this->ensureOwner($product);
 
-        $validated = $request->validate([
-            'price' => 'required|numeric|min:0',
+        $validated = $request->validate(['price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
         ]);
 
-        $product->update([
-            'price' => $validated['price'],
+        $product->update(['price' => $validated['price'],
             'stock_quantity' => $validated['stock_quantity'],
         ]);
 
@@ -575,7 +579,7 @@ class ProductController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.products.index')
+        return redirect()->route('portal.products.index')
             ->with('success', 'Ürün güncellendi.');
     }
 
@@ -589,7 +593,7 @@ class ProductController extends Controller
             $user->subscription?->decrementProducts();
         }
 
-        return redirect()->route('admin.products.index')
+        return redirect()->route('portal.products.index')
             ->with('success', 'Ürün başarıyla silindi.');
     }
 
@@ -615,3 +619,5 @@ class ProductController extends Controller
         return $sku;
     }
 }
+
+

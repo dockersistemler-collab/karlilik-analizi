@@ -87,11 +87,9 @@ class ReferralController extends Controller
                 foreach ($rows as $referral) {
                     fputcsv($handle, [
                         $referral->referrer_id,
-                        $referral->referrer?->name,
-                        $referral->referred_email,
+                        $referral->referrer?->name, $referral->referred_email,
                         $referral->referred_user_id,
-                        $referral->program?->name,
-                        $referral->status,
+                        $referral->program?->name, $referral->status,
                         $referral->referrer_reward_type ? ($referral->referrer_reward_type.' '.$referral->referrer_reward_value) : null,
                         $referral->referred_reward_type ? ($referral->referred_reward_type.' '.$referral->referred_reward_value) : null,
                         optional($referral->rewarded_at)->format('Y-m-d H:i'),

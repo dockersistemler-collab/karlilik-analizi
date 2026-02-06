@@ -17,8 +17,7 @@ class ChangeTicketStatusAction
         if ($fromStatus === $toStatus) {
             return $ticket;
         }
-
-        $ticket->status = $toStatus;
+$ticket->status = $toStatus;
         $ticket->last_activity_at = now();
         $ticket->closed_at = $toStatus === Ticket::STATUS_CLOSED ? now() : null;
         $ticket->save();

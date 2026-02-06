@@ -39,8 +39,7 @@ class TopProductsReportService
                         'total' => 0,
                     ]);
                 }
-
-                $row = $grouped->get($key);
+$row = $grouped->get($key);
                 $row['quantity'] += $qty;
                 $row['total'] += $price * $qty;
                 $grouped->put($key, $row);

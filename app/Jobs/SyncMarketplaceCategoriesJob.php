@@ -15,8 +15,6 @@ class SyncMarketplaceCategoriesJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public string $queue = 'integrations';
-
     public int $tries = 3;
 
     public int $timeout = 120;
@@ -25,6 +23,7 @@ class SyncMarketplaceCategoriesJob implements ShouldQueue
 
     public function __construct(public int $credentialId)
     {
+        $this->onQueue('integrations');
     }
 
     public function handle(MarketplaceCategorySyncService $syncService): void

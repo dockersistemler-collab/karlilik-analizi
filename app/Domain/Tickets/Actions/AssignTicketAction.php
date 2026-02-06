@@ -19,8 +19,7 @@ class AssignTicketAction
                 'assigned_to_id' => 'Seçilen kullanıcı destek yöneticisi değil.',
             ]);
         }
-
-        $ticket->assigned_to_id = $assignee->id;
+$ticket->assigned_to_id = $assignee->id;
         $ticket->save();
 
         DB::afterCommit(function () use ($ticket, $assignee, $actor): void {

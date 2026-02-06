@@ -26,6 +26,8 @@ class Order extends Model
         'billing_address',
         'cargo_company',
         'tracking_number',
+        'shipment_provider_key',
+        'shipment_status',
         'order_date',
         'approved_at',
         'shipped_at',
@@ -61,4 +63,10 @@ class Order extends Model
     {
         return $this->hasMany(OrderStatusLog::class);
     }
+
+    public function shipment()
+    {
+        return $this->hasOne(Shipment::class);
+    }
 }
+

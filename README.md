@@ -57,3 +57,22 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Notification Hub
+
+- Routes
+- `admin.notification-hub.notifications.index` => `/admin/notification-hub/notifications`
+- `admin.notification-hub.preferences.index` => `/admin/notification-hub/preferences`
+- `super-admin.notification-hub.notifications.index` => `/super-admin/notification-hub/notifications`
+
+- Filter parametreleri
+- `type` (critical|operational|info)
+- `marketplace` (trendyol|hepsiburada|amazon|n11 vb.)
+- `read` (read|unread)
+- `from` / `to` (YYYY-MM-DD)
+
+- Dedupe mantığı
+- `dedupe_key` aynıysa ve 10 dk içinde tekrar geldiyse yeni kayıt açılmaz, mevcut kayıt `updated_at` güncellenir.
+
+- Support View KVKK notu
+- Support View açıkken yapılan görüntüleme/okuma/ayar değişiklikleri `notification_audit_logs` tablosuna yazılır.

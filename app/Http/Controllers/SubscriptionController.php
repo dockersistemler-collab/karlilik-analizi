@@ -11,6 +11,10 @@ use App\Models\Invoice;
 use App\Models\Customer;
 use App\Models\Referral;
 use App\Models\ReferralProgram;
+use App\Events\SubscriptionStarted;
+use App\Events\SubscriptionRenewed;
+use App\Events\SubscriptionCancelled;
+use App\Services\BillingEventLogger;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -53,8 +57,7 @@ class SubscriptionController extends Controller
         if ($request->filled('date_to')) {
             $query->whereDate('issued_at', '<=', $request->date_to);
         }
-
-        $invoices = $query->paginate(20)->withQueryString();
+$invoices = $query->paginate(20)->withQueryString();
 
         return view('admin.invoices', compact('invoices'));
     }
@@ -65,8 +68,7 @@ class SubscriptionController extends Controller
         if (!$user || $invoice->user_id !== $user->id) {
             abort(403);
         }
-
-        $invoice->load(['subscription.plan']);
+$invoice->load(['subscription.plan']);
 
         return view('admin.invoice-show', compact('invoice'));
     }
@@ -87,8 +89,7 @@ class SubscriptionController extends Controller
         if ($request->filled('date_to')) {
             $query->whereDate('issued_at', '<=', $request->date_to);
         }
-
-        $filename = 'invoices-' . now()->format('Ymd-His') . '.csv';
+$filename = 'invoices-' . now()->format('Ymd-His') . '.csv';
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
@@ -119,16 +120,14 @@ class SubscriptionController extends Controller
         return view('admin.invoice-create');
     }
 
-    public function storeInvoice(Request $request): RedirectResponse
+    public function storeInvoice(Request $request, BillingEventLogger $events): RedirectResponse
     {
         $user = $request->user();
 
         if (!$user) {
             abort(401);
         }
-
-        $validated = $request->validate([
-            'customer_name' => 'required|string|max:255',
+$validated = $request->validate(['customer_name' => 'required|string|max:255',
             'customer_email' => 'required|email|max:255',
             'billing_address' => 'nullable|string|max:1000',
             'amount' => 'required|numeric|min:0',
@@ -140,7 +139,7 @@ class SubscriptionController extends Controller
 
         $invoiceNumber = 'INV-' . now()->format('Ymd') . '-' . str_pad((string) random_int(1, 999999), 6, '0', STR_PAD_LEFT);
 
-        Invoice::create([
+        $invoice = Invoice::create([
             'user_id' => $user->id,
             'subscription_id' => null,
             'invoice_number' => $invoiceNumber,
@@ -154,8 +153,31 @@ class SubscriptionController extends Controller
             'billing_address' => $validated['billing_address'] ?? null,
             'notes' => $validated['notes'] ?? null,
         ]);
+        $events->record(['tenant_id' => $user->id,
+            'user_id' => $user->id,
+            'invoice_id' => $invoice->id,
+            'type' => 'invoice.created',
+            'status' => $invoice->status,
+            'amount' => $invoice->amount,
+            'currency' => $invoice->currency,
+            'provider' => 'manual',
+            'payload' => [
+                'invoice_number' => $invoice->invoice_number,
+            ],
+        ]);
+        if ($invoice->status === 'paid') {
+            $events->record(['tenant_id' => $user->id,
+                'user_id' => $user->id,
+                'invoice_id' => $invoice->id,
+                'type' => 'invoice.paid',
+                'status' => $invoice->status,
+                'amount' => $invoice->amount,
+                'currency' => $invoice->currency,
+                'provider' => 'manual',
+            ]);
+        }
 
-        return redirect()->route('admin.invoices.index')
+        return redirect()->route('portal.invoices.index')
             ->with('success', 'Fatura oluşturuldu.');
     }
 
@@ -166,13 +188,11 @@ class SubscriptionController extends Controller
         if (!$user) {
             abort(401);
         }
-
-        $query = trim((string) $request->query('q', ''));
+$query = trim((string) $request->query('q', ''));
         if (mb_strlen($query) < 2) {
             return response()->json([]);
         }
-
-        $manualCustomers = Customer::query()
+$manualCustomers = Customer::query()
             ->where('user_id', $user->id)
             ->where(function ($builder) use ($query) {
                 $builder->where('name', 'like', '%'.$query.'%')
@@ -217,7 +237,7 @@ class SubscriptionController extends Controller
         return response()->json($customers);
     }
 
-    public function store(Request $request, Plan $plan): RedirectResponse
+    public function store(Request $request, Plan $plan, BillingEventLogger $events): RedirectResponse
     {
         $user = $request->user();
 
@@ -229,16 +249,14 @@ class SubscriptionController extends Controller
             return redirect()->route('pricing')
                 ->with('info', 'Seçtiğiniz paket aktif değil.');
         }
-
-        $currentSubscription = $user->subscription;
+$currentSubscription = $user->subscription;
         if ($currentSubscription && $currentSubscription->isActive()) {
             if ($currentSubscription->plan_id === $plan->id) {
-                return redirect()->route('admin.subscription')
+                return redirect()->route('portal.subscription')
                     ->with('info', 'Zaten bu paketi kullanıyorsunuz.');
             }
         }
-
-        $billingPeriod = $plan->billing_period;
+$billingPeriod = $plan->billing_period;
         $amount = $billingPeriod === 'yearly' && $plan->yearly_price
             ? $plan->yearly_price
             : $plan->price;
@@ -276,15 +294,13 @@ class SubscriptionController extends Controller
         }
 
         if ($currentSubscription && $currentSubscription->isActive()) {
-            $currentSubscription->update([
-                'status' => 'cancelled',
+            $currentSubscription->update(['status' => 'cancelled',
                 'cancelled_at' => now(),
                 'ends_at' => now(),
                 'auto_renew' => false,
             ]);
         }
-
-        $newSubscription = Subscription::create([
+$newSubscription = Subscription::create([
             'user_id' => $user->id,
             'plan_id' => $plan->id,
             'status' => 'active',
@@ -298,9 +314,30 @@ class SubscriptionController extends Controller
             'current_month_orders_count' => $currentMonthOrders,
             'usage_reset_at' => now()->addMonth(),
         ]);
+        event(new SubscriptionStarted(
+            $user->id,
+            $newSubscription->id,
+            $plan->id,
+            $plan->name,
+            $startsAt->toDateTimeString(),
+            $endsAt->toDateTimeString(),
+            now()->toDateTimeString()
+        ));
+        event(new SubscriptionRenewed(
+            $user->id,
+            $newSubscription->id,
+            $plan->id,
+            $plan->name,
+            now()->toDateTimeString(),
+            $startsAt->toDateTimeString(),
+            $endsAt->toDateTimeString(),
+            is_numeric($amount) ? (string) $amount : null,
+            'TRY',
+            now()->toDateTimeString()
+        ));
 
         $invoiceNumber = 'INV-' . now()->format('Ymd') . '-' . str_pad((string) random_int(1, 999999), 6, '0', STR_PAD_LEFT);
-        Invoice::create([
+        $invoice = Invoice::create([
             'user_id' => $user->id,
             'subscription_id' => $newSubscription->id,
             'invoice_number' => $invoiceNumber,
@@ -313,8 +350,28 @@ class SubscriptionController extends Controller
             'billing_email' => $user->billing_email ?: $user->email,
             'billing_address' => $user->billing_address,
         ]);
+        $events->record(['tenant_id' => $user->id,
+            'user_id' => $user->id,
+            'subscription_id' => $newSubscription->id,
+            'invoice_id' => $invoice->id,
+            'type' => 'invoice.created',
+            'status' => $invoice->status,
+            'amount' => $invoice->amount,
+            'currency' => $invoice->currency,
+            'provider' => 'subscription',
+        ]);
+        $events->record(['tenant_id' => $user->id,
+            'user_id' => $user->id,
+            'subscription_id' => $newSubscription->id,
+            'invoice_id' => $invoice->id,
+            'type' => 'invoice.paid',
+            'status' => $invoice->status,
+            'amount' => $invoice->amount,
+            'currency' => $invoice->currency,
+            'provider' => 'subscription',
+        ]);
 
-        return redirect()->route('admin.dashboard')
+        return redirect()->route('portal.dashboard')
             ->with('success', 'Aboneliğiniz başarıyla başlatıldı.');
     }
 
@@ -325,50 +382,54 @@ class SubscriptionController extends Controller
         if (!$user || !$user->isClient()) {
             abort(403);
         }
-
-        $subscription = $user->subscription;
+$subscription = $user->subscription;
         if (!$subscription || !$subscription->isActive()) {
-            return redirect()->route('admin.subscription')
+            return redirect()->route('portal.subscription')
                 ->with('info', 'Aktif abonelik bulunamadı.');
         }
-
-        $subscription->update([
+$subscription->update([
             'status' => 'cancelled',
             'cancelled_at' => now(),
             'ends_at' => now(),
             'auto_renew' => false,
         ]);
+        event(new SubscriptionCancelled(
+            $user->id,
+            $subscription->id,
+            $subscription->plan_id,
+            $subscription->plan?->name,
+            now()->toDateTimeString(),
+            $subscription->ends_at?->toDateTimeString(), null,
+            now()->toDateTimeString()
+        ));
 
-        return redirect()->route('admin.subscription')
+        return redirect()->route('portal.subscription')
             ->with('success', 'Aboneliğiniz iptal edildi.');
     }
 
-    public function renew(Request $request): RedirectResponse
+    public function renew(Request $request, BillingEventLogger $events): RedirectResponse
     {
         $user = $request->user();
 
         if (!$user || !$user->isClient()) {
             abort(403);
         }
-
-        $lastSubscription = $user->subscription;
+$lastSubscription = $user->subscription;
         if (!$lastSubscription) {
             return redirect()->route('pricing')
                 ->with('info', 'Yenilenecek bir abonelik bulunamadı.');
         }
 
         if ($lastSubscription->isActive()) {
-            return redirect()->route('admin.subscription')
+            return redirect()->route('portal.subscription')
                 ->with('info', 'Zaten aktif bir aboneliğiniz var.');
         }
-
-        $plan = $lastSubscription->plan;
+$plan = $lastSubscription->plan;
         if (!$plan || !$plan->is_active) {
             return redirect()->route('pricing')
                 ->with('info', 'Abonelik paketi artık aktif değil. Lütfen yeni bir paket seçin.');
         }
-
-        $billingPeriod = $lastSubscription->billing_period;
+$billingPeriod = $lastSubscription->billing_period;
         $amount = $billingPeriod === 'yearly' && $plan->yearly_price
             ? $plan->yearly_price
             : $plan->price;
@@ -403,8 +464,7 @@ class SubscriptionController extends Controller
             return redirect()->route('pricing')
                 ->with('info', 'Bu ayki sipariş sayınız bu paketin limitini aşıyor.');
         }
-
-        $newSubscription = Subscription::create([
+$newSubscription = Subscription::create([
             'user_id' => $user->id,
             'plan_id' => $plan->id,
             'status' => 'active',
@@ -418,9 +478,18 @@ class SubscriptionController extends Controller
             'current_month_orders_count' => $currentMonthOrders,
             'usage_reset_at' => now()->addMonth(),
         ]);
+        event(new SubscriptionStarted(
+            $user->id,
+            $newSubscription->id,
+            $plan->id,
+            $plan->name,
+            $startsAt->toDateTimeString(),
+            $endsAt->toDateTimeString(),
+            now()->toDateTimeString()
+        ));
 
         $invoiceNumber = 'INV-' . now()->format('Ymd') . '-' . str_pad((string) random_int(1, 999999), 6, '0', STR_PAD_LEFT);
-        Invoice::create([
+        $invoice = Invoice::create([
             'user_id' => $user->id,
             'subscription_id' => $newSubscription->id,
             'invoice_number' => $invoiceNumber,
@@ -433,8 +502,28 @@ class SubscriptionController extends Controller
             'billing_email' => $user->billing_email ?: $user->email,
             'billing_address' => $user->billing_address,
         ]);
+        $events->record(['tenant_id' => $user->id,
+            'user_id' => $user->id,
+            'subscription_id' => $newSubscription->id,
+            'invoice_id' => $invoice->id,
+            'type' => 'invoice.created',
+            'status' => $invoice->status,
+            'amount' => $invoice->amount,
+            'currency' => $invoice->currency,
+            'provider' => 'subscription',
+        ]);
+        $events->record(['tenant_id' => $user->id,
+            'user_id' => $user->id,
+            'subscription_id' => $newSubscription->id,
+            'invoice_id' => $invoice->id,
+            'type' => 'invoice.paid',
+            'status' => $invoice->status,
+            'amount' => $invoice->amount,
+            'currency' => $invoice->currency,
+            'provider' => 'subscription',
+        ]);
 
-        return redirect()->route('admin.subscription')
+        return redirect()->route('portal.subscription')
             ->with('success', 'Aboneliğiniz yenilendi.');
     }
 
@@ -452,13 +541,11 @@ class SubscriptionController extends Controller
         if (!$referral) {
             return [$amount, $endsAt];
         }
-
-        $program = ReferralProgram::active()->latest()->first();
+$program = ReferralProgram::active()->latest()->first();
         if (!$program) {
             return [$amount, $endsAt];
         }
-
-        $referral->program_id = $program->id;
+$referral->program_id = $program->id;
 
         if ($program->max_uses_per_referrer_per_year > 0) {
             $count = Referral::query()
@@ -474,8 +561,7 @@ class SubscriptionController extends Controller
                 return [$amount, $endsAt];
             }
         }
-
-        $referral->referrer_reward_type = $program->referrer_reward_type;
+$referral->referrer_reward_type = $program->referrer_reward_type;
         $referral->referrer_reward_value = $program->referrer_reward_value;
         $referral->referred_reward_type = $program->referred_reward_type;
         $referral->referred_reward_value = $program->referred_reward_value;
@@ -492,14 +578,12 @@ class SubscriptionController extends Controller
                 $endsAt = $endsAt->copy()->addMonths($months);
             }
         }
-
-        $referrer = $referral->referrer;
+$referrer = $referral->referrer;
         if ($referrer) {
             if ($program->referrer_reward_type === 'duration' && $program->referrer_reward_value) {
                 $months = (int) $program->referrer_reward_value;
                 if ($months > 0 && $referrer->subscription && $referrer->subscription->isActive()) {
-                    $referrer->subscription->update([
-                        'ends_at' => $referrer->subscription->ends_at->copy()->addMonths($months),
+                    $referrer->subscription->update(['ends_at' => $referrer->subscription->ends_at->copy()->addMonths($months),
                     ]);
                 }
             }
@@ -508,8 +592,7 @@ class SubscriptionController extends Controller
                 $referral->referrer_discount_amount = (float) $program->referrer_reward_value;
             }
         }
-
-        $referral->status = 'rewarded';
+$referral->status = 'rewarded';
         $referral->rewarded_at = now();
         $referral->save();
 
@@ -530,8 +613,7 @@ class SubscriptionController extends Controller
         if (!$credit) {
             return $amount;
         }
-
-        $discount = ($amount * (float) $credit->referrer_discount_amount) / 100;
+$discount = ($amount * (float) $credit->referrer_discount_amount) / 100;
         $amount = max($amount - $discount, 0);
 
         $credit->referrer_discount_consumed_at = now();
@@ -540,3 +622,5 @@ class SubscriptionController extends Controller
         return $amount;
     }
 }
+
+

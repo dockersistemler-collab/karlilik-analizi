@@ -1,0 +1,104 @@
+{
+  "info": {
+    "_postman_id": "f8f39c1c-9c00-4a3d-9c4a-9e2b0a6d9d8a",
+    "name": "Pazaryeri Entegrasyon - EInvoice API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "E-Invoice API collection. Requires BASE_URL and API_TOKEN environment variables."
+  },
+  "item": [
+    {
+      "name": "Einvoices",
+      "item": [
+        {
+          "name": "List Einvoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{API_TOKEN}}", "type": "string" } ] },
+            "url": {
+              "raw": "{{BASE_URL}}/api/v1/einvoices?status=&marketplace=&type=&updated_since=&per_page=20&page=1",
+              "host": [ "{{BASE_URL}}" ],
+              "path": [ "api", "v1", "einvoices" ],
+              "query": [
+                { "key": "status", "value": "" },
+                { "key": "marketplace", "value": "" },
+                { "key": "type", "value": "" },
+                { "key": "updated_since", "value": "" },
+                { "key": "per_page", "value": "20" },
+                { "key": "page", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Einvoice",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{API_TOKEN}}", "type": "string" } ] },
+            "url": {
+              "raw": "{{BASE_URL}}/api/v1/einvoices/{{EINVOICE_ID}}?include_items=true&include_events=false",
+              "host": [ "{{BASE_URL}}" ],
+              "path": [ "api", "v1", "einvoices", "{{EINVOICE_ID}}" ],
+              "query": [
+                { "key": "include_items", "value": "true" },
+                { "key": "include_events", "value": "false" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Download PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/pdf" }
+            ],
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{API_TOKEN}}", "type": "string" } ] },
+            "url": {
+              "raw": "{{BASE_URL}}/api/v1/einvoices/{{EINVOICE_ID}}/pdf",
+              "host": [ "{{BASE_URL}}" ],
+              "path": [ "api", "v1", "einvoices", "{{EINVOICE_ID}}", "pdf" ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Provider",
+      "item": [
+        {
+          "name": "Update Provider Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{API_TOKEN}}", "type": "string" } ] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"provider_status\": \"accepted\",\n  \"provider_invoice_id\": \"PRV-999\",\n  \"raw\": {\n    \"provider_message\": \"OK\"\n  }\n}\n",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/v1/einvoices/{{EINVOICE_ID}}/provider-status",
+              "host": [ "{{BASE_URL}}" ],
+              "path": [ "api", "v1", "einvoices", "{{EINVOICE_ID}}", "provider-status" ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "BASE_URL", "value": "http://localhost" },
+    { "key": "API_TOKEN", "value": "" },
+    { "key": "EINVOICE_ID", "value": "123" }
+  ]
+}
+

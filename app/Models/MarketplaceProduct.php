@@ -43,4 +43,4 @@ class MarketplaceProduct extends Model
     {
         return $this->belongsTo(Marketplace::class);
     }
-}
+}

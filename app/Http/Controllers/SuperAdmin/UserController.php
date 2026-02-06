@@ -15,11 +15,46 @@ use Carbon\Carbon;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::latest()->paginate(20);
+        $query = User::query()->latest();
 
-        return view('super-admin.users.index', compact('users'));
+        $search = trim((string) $request->query('q', ''));
+        $role = trim((string) $request->query('role', ''));
+        $status = trim((string) $request->query('status', ''));
+        $dateFrom = trim((string) $request->query('date_from', ''));
+        $dateTo = trim((string) $request->query('date_to', ''));
+
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search): void {
+                $builder->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('email', 'like', '%'.$search.'%');
+            });
+        }
+
+        if ($role !== '') {
+            $query->where('role', $role);
+        }
+
+        if ($status !== '') {
+            $query->where('is_active', $status === 'active');
+        }
+
+        if ($dateFrom !== '') {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+
+        if ($dateTo !== '') {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+$users = $query->paginate(20)->withQueryString();
+        $roles = [
+            'super_admin' => 'Super Admin',
+            'support_agent' => 'Destek',
+            'client' => 'Müşteri',
+        ];
+
+        return view('super-admin.users.index', compact('users', 'roles', 'search', 'role', 'status', 'dateFrom', 'dateTo'));
     }
 
     public function edit(User $user)
@@ -34,10 +69,9 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
+        $validated = $request->validate(['name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'role' => 'required|in:super_admin,client',
+            'role' => 'required|in:super_admin,client,support_agent',
             'is_active' => 'boolean',
             'plan_id' => 'nullable|exists:plans,id',
             'billing_period' => 'nullable|in:monthly,yearly',
@@ -71,15 +105,13 @@ class UserController extends Controller
 
             $active = $user->subscription;
             if ($active && $active->isActive()) {
-                $active->update([
-                    'status' => 'cancelled',
+                $active->update(['status' => 'cancelled',
                     'cancelled_at' => now(),
                     'ends_at' => now(),
                     'auto_renew' => false,
                 ]);
             }
-
-            $newSubscription = Subscription::create([
+$newSubscription = Subscription::create([
                 'user_id' => $user->id,
                 'plan_id' => $plan->id,
                 'status' => 'active',
@@ -111,6 +143,8 @@ class UserController extends Controller
         }
 
         return redirect()->route('super-admin.users.index')
-            ->with('success', 'Kullanıcı başarıyla güncellendi.');
+            ->with('success', 'Kullanıcı baÅŸarıyla güncellendi.');
     }
 }
+
+

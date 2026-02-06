@@ -6,6 +6,7 @@ use App\Models\ModulePurchase;
 use App\Services\Entitlements\EntitlementService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ModulePurchaseService
 {
@@ -13,31 +14,76 @@ class ModulePurchaseService
     {
     }
 
-    public function markPaid(ModulePurchase $purchase): ModulePurchase
+    public function markPaid(ModulePurchase $purchase, array $meta = [], ?string $providerPaymentId = null): ModulePurchase
     {
-        return DB::transaction(function () use ($purchase) {
+        return DB::transaction(function () use ($purchase, $meta, $providerPaymentId) {
             $purchase->refresh();
-
-            if ($purchase->status === 'paid') {
-                return $purchase;
-            }
-
             $purchase->loadMissing(['user', 'module']);
 
-            $startsAt = $purchase->starts_at ?? Carbon::now();
-            $endsAt = $purchase->ends_at ?? $this->calculateEndsAt($startsAt, $purchase->period);
+            if ($purchase->status === 'paid') {
+                $dirty = false;
 
-            $purchase->status = 'paid';
-            $purchase->starts_at = $startsAt;
+                if (!$purchase->provider_payment_id && is_string($providerPaymentId) && trim($providerPaymentId) !== '') {
+                    $purchase->provider_payment_id = trim($providerPaymentId);
+                    $dirty = true;
+                }
+
+                if (!empty($meta)) {
+                    $existingMeta = is_array($purchase->meta) ? $purchase->meta : [];
+                    $mergedMeta = array_merge($existingMeta, $meta);
+                    $purchase->meta = empty($mergedMeta) ? null : $mergedMeta;
+                    $dirty = true;
+                }
+
+                if ($dirty) {
+                    $purchase->save();
+                }
+
+                return $purchase;
+            }
+$now = Carbon::now();
+
+            $activeUserModule = $purchase->user
+                ->userModules()
+                ->where('module_id', $purchase->module_id)
+                ->where('status', 'active')
+                ->first();
+
+            $baseStart = $now;
+            if ($activeUserModule?->ends_at && $activeUserModule->ends_at->greaterThan($now)) {
+                $baseStart = $activeUserModule->ends_at->copy();
+            }
+$endsAt = match ($purchase->period) {
+                'monthly' => $baseStart->copy()->addMonth(),
+                'yearly' => $baseStart->copy()->addYear(),
+                'one_time' => null,
+                default => null,
+            };
+
+            $existingMeta = is_array($purchase->meta) ? $purchase->meta : [];
+            $mergedMeta = array_merge($existingMeta, $meta);
+            if (empty($mergedMeta)) {
+                $mergedMeta = null;
+            }
+
+            if (!$purchase->provider_payment_id && is_string($providerPaymentId) && trim($providerPaymentId) !== '') {
+                $purchase->provider_payment_id = trim($providerPaymentId);
+            }
+$purchase->status = 'paid';
+            $purchase->starts_at = $baseStart;
             $purchase->ends_at = $endsAt;
-            $purchase->save();
+            $purchase->meta = $mergedMeta;
 
-            $this->entitlements->grantModule(
-                $purchase->user,
+            if (Schema::hasColumn('module_purchases', 'paid_at')) {
+                $purchase->setAttribute('paid_at', $now);
+            }
+$purchase->save();
+
+            $this->entitlements->grantModule($purchase->user,
                 $purchase->module->code,
-                $purchase->ends_at,
-                is_array($purchase->meta) ? $purchase->meta : [],
-                $purchase->starts_at
+                $endsAt,
+                is_array($mergedMeta) ? $mergedMeta : [],
+                $baseStart
             );
 
             return $purchase;
@@ -53,11 +99,8 @@ class ModulePurchaseService
             if ($purchase->status === 'cancelled') {
                 return $purchase;
             }
-
-            $purchase->status = 'cancelled';
+$purchase->status = 'cancelled';
             $purchase->save();
-
-            $this->entitlements->revokeModule($purchase->user, $purchase->module->code);
 
             return $purchase;
         });
@@ -72,8 +115,7 @@ class ModulePurchaseService
             if ($purchase->status === 'refunded') {
                 return $purchase;
             }
-
-            $purchase->status = 'refunded';
+$purchase->status = 'refunded';
             $purchase->save();
 
             $this->entitlements->revokeModule($purchase->user, $purchase->module->code);
@@ -81,15 +123,4 @@ class ModulePurchaseService
             return $purchase;
         });
     }
-
-    private function calculateEndsAt(Carbon $startsAt, string $period): ?Carbon
-    {
-        return match ($period) {
-            'monthly' => $startsAt->copy()->addMonth(),
-            'yearly' => $startsAt->copy()->addYear(),
-            'one_time' => null,
-            default => null,
-        };
-    }
 }
-

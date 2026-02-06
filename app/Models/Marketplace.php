@@ -25,7 +25,7 @@ class Marketplace extends Model
     // İlişkiler
     public function credentials()
     {
-        // Bir Pazaryerine (örn: Trendyol) bağlı BİRDEN ÇOK satıcı hesabı olabilir.
+        // Bir Pazaryerine (örn: Trendyol) baÄŸlı BİRDEN Ã‡OK satıcı hesabı olabilir.
         return $this->hasMany(MarketplaceCredential::class);
     }
 
@@ -38,4 +38,4 @@ class Marketplace extends Model
     {
         return $this->hasMany(Order::class);
     }
-}
+}

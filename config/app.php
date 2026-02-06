@@ -123,4 +123,8 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'read_legacy_plan_modules' => env('APP_READ_LEGACY_PLAN_MODULES', true),
+
+    'drop_legacy_columns' => env('APP_DROP_LEGACY_COLUMNS', false),
+
 ];

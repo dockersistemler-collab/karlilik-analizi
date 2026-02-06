@@ -40,20 +40,18 @@ class BrandSalesReportService
                     foreach ($marketplaces as $marketplace) {
                         $row['mp_' . $marketplace->id] = 0;
                     }
-                    $grouped->put($brand, $row);
+$grouped->put($brand, $row);
                 }
-
-                $row = $grouped->get($brand);
+$row = $grouped->get($brand);
                 $row['revenue'] += $revenue;
                 $row['orders'] += $qty;
                 if (!empty($order->marketplace_id)) {
                     $row['mp_' . $order->marketplace_id] += $revenue;
                 }
-                $grouped->put($brand, $row);
+$grouped->put($brand, $row);
             }
         }
-
-        $table = $grouped->values()->sortByDesc('revenue')->values()->all();
+$table = $grouped->values()->sortByDesc('revenue')->values()->all();
         $chart = [
             'labels' => array_map(fn ($row) => $row['brand'], $table),
             'revenue' => array_map(fn ($row) => (float) $row['revenue'], $table),

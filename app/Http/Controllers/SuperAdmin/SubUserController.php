@@ -35,8 +35,7 @@ class SubUserController extends Controller
         if (($filters['status'] ?? null) === 'inactive') {
             $query->where('is_active', false);
         }
-
-        $subUsers = $query->latest()->paginate(30)->withQueryString();
+$subUsers = $query->latest()->paginate(30)->withQueryString();
         $owners = User::query()->where('role', 'client')->orderBy('name')->get();
 
         return view('super-admin.sub-users.index', compact('subUsers', 'owners', 'filters'));

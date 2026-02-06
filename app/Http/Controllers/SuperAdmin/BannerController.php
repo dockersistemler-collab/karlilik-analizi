@@ -36,8 +36,7 @@ class BannerController extends Controller
         if ($request->hasFile('image')) {
             $validated['image_path'] = $request->file('image')->store('banners', 'public');
         }
-
-        $validated['is_active'] = $request->boolean('is_active');
+$validated['is_active'] = $request->boolean('is_active');
         $validated['show_countdown'] = $request->boolean('show_countdown');
 
         Banner::create($validated);
@@ -61,15 +60,14 @@ class BannerController extends Controller
             if ($banner->image_path) {
                 Storage::disk('public')->delete($banner->image_path);
             }
-            $validated['image_path'] = $request->file('image')->store('banners', 'public');
+$validated['image_path'] = $request->file('image')->store('banners', 'public');
         }
 
         if ($request->boolean('remove_image') && $banner->image_path) {
             Storage::disk('public')->delete($banner->image_path);
             $validated['image_path'] = null;
         }
-
-        $validated['is_active'] = $request->boolean('is_active');
+$validated['is_active'] = $request->boolean('is_active');
         $validated['show_countdown'] = $request->boolean('show_countdown');
 
         $banner->update($validated);
@@ -83,8 +81,7 @@ class BannerController extends Controller
         if ($banner->image_path) {
             Storage::disk('public')->delete($banner->image_path);
         }
-
-        $banner->delete();
+$banner->delete();
 
         return redirect()->route('super-admin.banners.index')
             ->with('success', 'Banner silindi.');
@@ -93,15 +90,14 @@ class BannerController extends Controller
     private function placements(): array
     {
         return [
-            'admin_header' => 'Müşteri Paneli Üst Bar',
-            'public_header' => 'Public Site Üst Bar',
+            'admin_header' => 'Müşteri Paneli Ãœst Bar',
+            'public_header' => 'Public Site Ãœst Bar',
         ];
     }
 
     private function validateBanner(Request $request): array
     {
-        return $request->validate([
-            'placement' => 'required|string|max:50',
+        return $request->validate(['placement' => 'required|string|max:50',
             'title' => 'nullable|string|max:255',
             'message' => 'nullable|string|max:1000',
             'link_url' => 'nullable|url|max:500',
@@ -118,3 +114,5 @@ class BannerController extends Controller
         ]);
     }
 }
+
+

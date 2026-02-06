@@ -3,12 +3,21 @@
 namespace Database\Seeders;
 
 use App\Models\Plan;
+use App\Models\Marketplace;
 use Illuminate\Database\Seeder;
 
 class PlanSeeder extends Seeder
 {
     public function run(): void
     {
+        $marketplaceModules = Marketplace::query()
+            ->where('is_active', true)
+            ->pluck('code')
+            ->filter(fn ($code) => is_string($code) && trim($code) !== '')
+            ->map(fn ($code) => 'integration.marketplace.' . $code)
+            ->values()
+            ->all();
+
         $plans = [
             [
                 'name' => 'Başlangıç',
@@ -26,10 +35,15 @@ class PlanSeeder extends Seeder
                 'priority_support' => false,
                 'custom_integrations' => false,
                 'features' => [
-                    'Temel ürün yönetimi',
-                    'Stok senkronizasyonu',
-                    'Sipariş takibi',
-                    'E-posta desteği',
+                    'marketing' => [
+                        'Temel ürün yönetimi',
+                        'Stok senkronizasyonu',
+                        'Sipariş takibi',
+                        'E-posta desteği',
+                    ],
+                    'modules' => [
+                        'feature.tickets',
+                    ],
                 ],
                 'is_active' => true,
                 'sort_order' => 1,
@@ -50,13 +64,26 @@ class PlanSeeder extends Seeder
                 'priority_support' => false,
                 'custom_integrations' => false,
                 'features' => [
-                    'Gelişmiş ürün yönetimi',
-                    'Otomatik stok senkronizasyonu',
-                    'Gelişmiş sipariş yönetimi',
-                    'API erişimi',
-                    'Gelişmiş raporlar',
-                    'Toplu işlemler',
-                    'E-posta ve chat desteği',
+                    'marketing' => [
+                        'Gelişmiş ürün yönetimi',
+                        'Otomatik stok senkronizasyonu',
+                        'Gelişmiş sipariş yönetimi',
+                        'API erişimi',
+                        'Gelişmiş raporlar',
+                        'Toplu işlemler',
+                        'E-posta ve chat desteği',
+                    ],
+                    'modules' => [
+                        'feature.einvoice_api',
+                        'feature.reports',
+                        'feature.exports',
+                        'feature.integrations',
+                        'feature.category_mapping',
+                        'feature.sub_users',
+                        'feature.tickets',
+                        'feature.quick_actions',
+                        'feature.cargo_tracking',
+                    ],
                 ],
                 'is_active' => true,
                 'sort_order' => 2,
@@ -77,16 +104,34 @@ class PlanSeeder extends Seeder
                 'priority_support' => true,
                 'custom_integrations' => true,
                 'features' => [
-                    'Sınırsız ürün',
-                    'Sınırsız pazaryeri',
-                    'Sınırsız sipariş',
-                    'API erişimi',
-                    'Gelişmiş raporlar ve analizler',
-                    'Öncelikli destek',
-                    'Özel entegrasyonlar',
-                    'Toplu işlemler',
-                    'Çoklu kullanıcı yönetimi',
-                    '7/24 destek',
+                    'marketing' => [
+                        'Sınırsız ürün',
+                        'Sınırsız pazaryeri',
+                        'Sınırsız sipariş',
+                        'API erişimi',
+                        'Gelişmiş raporlar ve analizler',
+                        'Öncelikli destek',
+                        'Özel entegrasyonlar',
+                        'Toplu işlemler',
+                        'Çoklu kullanıcı yönetimi',
+                        '7/24 destek',
+                    ],
+                    'modules' => array_values(array_unique(array_merge([
+                        'feature.einvoice_api',
+                        'feature.einvoice_webhooks',
+                        'feature.reports',
+                        'feature.exports',
+                        'feature.integrations',
+                        'feature.category_mapping',
+                        'feature.sub_users',
+                        'feature.tickets',
+                        'feature.quick_actions',
+                        'feature.cargo_tracking',
+                        'feature.cargo_webhooks',
+                        'integration.cargo.trendyol_express',
+                        'integration.cargo.aras',
+                        'integration.cargo.yurtici',
+                    ], $marketplaceModules))),
                 ],
                 'is_active' => true,
                 'sort_order' => 3,
@@ -94,7 +139,10 @@ class PlanSeeder extends Seeder
         ];
 
         foreach ($plans as $plan) {
-            Plan::create($plan);
+            Plan::updateOrCreate(
+                ['slug' => $plan['slug']],
+                $plan
+            );
         }
     }
 }

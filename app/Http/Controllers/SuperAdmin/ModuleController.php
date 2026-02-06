@@ -36,8 +36,7 @@ class ModuleController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'code' => 'required|string|max:255|regex:/^[a-z0-9_.-]+$/|unique:modules,code',
+        $validated = $request->validate(['code' => 'required|string|max:255|regex:/^[a-z0-9_.-]+$/|unique:modules,code',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:5000',
             'type' => 'required|in:integration,feature',
@@ -73,8 +72,7 @@ class ModuleController extends Controller
 
     public function update(Request $request, Module $module): RedirectResponse
     {
-        $validated = $request->validate([
-            'code' => 'required|string|max:255|regex:/^[a-z0-9_.-]+$/|unique:modules,code,' . $module->id,
+        $validated = $request->validate(['code' => 'required|string|max:255|regex:/^[a-z0-9_.-]+$/|unique:modules,code,' . $module->id,
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:5000',
             'type' => 'required|in:integration,feature',
@@ -101,8 +99,7 @@ class ModuleController extends Controller
 
     public function assignToUser(Request $request, Module $module): RedirectResponse
     {
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
+        $validated = $request->validate(['user_id' => 'required|exists:users,id',
             'status' => 'required|in:active,inactive,expired',
             'starts_at' => 'nullable|date',
             'ends_at' => 'nullable|date|after_or_equal:starts_at',
@@ -115,7 +112,7 @@ class ModuleController extends Controller
             if (!is_array($decoded)) {
                 return back()->with('info', 'Meta alanı geçerli bir JSON olmalı.');
             }
-            $meta = $decoded;
+$meta = $decoded;
         }
 
         UserModule::query()->updateOrCreate(

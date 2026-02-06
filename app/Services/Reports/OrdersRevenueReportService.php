@@ -57,8 +57,7 @@ class OrdersRevenueReportService
         if (!$dateFrom || !$dateTo) {
             return 'daily';
         }
-
-        $start = Carbon::parse($dateFrom);
+$start = Carbon::parse($dateFrom);
         $end = Carbon::parse($dateTo);
 
         return $start->diffInDays($end) > 31 ? 'monthly' : 'daily';
@@ -87,8 +86,7 @@ class OrdersRevenueReportService
                 $row['total'] += (float) $item->revenue;
                 $row['orders_total'] += (int) $item->orders;
             }
-
-            $table[] = $row;
+$table[] = $row;
         }
 
         return $table;

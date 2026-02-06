@@ -121,9 +121,10 @@ class Subscription extends Model
     // Aylık kullanım resetleme
     public function resetMonthlyUsage()
     {
-        $this->update([
-            'current_month_orders_count' => 0,
+        $this->update(['current_month_orders_count' => 0,
             'usage_reset_at' => now()->addMonth(),
         ]);
     }
 }
+
+

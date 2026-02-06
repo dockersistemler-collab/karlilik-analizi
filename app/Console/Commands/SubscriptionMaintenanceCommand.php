@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Events\TrialEnded;
 use App\Models\Subscription;
 use App\Models\Invoice;
 use Carbon\Carbon;
@@ -45,8 +46,7 @@ class SubscriptionMaintenanceCommand extends Command
             if (!$plan) {
                 continue;
             }
-
-            $startsAt = $now->copy();
+$startsAt = $now->copy();
             $endsAt = $subscription->billing_period === 'yearly'
                 ? $startsAt->copy()->addYear()
                 : $startsAt->copy()->addMonth();
@@ -55,8 +55,7 @@ class SubscriptionMaintenanceCommand extends Command
                 ? $plan->yearly_price
                 : $plan->price;
 
-            $subscription->update([
-                'status' => 'active',
+            $subscription->update(['status' => 'active',
                 'starts_at' => $startsAt,
                 'ends_at' => $endsAt,
                 'amount' => $amount,
@@ -74,13 +73,16 @@ class SubscriptionMaintenanceCommand extends Command
                 'status' => 'paid',
                 'issued_at' => $now,
                 'paid_at' => $now,
-                'billing_name' => $subscription->user?->billing_name ?: $subscription->user?->name,
-                'billing_email' => $subscription->user?->billing_email ?: $subscription->user?->email,
-                'billing_address' => $subscription->user?->billing_address,
+                'billing_name' => $subscription->user?->billing_name ?: $subscription->user?->name, 'billing_email' => $subscription->user?->billing_email ?: $subscription->user?->email, 'billing_address' => $subscription->user?->billing_address,
             ]);
 
             $renewed++;
         }
+$trialExpired = Subscription::where('status', 'active')
+            ->where('ends_at', '<', $now)
+            ->where('auto_renew', false)
+            ->where('amount', 0)
+            ->get();
 
         $expired = Subscription::where('status', 'active')
             ->where('ends_at', '<', $now)
@@ -89,7 +91,16 @@ class SubscriptionMaintenanceCommand extends Command
                 'status' => 'expired',
             ]);
 
-        $this->info("Expired: {$expired} | Reset: {$reset} | Renewed: {$renewed}");
+        foreach ($trialExpired as $subscription) {
+            event(new TrialEnded(
+                $subscription->user_id,
+                $subscription->id,
+                $subscription->plan_id,
+                $subscription->starts_at?->toDateTimeString(), $subscription->ends_at?->toDateTimeString() ?? $now->toDateTimeString(),
+                $now->toDateTimeString()
+            ));
+        }
+$this->info("Expired: {$expired} | Reset: {$reset} | Renewed: {$renewed}");
 
         return Command::SUCCESS;
     }

@@ -20,8 +20,7 @@ class EntitlementService
         if ($user->isSuperAdmin()) {
             return true;
         }
-
-        $plan = $user->getActivePlan();
+$plan = $user->getActivePlan();
         if (!$plan) {
             return false;
         }
@@ -50,26 +49,30 @@ class EntitlementService
         if ($code === '') {
             throw new RuntimeException('Module code is required.');
         }
-
-        $module = Module::query()->where('code', $code)->first();
+$module = Module::query()->where('code', $code)->first();
         if (!$module) {
             throw new RuntimeException("Module not found: {$code}");
         }
-
-        $userModule = $user->userModules()
+$userModule = $user->userModules()
             ->where('module_id', $module->id)
             ->first();
 
-        $effectiveStartsAt = $startsAt ?? ($userModule?->starts_at ?? Carbon::now());
+        if ($endsAt) {
+            $endsAt = $endsAt->copy()->setMicrosecond(0);
+        }
+$existingEndsAt = $userModule?->ends_at;
+        if ($existingEndsAt) {
+            $existingEndsAt = $existingEndsAt->copy()->setMicrosecond(0);
+        }
+$effectiveStartsAt = $startsAt ?? ($userModule?->starts_at ?? Carbon::now());
 
         $effectiveEndsAt = $endsAt;
-        if ($userModule?->ends_at && $endsAt) {
-            $effectiveEndsAt = $endsAt->greaterThan($userModule->ends_at) ? $endsAt : $userModule->ends_at;
-        } elseif ($userModule?->ends_at && !$endsAt) {
-            $effectiveEndsAt = $userModule->ends_at;
+        if ($existingEndsAt && $endsAt) {
+            $effectiveEndsAt = $endsAt->greaterThan($existingEndsAt) ? $endsAt : $existingEndsAt;
+        } elseif ($existingEndsAt && !$endsAt) {
+            $effectiveEndsAt = $existingEndsAt;
         }
-
-        $existingMeta = is_array($userModule?->meta) ? $userModule->meta : [];
+$existingMeta = is_array($userModule?->meta) ? $userModule->meta : [];
         $mergedMeta = array_merge($existingMeta, $meta);
         if (empty($mergedMeta)) {
             $mergedMeta = null;
@@ -85,8 +88,7 @@ class EntitlementService
             return $userModule;
         }
 
-        return $user->userModules()->create([
-            'module_id' => $module->id,
+        return $user->userModules()->create(['module_id' => $module->id,
             'status' => 'active',
             'starts_at' => $effectiveStartsAt,
             'ends_at' => $effectiveEndsAt,
@@ -100,13 +102,11 @@ class EntitlementService
         if ($code === '') {
             throw new RuntimeException('Module code is required.');
         }
-
-        $module = Module::query()->where('code', $code)->first();
+$module = Module::query()->where('code', $code)->first();
         if (!$module) {
             return;
         }
-
-        $userModule = $user->userModules()
+$userModule = $user->userModules()
             ->where('module_id', $module->id)
             ->first();
 
@@ -118,8 +118,7 @@ class EntitlementService
             $userModule->delete();
             return;
         }
-
-        $userModule->status = 'inactive';
+$userModule->status = 'inactive';
         $userModule->ends_at = Carbon::now();
         $userModule->save();
     }
@@ -140,13 +139,11 @@ class EntitlementService
         if (!in_array($status, ['active', 'inactive', 'expired'], true)) {
             throw new RuntimeException('Invalid module status.');
         }
-
-        $module = Module::query()->where('code', $code)->first();
+$module = Module::query()->where('code', $code)->first();
         if (!$module) {
             throw new RuntimeException("Module not found: {$code}");
         }
-
-        $userModule = $user->userModules()
+$userModule = $user->userModules()
             ->where('module_id', $module->id)
             ->first();
 
@@ -166,7 +163,7 @@ class EntitlementService
             if ($endsAt !== null) {
                 $userModule->ends_at = $endsAt;
             }
-            $userModule->meta = $mergedMeta;
+$userModule->meta = $mergedMeta;
             $userModule->save();
 
             return $userModule;
@@ -199,3 +196,5 @@ class EntitlementService
             ->exists();
     }
 }
+
+

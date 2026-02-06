@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\SupportUser;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -12,7 +13,7 @@ class SettingsController extends Controller
 {
     public function index(Request $request): View
     {
-        $user = $request->user();
+        $user = SupportUser::currentUser();
 
         $allowedTabs = [
             'company',
@@ -35,10 +36,9 @@ class SettingsController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
-        $user = $request->user();
+        $user = SupportUser::currentUser();
 
-        $validated = $request->validate([
-            'billing_name' => 'nullable|string|max:255',
+        $validated = $request->validate(['billing_name' => 'nullable|string|max:255',
             'billing_email' => 'nullable|email|max:255',
             'billing_address' => 'nullable|string|max:2000',
             'company_name' => 'nullable|string|max:255',
@@ -55,15 +55,14 @@ class SettingsController extends Controller
             if ($user->company_logo_path) {
                 Storage::disk('public')->delete($user->company_logo_path);
             }
-            $path = $request->file('company_logo')->store('company-logos', 'public');
+$path = $request->file('company_logo')->store('company-logos', 'public');
             $validated['company_logo_path'] = $path;
         }
 
         if ($request->has('invoice_number_tracking')) {
             $validated['invoice_number_tracking'] = $request->boolean('invoice_number_tracking');
         }
-
-        $user->update($validated);
+$user->update($validated);
 
         return back()->with('success', 'Genel ayarlar güncellendi.');
     }

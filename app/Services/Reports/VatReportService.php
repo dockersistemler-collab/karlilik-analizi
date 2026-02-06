@@ -36,17 +36,15 @@ class VatReportService
             if (!$grouped->has($period)) {
                 $grouped->put($period, 0.0);
             }
-
-            $grouped->put($period, $grouped->get($period) + $vatTotal);
+$grouped->put($period, $grouped->get($period) + $vatTotal);
 
             $marketplaceId = $order->marketplace_id;
             if (!isset($totalsByMarketplace[$marketplaceId])) {
                 $totalsByMarketplace[$marketplaceId] = 0.0;
             }
-            $totalsByMarketplace[$marketplaceId] += $vatTotal;
+$totalsByMarketplace[$marketplaceId] += $vatTotal;
         }
-
-        $labels = $grouped->keys()->values()->all();
+$labels = $grouped->keys()->values()->all();
         $values = $grouped->values()->map(fn ($value) => round($value, 2))->all();
 
         return [
@@ -63,15 +61,13 @@ class VatReportService
         if (isset($item['vat_amount'])) {
             return (float) $item['vat_amount'] * $qty;
         }
-
-        $rate = $item['vat_rate'] ?? $item['kdv_orani'] ?? null;
+$rate = $item['vat_rate'] ?? $item['kdv_orani'] ?? null;
         $price = (float) ($item['price'] ?? $item['unit_price'] ?? $item['fiyat'] ?? 0);
 
         if (!$rate || $price <= 0 || $qty <= 0) {
             return 0.0;
         }
-
-        $rate = (float) $rate;
+$rate = (float) $rate;
         $gross = $price * $qty;
 
         return $gross * ($rate / (100 + $rate));

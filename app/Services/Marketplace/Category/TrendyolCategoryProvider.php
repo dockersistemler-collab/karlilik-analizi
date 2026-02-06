@@ -23,10 +23,10 @@ class TrendyolCategoryProvider implements MarketplaceCategoryProviderInterface
 
         $data = $response->json();
         if (!$response->successful() || !$data) {
+            event(new \App\Events\MarketplaceConnectionLost($marketplace?->code ?? 'trendyol', (string) ($credential->store_id ?? $credential->supplier_id ?? '0'), (int) $credential->user_id, 'HTTP '.$response->status(), now()->toDateTimeString()));
             throw new \RuntimeException('Trendyol kategorileri cekilemedi. HTTP: ' . $response->status());
         }
-
-        $nodes = $data['categories'] ?? $data['content'] ?? $data;
+$nodes = $data['categories'] ?? $data['content'] ?? $data;
         if (!is_array($nodes)) {
             throw new \RuntimeException('Trendyol kategori verisi beklenmeyen formatta.');
         }
@@ -45,19 +45,17 @@ class TrendyolCategoryProvider implements MarketplaceCategoryProviderInterface
             if (!is_array($node)) {
                 continue;
             }
-
-            $externalId = $node['id'] ?? $node['categoryId'] ?? $node['code'] ?? null;
+$externalId = $node['id'] ?? $node['categoryId'] ?? $node['code'] ?? null;
             if ($externalId === null) {
                 continue;
             }
-            $externalId = (string) $externalId;
+$externalId = (string) $externalId;
 
             $name = $node['name'] ?? $node['title'] ?? null;
             if (!is_string($name) || $name === '') {
                 $name = $externalId;
             }
-
-            $childrenRaw = $node['subCategories'] ?? $node['children'] ?? [];
+$childrenRaw = $node['subCategories'] ?? $node['children'] ?? [];
             $children = is_array($childrenRaw) ? $this->normalizeNodes($childrenRaw, $externalId) : [];
 
             $out[] = [
@@ -73,4 +71,3 @@ class TrendyolCategoryProvider implements MarketplaceCategoryProviderInterface
         return $out;
     }
 }
-

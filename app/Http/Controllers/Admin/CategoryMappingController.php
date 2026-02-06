@@ -19,8 +19,7 @@ class CategoryMappingController extends Controller
         if ($category->user_id !== $user->id) {
             abort(403);
         }
-
-        $marketplaces = Marketplace::query()
+$marketplaces = Marketplace::query()
             ->where('is_active', true)
             ->whereIn('id', function ($query) use ($user) {
                 $query->select('marketplace_id')
@@ -42,13 +41,12 @@ class CategoryMappingController extends Controller
         foreach ($marketplaces as $marketplace) {
             $mapping = $mappings->get($marketplace->id);
             $path = $mapping?->marketplaceCategory?->path;
-            $payload[] = [
+$payload[] = [
                 'marketplace_id' => $marketplace->id,
                 'marketplace_name' => $marketplace->name,
                 'marketplace_code' => $marketplace->code,
                 'is_mapped' => (bool) $mapping,
-                'mapped_external_id' => $mapping?->marketplace_category_external_id,
-                'mapped_path' => $path,
+                'mapped_external_id' => $mapping?->marketplace_category_external_id, 'mapped_path' => $path,
             ];
         }
 
@@ -56,7 +54,7 @@ class CategoryMappingController extends Controller
             'ok' => true,
             'category_id' => $category->id,
             'items' => $payload,
-            'manage_url' => route('admin.categories.index', ['open_category_id' => $category->id]),
+            'manage_url' => route('portal.categories.index', ['open_category_id' => $category->id]),
         ]);
     }
 
@@ -66,9 +64,7 @@ class CategoryMappingController extends Controller
         if ($category->user_id !== $user->id) {
             abort(403);
         }
-
-        $validated = $request->validate([
-            'external_id' => 'required|string|max:255',
+$validated = $request->validate(['external_id' => 'required|string|max:255',
         ]);
 
         $marketplaceCategory = MarketplaceCategory::query()
@@ -133,3 +129,5 @@ class CategoryMappingController extends Controller
         ]);
     }
 }
+
+

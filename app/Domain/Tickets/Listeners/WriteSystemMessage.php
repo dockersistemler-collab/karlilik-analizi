@@ -19,7 +19,7 @@ class WriteSystemMessage implements ShouldQueue
             'sender_type' => TicketMessage::SENDER_SYSTEM,
             'sender_id' => null,
             'body' => sprintf(
-                'Durum değişti: %s -> %s',
+                'Durum deÄŸiÅŸti: %s -> %s',
                 $this->label($event->fromStatus),
                 $this->label($event->toStatus)
             ),
@@ -33,7 +33,7 @@ class WriteSystemMessage implements ShouldQueue
             'open' => 'Açık',
             'waiting_customer' => 'Müşteri yanıtı bekleniyor',
             'waiting_admin' => 'Destek yanıtı bekleniyor',
-            'resolved' => 'Çözüldü',
+            'resolved' => 'Ã‡özüldü',
             'closed' => 'Kapatıldı',
             default => $status,
         };
@@ -41,3 +41,4 @@ class WriteSystemMessage implements ShouldQueue
 }
 
 
+

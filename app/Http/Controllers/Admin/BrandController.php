@@ -32,8 +32,7 @@ class BrandController extends Controller
     {
         $user = $request->user();
 
-        $validated = $request->validate([
-            'name' => [
+        $validated = $request->validate(['name' => [
                 'required',
                 'string',
                 'max:255',
@@ -53,7 +52,7 @@ class BrandController extends Controller
             ], 201);
         }
 
-        return redirect()->route('admin.brands.index')
+        return redirect()->route('portal.brands.index')
             ->with('success', 'Marka oluşturuldu.');
     }
 
@@ -69,8 +68,7 @@ class BrandController extends Controller
         $this->ensureOwner($brand);
         $user = $request->user();
 
-        $validated = $request->validate([
-            'name' => [
+        $validated = $request->validate(['name' => [
                 'required',
                 'string',
                 'max:255',
@@ -78,8 +76,7 @@ class BrandController extends Controller
             ],
         ]);
 
-        $brand->update([
-            'name' => $validated['name'],
+        $brand->update(['name' => $validated['name'],
         ]);
 
         if ($request->ajax() || $request->expectsJson()) {
@@ -89,7 +86,7 @@ class BrandController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.brands.index')
+        return redirect()->route('portal.brands.index')
             ->with('success', 'Marka güncellendi.');
     }
 
@@ -98,7 +95,7 @@ class BrandController extends Controller
         $this->ensureOwner($brand);
         $brand->delete();
 
-        return redirect()->route('admin.brands.index')
+        return redirect()->route('portal.brands.index')
             ->with('success', 'Marka silindi.');
     }
 
@@ -110,3 +107,5 @@ class BrandController extends Controller
         }
     }
 }
+
+

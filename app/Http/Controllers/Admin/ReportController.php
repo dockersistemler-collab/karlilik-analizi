@@ -14,6 +14,7 @@ use App\Services\Reports\SoldProductsReportService;
 use App\Services\Reports\StockValueReportService;
 use App\Services\Reports\TopProductsReportService;
 use App\Services\Reports\VatReportService;
+use App\Support\SupportUser;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
@@ -24,7 +25,7 @@ class ReportController extends Controller
     {
         $filters = ReportFilters::fromRequest($request, true);
         $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
-        $report = $service->get($request->user(), $filters);
+        $report = $service->get(SupportUser::currentUser(), $filters);
 
         return view('admin.reports', [
             'filters' => $filters,
@@ -39,7 +40,7 @@ class ReportController extends Controller
     {
         $filters = ReportFilters::fromRequest($request);
         $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
-        $rows = $service->get($request->user(), $filters, 100);
+        $rows = $service->get(SupportUser::currentUser(), $filters, 100);
 
         return view('admin.reports.top-products', [
             'filters' => $filters,
@@ -53,7 +54,7 @@ class ReportController extends Controller
     public function topProductsExport(Request $request, TopProductsReportService $service): Response
     {
         $filters = ReportFilters::fromRequest($request);
-        $rows = $service->get($request->user(), $filters, 1000);
+        $rows = $service->get(SupportUser::currentUser(), $filters, 1000);
 
         $headers = ['stok_kodu', 'urun_adi', 'satis_adedi', 'toplam_tutar'];
         $data = $rows->map(function ($row) {
@@ -72,7 +73,7 @@ class ReportController extends Controller
     {
         $filters = ReportFilters::fromRequest($request);
         $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
-        $rows = $service->get($request->user(), $filters);
+        $rows = $service->get(SupportUser::currentUser(), $filters);
 
         return view('admin.reports.sold-products', [
             'filters' => $filters,
@@ -85,7 +86,7 @@ class ReportController extends Controller
     public function soldProductsPrint(Request $request, SoldProductsReportService $service): View
     {
         $filters = ReportFilters::fromRequest($request);
-        $rows = $service->get($request->user(), $filters);
+        $rows = $service->get(SupportUser::currentUser(), $filters);
 
         return view('admin.reports.sold-products-print', [
             'filters' => $filters,
@@ -97,7 +98,7 @@ class ReportController extends Controller
     {
         $filters = ReportFilters::fromRequest($request, true);
         $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
-        $rows = $service->get($request->user(), $filters);
+        $rows = $service->get(SupportUser::currentUser(), $filters);
         $chartType = $request->input('chart_type', 'bar');
 
         return view('admin.reports.category-sales', [
@@ -113,7 +114,7 @@ class ReportController extends Controller
     {
         $filters = ReportFilters::fromRequest($request, true);
         $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
-        $report = $service->get($request->user(), $filters, $marketplaces);
+        $report = $service->get(SupportUser::currentUser(), $filters, $marketplaces);
         $chartType = $request->input('chart_type', 'bar');
 
         return view('admin.reports.brand-sales', [
@@ -129,13 +130,13 @@ class ReportController extends Controller
     {
         $filters = ReportFilters::fromRequest($request, true);
         $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
-        $chart = $service->get($request->user(), $filters);
+        $chart = $service->get(SupportUser::currentUser(), $filters);
         $vatColorsRaw = AppSetting::getValue('vat_report_marketplace_colors', '{}');
         $vatColors = json_decode($vatColorsRaw, true);
         if (!is_array($vatColors)) {
             $vatColors = [];
         }
-        $selectedMarketplaceId = $filters['marketplace_id'] ?? null;
+$selectedMarketplaceId = $filters['marketplace_id'] ?? null;
         $marketplaceList = $selectedMarketplaceId
             ? $marketplaces->where('id', $selectedMarketplaceId)
             : $marketplaces;
@@ -164,7 +165,7 @@ class ReportController extends Controller
     {
         $filters = ReportFilters::fromRequest($request, true);
         $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
-        $report = $service->get($request->user(), $filters);
+        $report = $service->get(SupportUser::currentUser(), $filters);
 
         return view('admin.reports.commission', [
             'filters' => $filters,
@@ -176,7 +177,7 @@ class ReportController extends Controller
 
     public function stockValue(Request $request, StockValueReportService $service): View
     {
-        $report = $service->get($request->user());
+        $report = $service->get(SupportUser::currentUser());
 
         return view('admin.reports.stock-value', [
             'summary' => $report['summary'],
@@ -187,13 +188,13 @@ class ReportController extends Controller
     public function ordersRevenueExport(Request $request, OrdersRevenueReportService $service): Response
     {
         $filters = ReportFilters::fromRequest($request, true);
-        $report = $service->get($request->user(), $filters);
+        $report = $service->get(SupportUser::currentUser(), $filters);
 
         $headers = ['tarih'];
         foreach ($report['marketplaces'] as $marketplace) {
             $headers[] = $marketplace->name;
         }
-        $headers[] = 'toplam';
+$headers[] = 'toplam';
 
         $data = [];
         foreach ($report['table'] as $row) {
@@ -201,7 +202,7 @@ class ReportController extends Controller
             foreach ($report['marketplaces'] as $marketplace) {
                 $line[] = number_format((float) $row['mp_' . $marketplace->id], 2, '.', '');
             }
-            $line[] = number_format((float) $row['total'], 2, '.', '');
+$line[] = number_format((float) $row['total'], 2, '.', '');
             $data[] = $line;
         }
 

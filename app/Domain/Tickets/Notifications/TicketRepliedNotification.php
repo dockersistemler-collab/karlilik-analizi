@@ -27,7 +27,7 @@ class TicketRepliedNotification extends Notification
     {
         $route = $notifiable->isSuperAdmin()
             ? route('super-admin.tickets.show', $this->ticket)
-            : route('admin.tickets.show', $this->ticket);
+            : route('portal.tickets.show', $this->ticket);
 
         return (new MailMessage())
             ->subject('Destek Talebine Yanıt: '.$this->ticket->subject)
@@ -47,3 +47,4 @@ class TicketRepliedNotification extends Notification
 }
 
 
+

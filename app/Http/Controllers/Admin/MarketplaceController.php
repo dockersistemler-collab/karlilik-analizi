@@ -24,8 +24,7 @@ class MarketplaceController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
+        $validated = $request->validate(['name' => 'required|string|max:255',
             'code' => 'required|string|unique:marketplaces,code',
             'api_url' => 'nullable|url',
             'is_active' => 'boolean',
@@ -33,14 +32,13 @@ class MarketplaceController extends Controller
 
         $marketplace = Marketplace::create($validated);
 
-        return redirect()->route('admin.marketplaces.index')
+        return redirect()->route('portal.marketplaces.index')
             ->with('success', 'Pazaryeri başarıyla oluşturuldu.');
     }
 
     public function show(Marketplace $marketplace)
     {
-        $marketplace->load([
-    'credential' => function ($q) {
+        $marketplace->load(['credential' => function ($q) {
         $q->where('user_id', auth()->id());
     },
     'products',
@@ -59,8 +57,7 @@ class MarketplaceController extends Controller
 
     public function update(Request $request, Marketplace $marketplace)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
+        $validated = $request->validate(['name' => 'required|string|max:255',
             'code' => 'required|string|unique:marketplaces,code,' . $marketplace->id,
             'api_url' => 'nullable|url',
             'is_active' => 'boolean',
@@ -71,8 +68,7 @@ class MarketplaceController extends Controller
         // Credential bilgilerini güncelle (kullanıcı bazlı tek kayıt)
 if ($request->filled('api_key') || $request->filled('api_secret') || $request->filled('supplier_id')) {
 
-    $credentialData = $request->only([
-        'api_key',
+    $credentialData = $request->only(['api_key',
         'api_secret',
         'supplier_id',
         'store_id',
@@ -90,7 +86,7 @@ if ($request->filled('api_key') || $request->filled('api_secret') || $request->f
     );
 }
 
-        return redirect()->route('admin.marketplaces.index')
+        return redirect()->route('portal.marketplaces.index')
             ->with('success', 'Pazaryeri başarıyla güncellendi.');
     }
 
@@ -98,7 +94,9 @@ if ($request->filled('api_key') || $request->filled('api_secret') || $request->f
     {
         $marketplace->delete();
 
-        return redirect()->route('admin.marketplaces.index')
+        return redirect()->route('portal.marketplaces.index')
             ->with('success', 'Pazaryeri başarıyla silindi.');
     }
 }
+
+

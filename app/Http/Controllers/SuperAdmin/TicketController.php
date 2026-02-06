@@ -32,8 +32,7 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket): View
     {
-        $ticket->load([
-            'messages' => function ($query) {
+        $ticket->load(['messages' => function ($query) {
                 $query->with(['attachments', 'sender'])->orderBy('created_at');
             },
             'customer',
@@ -47,8 +46,7 @@ class TicketController extends Controller
 
     public function reply(Request $request, Ticket $ticket, ReplyToTicketAction $action): RedirectResponse
     {
-        $validated = $request->validate([
-            'body' => 'required|string|max:5000',
+        $validated = $request->validate(['body' => 'required|string|max:5000',
             'is_internal' => 'nullable|boolean',
             'attachments' => 'nullable|array|max:5',
             'attachments.*' => 'file|max:5120',
@@ -72,8 +70,7 @@ class TicketController extends Controller
 
     public function assign(Request $request, Ticket $ticket, AssignTicketAction $action): RedirectResponse
     {
-        $validated = $request->validate([
-            'assigned_to_id' => 'required|integer|exists:users,id',
+        $validated = $request->validate(['assigned_to_id' => 'required|integer|exists:users,id',
         ]);
 
         $action->execute($ticket, (int) $validated['assigned_to_id'], $request->user());
@@ -84,8 +81,7 @@ class TicketController extends Controller
 
     public function changeStatus(Request $request, Ticket $ticket, ChangeTicketStatusAction $action): RedirectResponse
     {
-        $validated = $request->validate([
-            'status' => 'required|in:open,waiting_customer,waiting_admin,resolved,closed',
+        $validated = $request->validate(['status' => 'required|in:open,waiting_customer,waiting_admin,resolved,closed',
         ]);
 
         $action->execute($ticket, $validated['status'], $request->user(), TicketMessage::SENDER_ADMIN);

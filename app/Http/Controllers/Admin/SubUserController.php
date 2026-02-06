@@ -15,18 +15,18 @@ class SubUserController extends Controller
 {
         private const PERMISSIONS = [
         'dashboard' => 'Panel',
-        'products' => 'Ürünler',
-        'orders' => 'Siparişler',
+        'products' => 'Ãœrünler',
+        'orders' => 'SipariÅŸler',
         'customers' => 'Müşteriler',
         'reports' => 'Raporlar (Tümü)',
-        'reports.orders' => 'Raporlar: Sipariş ve Ciro',
-        'reports.top_products' => 'Raporlar: Çok Satan Ürünler',
-        'reports.sold_products' => 'Raporlar: Satılan Ürün Listesi',
-        'reports.category_sales' => 'Raporlar: Kategori Bazlı Satış',
-        'reports.brand_sales' => 'Raporlar: Marka Bazlı Satış',
+        'reports.orders' => 'Raporlar: SipariÅŸ ve Ciro',
+        'reports.top_products' => 'Raporlar: Ã‡ok Satan Ãœrünler',
+        'reports.sold_products' => 'Raporlar: Satılan Ãœrün Listesi',
+        'reports.category_sales' => 'Raporlar: Kategori Bazlı SatıÅŸ',
+        'reports.brand_sales' => 'Raporlar: Marka Bazlı SatıÅŸ',
         'reports.vat' => 'Raporlar: KDV Raporu',
         'reports.commission' => 'Raporlar: Komisyon Raporu',
-        'reports.stock_value' => 'Raporlar: Stoktaki Ürün Tutarları',
+        'reports.stock_value' => 'Raporlar: Stoktaki Ãœrün Tutarları',
         'integrations' => 'Entegrasyonlar',
         'addons' => 'Ek Modüller',
         'subscription' => 'Paketim',
@@ -59,8 +59,7 @@ class SubUserController extends Controller
     {
         $owner = $request->user();
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
+        $validated = $request->validate(['name' => 'required|string|max:255',
             'email' => [
                 'required',
                 'email',
@@ -94,8 +93,8 @@ class SubUserController extends Controller
             ], 201);
         }
 
-        return redirect()->route('admin.sub-users.index')
-            ->with('success', 'Alt kullanıcı oluşturuldu.');
+        return redirect()->route('portal.sub-users.index')
+            ->with('success', 'Alt kullanıcı oluÅŸturuldu.');
     }
 
     public function edit(Request $request, SubUser $subUser): View
@@ -111,8 +110,7 @@ class SubUserController extends Controller
     {
         $this->ensureOwner($request, $subUser);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
+        $validated = $request->validate(['name' => 'required|string|max:255',
             'email' => [
                 'required',
                 'email',
@@ -126,8 +124,7 @@ class SubUserController extends Controller
             'permissions.*' => [Rule::in(array_keys(self::PERMISSIONS))],
         ]);
 
-        $subUser->update([
-            'name' => $validated['name'],
+        $subUser->update(['name' => $validated['name'],
             'email' => $validated['email'],
             'password' => $validated['password'] ?? $subUser->password,
             'is_active' => (bool) ($validated['is_active'] ?? false),
@@ -135,7 +132,7 @@ class SubUserController extends Controller
 
         $this->syncPermissions($subUser, $validated['permissions'] ?? []);
 
-        return redirect()->route('admin.sub-users.index')
+        return redirect()->route('portal.sub-users.index')
             ->with('success', 'Alt kullanıcı güncellendi.');
     }
 
@@ -144,7 +141,7 @@ class SubUserController extends Controller
         $this->ensureOwner($request, $subUser);
         $subUser->delete();
 
-        return redirect()->route('admin.sub-users.index')
+        return redirect()->route('portal.sub-users.index')
             ->with('success', 'Alt kullanıcı silindi.');
     }
 
@@ -174,4 +171,8 @@ class SubUserController extends Controller
         }
     }
 }
+
+
+
+
 

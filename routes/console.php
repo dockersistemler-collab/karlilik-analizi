@@ -10,6 +10,24 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('subscriptions:maintain')->hourly();
+Schedule::command('modules:send-renewal-reminders')
+    ->dailyAt('09:00')
+    ->timezone('Europe/Istanbul')
+    ->withoutOverlapping();
+Schedule::command('marketplace:check-token-expirations')
+    ->dailyAt('09:00')
+    ->timezone('Europe/Istanbul')
+    ->withoutOverlapping();
+
+Schedule::command('cargo:poll-tracking')
+    ->everyFifteenMinutes()
+    ->withoutOverlapping();
+Schedule::command('integrations:health-notify')
+    ->everyTenMinutes()
+    ->withoutOverlapping();
+Schedule::command('billing:dunning-run')
+    ->hourly()
+    ->withoutOverlapping();
 
 Artisan::command('user:promote {email}', function (string $email) {
     $user = User::where('email', $email)->first();

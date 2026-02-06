@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Marketplace;
+use App\Models\Module;
 use Illuminate\Database\Seeder;
 
 class MarketplaceSeeder extends Seeder
@@ -68,7 +69,24 @@ class MarketplaceSeeder extends Seeder
         ];
 
         foreach ($marketplaces as $marketplace) {
-            Marketplace::create($marketplace);
+            Marketplace::updateOrCreate(
+                ['code' => $marketplace['code']],
+                $marketplace
+            );
+
+            if (!empty($marketplace['code']) && !empty($marketplace['is_active'])) {
+                Module::query()->updateOrCreate(
+                    ['code' => 'integration.marketplace.' . $marketplace['code']],
+                    [
+                        'name' => ($marketplace['name'] ?? $marketplace['code']) . ' Entegrasyonu',
+                        'description' => 'Pazaryeri entegrasyon erişimi.',
+                        'type' => 'integration',
+                        'billing_type' => 'recurring',
+                        'is_active' => true,
+                        'sort_order' => 0,
+                    ]
+                );
+            }
         }
     }
 }

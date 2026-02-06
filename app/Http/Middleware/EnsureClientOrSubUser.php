@@ -13,6 +13,24 @@ class EnsureClientOrSubUser
     {
         if (Auth::guard('web')->check()) {
             $user = Auth::guard('web')->user();
+            if ($user && session('support_view_enabled')) {
+                if ($request->routeIs('super-admin.support-view.stop')) {
+                    return $next($request);
+                }
+
+                if ($user->role === 'support_agent') {
+                    $allowedRoutes = (array) config('support.allowed_routes', []);
+                    $routeName = $request->route()?->getName();
+                    if ($routeName && in_array($routeName, $allowedRoutes, true)) {
+                        return $next($request);
+                    }
+                    abort(403);
+                }
+
+                if ($user->role === 'super_admin') {
+                    return $next($request);
+                }
+            }
             if ($user && $user->isClient()) {
                 return $next($request);
             }
@@ -23,8 +41,7 @@ class EnsureClientOrSubUser
             if (!$subUser || !$subUser->is_active) {
                 abort(403);
             }
-
-            $owner = $subUser->owner;
+$owner = $subUser->owner;
             if (!$owner || !$owner->isClient()) {
                 abort(403);
             }

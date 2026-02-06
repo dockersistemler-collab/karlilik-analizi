@@ -20,8 +20,7 @@ class SendTicketNotification implements ShouldQueue
     public function handle(TicketCreated|TicketReplied|TicketAssigned $event): void
     {
         if ($event instanceof TicketCreated) {
-            $this->notifyAdmins(
-                $event->ticket,
+            $this->notifyAdmins($event->ticket,
                 new TicketCreatedNotification($event->ticket, $event->message)
             );
         }
@@ -30,8 +29,7 @@ class SendTicketNotification implements ShouldQueue
             if ($event->message->sender_type === TicketMessage::SENDER_ADMIN) {
                 $event->ticket->customer?->notify(new TicketRepliedNotification($event->ticket, $event->message));
             } else {
-                $this->notifyAdmins(
-                    $event->ticket,
+                $this->notifyAdmins($event->ticket,
                     new TicketRepliedNotification($event->ticket, $event->message),
                     $event->actor
                 );

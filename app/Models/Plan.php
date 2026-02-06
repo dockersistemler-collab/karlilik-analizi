@@ -8,34 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Plan extends Model
 {
     use HasFactory;
-
-    public const MODULES = [
-        'category_mapping' => 'Kategori Eşitleme',
-        'sub_users' => 'Alt Kullanıcılar',
-        'tickets' => 'Destek (Ticket)',
-        'quick_actions' => 'Hızlı Menü',
-    ];
-
-    public const REPORT_MODULES = [
-        'reports.top_products' => 'Çok Satan Ürünler',
-        'reports.sold_products' => 'Satılan Ürünler',
-        'reports.orders' => 'Sipariş ve Ciro',
-        'reports.category_sales' => 'Kategori Bazlı Satış',
-        'reports.brand_sales' => 'Marka Bazlı Satış',
-        'reports.vat' => 'KDV Raporu',
-        'reports.commission' => 'Komisyon Raporu',
-        'reports.stock_value' => 'Stok Değeri',
-    ];
-
-    public const EXPORT_MODULES = [
-        'exports.products' => 'Ürünler Export',
-        'exports.orders' => 'Siparişler Export',
-        'exports.invoices' => 'Faturalar Export',
-        'exports.reports.orders' => 'Raporlar: Sipariş ve Ciro Export',
-        'exports.reports.top_products' => 'Raporlar: Çok Satan Ürünler Export',
-    ];
-
-    protected $fillable = [
+protected $fillable = [
         'name',
         'slug',
         'description',
@@ -66,7 +39,7 @@ class Plan extends Model
         'yearly_price' => 'decimal:2',
     ];
 
-    // İlişkiler
+    // İliÅŸkiler
     public function subscriptions()
     {
         return $this->hasMany(Subscription::class);
@@ -99,13 +72,19 @@ class Plan extends Model
         if (!is_array($features)) {
             return [];
         }
-
-        if (!array_key_exists('modules', $features) || !is_array($features['modules'])) {
-            return [];
+$modules = [];
+        if (array_key_exists('modules', $features) && is_array($features['modules'])) {
+            $modules = array_values(array_filter($features['modules'], fn ($m) => is_string($m) && trim($m) !== ''));
         }
 
-        $modules = array_values(array_filter($features['modules'], fn ($m) => is_string($m) && trim($m) !== ''));
-        $modules = array_values(array_unique(array_map('trim', $modules)));
+        // TODO: Remove legacy plan_modules merge after migration window closes.
+        if (config('app.read_legacy_plan_modules', true)) {
+            if (array_key_exists('plan_modules', $features) && is_array($features['plan_modules'])) {
+                $legacy = array_values(array_filter($features['plan_modules'], fn ($m) => is_string($m) && trim($m) !== ''));
+                $modules = array_merge($modules, $legacy);
+            }
+        }
+$modules = array_values(array_unique(array_map('trim', $modules)));
         $modules = array_values(array_filter($modules, fn ($m) => $m !== ''));
 
         if (empty($modules)) {
@@ -130,23 +109,9 @@ class Plan extends Model
             return false;
         }
 
-        foreach ($modules as $module) {
-            if (!is_string($module) || $module === '') {
-                continue;
-            }
-            if ($module === $moduleKey) {
-                return true;
-            }
-            if (str_starts_with($module, $moduleKey . '.')) {
-                return true;
-            }
-            if (str_starts_with($moduleKey, $module . '.')) {
-                return true;
-            }
-        }
-
-        return false;
+        return in_array($moduleKey, $modules, true);
     }
+
 
     public function withModules(array $modules): array
     {
@@ -169,4 +134,7 @@ class Plan extends Model
             'modules' => $normalized,
         ];
     }
+
 }
+
+

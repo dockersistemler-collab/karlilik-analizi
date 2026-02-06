@@ -17,8 +17,7 @@ class MarketplaceCategorySyncService
         if (!$credential->marketplace) {
             throw new \RuntimeException('Marketplace bulunamadi.');
         }
-
-        $provider = $this->resolveProvider($credential->marketplace);
+$provider = $this->resolveProvider($credential->marketplace);
         $tree = $provider->fetchCategoryTree($credential);
 
         $now = Carbon::now();

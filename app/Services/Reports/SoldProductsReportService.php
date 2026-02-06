@@ -39,8 +39,7 @@ class SoldProductsReportService
                         'quantity' => 0,
                     ]);
                 }
-
-                $row = $grouped->get($key);
+$row = $grouped->get($key);
                 $row['quantity'] += $qty;
                 $grouped->put($key, $row);
             }

@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Marketplace;
+use App\Support\SupportUser;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
     private function ensureOwner(Order $order): void
     {
-        $user = auth()->user();
+        $user = SupportUser::currentUser();
         if ($user && !$user->isSuperAdmin() && $order->user_id !== $user->id) {
             abort(403);
         }
@@ -19,7 +20,7 @@ class OrderController extends Controller
 
     public function index(Request $request)
     {
-        $user = $request->user();
+        $user = SupportUser::currentUser();
         $query = Order::with('marketplace')->latest();
 
         if ($user && !$user->isSuperAdmin()) {
@@ -41,8 +42,7 @@ class OrderController extends Controller
         if ($request->filled('date_to')) {
             $query->whereDate('order_date', '<=', $request->date_to);
         }
-
-        $orders = $query->paginate(20);
+$orders = $query->paginate(20);
         $marketplaces = Marketplace::where('is_active', true)->get();
 
         return view('admin.orders.index', compact('orders', 'marketplaces'));
@@ -58,16 +58,14 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $this->ensureOwner($order);
-        $validated = $request->validate([
-            'status' => 'required|in:pending,approved,shipped,delivered,cancelled,returned',
+        $validated = $request->validate(['status' => 'required|in:pending,approved,shipped,delivered,cancelled,returned',
             'tracking_number' => 'nullable|string',
             'cargo_company' => 'nullable|string',
             'note' => 'nullable|string|max:1000',
         ]);
 
         $oldStatus = $order->status;
-        $order->update([
-            'status' => $validated['status'],
+        $order->update(['status' => $validated['status'],
             'tracking_number' => $validated['tracking_number'] ?? null,
             'cargo_company' => $validated['cargo_company'] ?? null,
         ]);
@@ -89,8 +87,7 @@ class OrderController extends Controller
 
             \App\Models\OrderStatusLog::create([
                 'order_id' => $order->id,
-                'user_id' => $request->user()?->id,
-                'old_status' => $oldStatus,
+                'user_id' => SupportUser::currentUser()?->id, 'old_status' => $oldStatus,
                 'new_status' => $validated['status'],
                 'note' => $validated['note'] ?? null,
             ]);
@@ -101,27 +98,24 @@ class OrderController extends Controller
 
     public function bulkUpdate(Request $request)
     {
-        $validated = $request->validate([
-            'order_ids' => 'required|array',
+        $validated = $request->validate(['order_ids' => 'required|array',
             'order_ids.*' => 'exists:orders,id',
             'status' => 'required|in:pending,approved,shipped,delivered,cancelled,returned',
             'note' => 'nullable|string|max:1000',
         ]);
 
-        $user = $request->user();
+        $user = SupportUser::currentUser();
         $orders = Order::whereIn('id', $validated['order_ids'])->get();
 
         foreach ($orders as $order) {
             if ($user && !$user->isSuperAdmin() && $order->user_id !== $user->id) {
                 continue;
             }
-
-            $oldStatus = $order->status;
+$oldStatus = $order->status;
             if ($oldStatus === $validated['status']) {
                 continue;
             }
-
-            $order->update([
+$order->update([
                 'status' => $validated['status'],
             ]);
 
@@ -141,8 +135,7 @@ class OrderController extends Controller
 
             \App\Models\OrderStatusLog::create([
                 'order_id' => $order->id,
-                'user_id' => $user?->id,
-                'old_status' => $oldStatus,
+                'user_id' => $user?->id, 'old_status' => $oldStatus,
                 'new_status' => $validated['status'],
                 'note' => $validated['note'] ?? null,
             ]);
@@ -153,25 +146,22 @@ class OrderController extends Controller
 
     public function bulkShip(Request $request)
     {
-        $validated = $request->validate([
-            'bulk_ship_ids' => 'required|array',
+        $validated = $request->validate(['bulk_ship_ids' => 'required|array',
             'bulk_ship_ids.*' => 'exists:orders,id',
             'cargo_company' => 'required|string|max:255',
             'tracking_number' => 'required|string|max:255',
             'note' => 'nullable|string|max:1000',
         ]);
 
-        $user = $request->user();
+        $user = SupportUser::currentUser();
         $orders = Order::whereIn('id', $validated['bulk_ship_ids'])->get();
 
         foreach ($orders as $order) {
             if ($user && !$user->isSuperAdmin() && $order->user_id !== $user->id) {
                 continue;
             }
-
-            $oldStatus = $order->status;
-            $order->update([
-                'cargo_company' => $validated['cargo_company'],
+$oldStatus = $order->status;
+            $order->update(['cargo_company' => $validated['cargo_company'],
                 'tracking_number' => $validated['tracking_number'],
                 'status' => 'shipped',
                 'shipped_at' => now(),
@@ -179,8 +169,7 @@ class OrderController extends Controller
 
             \App\Models\OrderStatusLog::create([
                 'order_id' => $order->id,
-                'user_id' => $user?->id,
-                'old_status' => $oldStatus,
+                'user_id' => $user?->id, 'old_status' => $oldStatus,
                 'new_status' => 'shipped',
                 'note' => $validated['note'] ?? null,
             ]);
@@ -191,7 +180,7 @@ class OrderController extends Controller
 
     public function export(Request $request)
     {
-        $user = $request->user();
+        $user = SupportUser::currentUser();
         $query = Order::with('marketplace')->latest();
 
         if ($user && !$user->isSuperAdmin()) {
@@ -213,8 +202,7 @@ class OrderController extends Controller
         if ($request->filled('date_to')) {
             $query->whereDate('order_date', '<=', $request->date_to);
         }
-
-        $filename = 'orders-' . now()->format('Ymd-His') . '.csv';
+$filename = 'orders-' . now()->format('Ymd-His') . '.csv';
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
@@ -238,8 +226,7 @@ class OrderController extends Controller
                     fputcsv($handle, [
                         $order->marketplace_order_id,
                         $order->status,
-                        $order->marketplace?->name,
-                        $order->customer_name,
+                        $order->marketplace?->name, $order->customer_name,
                         $order->total_amount,
                         $order->currency,
                         optional($order->order_date)->format('Y-m-d H:i'),

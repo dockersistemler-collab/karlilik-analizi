@@ -18,8 +18,7 @@ class TrendyolService
         $this->apiSecret = $apiSecret;
         $this->supplierId = $supplierId;
         
-        // Trendyol API adresi (Test veya Canlı)
-        $this->baseUrl = $isTest 
+        // Trendyol API adresi (Test veya Canlı) ?? $this->baseUrl = $isTest 
             ? 'https://stageapi.trendyol.com/stage/sapigw/suppliers' 
             : 'https://api.trendyol.com/sapigw/suppliers';
     }

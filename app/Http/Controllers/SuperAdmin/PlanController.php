@@ -3,63 +3,68 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Marketplace;
+use App\Models\Module;
 use App\Models\Plan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class PlanController extends Controller
 {
-    private function moduleGroups(): array
+    private function entitlementModuleGroups(): array
     {
-        $marketplaces = Marketplace::query()
+        $modules = Module::query()
+            ->where('is_active', true)
+            ->whereIn('type', ['feature', 'integration'])
+            ->orderBy('type')
+            ->orderBy('sort_order')
             ->orderBy('name')
-            ->get(['name', 'code', 'is_active']);
+            ->get(['code', 'name', 'type']);
 
-        $marketplaceItems = [];
-        foreach ($marketplaces as $marketplace) {
-            if (!$marketplace->code) {
+        $featureItems = [];
+        $integrationItems = [];
+
+        foreach ($modules as $module) {
+            if (!is_string($module->code) || trim($module->code) === '') {
                 continue;
             }
-            $marketplaceItems['integrations.marketplace.' . $marketplace->code] = $marketplace->name;
+$label = is_string($module->name) && trim($module->name) !== '' ? $module->name : $module->code;
+
+            if ($module->type === 'integration') {
+                $integrationItems[$module->code] = $label;
+            } else {
+                $featureItems[$module->code] = $label;
+            }
         }
 
         return [
             [
-                'key' => 'core',
-                'label' => 'Genel Modüller',
-                'items' => Plan::MODULES,
+                'key' => 'feature',
+                'label' => 'Feature Modülleri',
+                'items' => $featureItems,
             ],
             [
-                'key' => 'reports',
-                'label' => 'Raporlar',
-                'items' => Plan::REPORT_MODULES,
-            ],
-            [
-                'key' => 'exports',
-                'label' => 'Exportlar',
-                'items' => Plan::EXPORT_MODULES,
-            ],
-            [
-                'key' => 'integrations',
-                'label' => 'Entegrasyon Pazaryerleri',
-                'items' => $marketplaceItems,
+                'key' => 'integration',
+                'label' => 'Integration Modülleri',
+                'items' => $integrationItems,
             ],
         ];
     }
 
-    private function moduleOptionsFlat(): array
+    /**
+     * @return array<int,string>
+     */
+    private function entitlementModuleCodes(): array
     {
-        $flat = [];
-        foreach ($this->moduleGroups() as $group) {
-            foreach (($group['items'] ?? []) as $key => $label) {
-                $flat[$key] = $label;
-            }
-        }
-        ksort($flat);
-
-        return $flat;
+        return Module::query()
+            ->where('is_active', true)
+            ->whereIn('type', ['feature', 'integration'])
+            ->orderBy('code')
+            ->pluck('code')
+            ->filter(fn ($c) => is_string($c) && trim($c) !== '')
+            ->values()
+            ->all();
     }
 
     public function index()
@@ -71,16 +76,17 @@ class PlanController extends Controller
 
     public function create()
     {
-        $moduleGroups = $this->moduleGroups();
-        $selectedModules = array_keys($this->moduleOptionsFlat());
+        $entitlementModuleGroups = $this->entitlementModuleGroups();
+        $selectedModules = [];
 
-        return view('super-admin.plans.create', compact('moduleGroups', 'selectedModules'));
+        return view('super-admin.plans.create', compact('entitlementModuleGroups', 'selectedModules'));
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
+        $entitlementCodes = $this->entitlementModuleCodes();
+
+        $validated = $request->validate(['name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'yearly_price' => 'nullable|numeric|min:0',
@@ -96,17 +102,18 @@ class PlanController extends Controller
             'is_active' => 'boolean',
             'sort_order' => 'nullable|integer|min:0',
             'modules' => 'nullable|array',
-            'modules.*' => ['string', Rule::in(array_keys($this->moduleOptionsFlat()))],
+            'modules.*' => ['string', Rule::in($entitlementCodes)],
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
+        $this->assertSlugUnique($validated['slug']);
         $validated['api_access'] = $request->boolean('api_access');
         $validated['advanced_reports'] = $request->boolean('advanced_reports');
         $validated['priority_support'] = $request->boolean('priority_support');
         $validated['custom_integrations'] = $request->boolean('custom_integrations');
         $validated['is_active'] = $request->boolean('is_active');
 
-        $modules = $validated['modules'] ?? array_keys($this->moduleOptionsFlat());
+        $modules = $validated['modules'] ?? [];
         unset($validated['modules']);
 
         $plan = new Plan();
@@ -120,16 +127,17 @@ class PlanController extends Controller
 
     public function edit(Plan $plan)
     {
-        $moduleGroups = $this->moduleGroups();
-        $selectedModules = $plan->enabledModules() ?? array_keys($this->moduleOptionsFlat());
+        $entitlementModuleGroups = $this->entitlementModuleGroups();
+        $selectedModules = $plan->enabledModules();
 
-        return view('super-admin.plans.edit', compact('plan', 'moduleGroups', 'selectedModules'));
+        return view('super-admin.plans.edit', compact('plan', 'entitlementModuleGroups', 'selectedModules'));
     }
 
     public function update(Request $request, Plan $plan)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
+        $entitlementCodes = $this->entitlementModuleCodes();
+
+        $validated = $request->validate(['name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'yearly_price' => 'nullable|numeric|min:0',
@@ -145,18 +153,20 @@ class PlanController extends Controller
             'is_active' => 'boolean',
             'sort_order' => 'nullable|integer|min:0',
             'modules' => 'nullable|array',
-            'modules.*' => ['string', Rule::in(array_keys($this->moduleOptionsFlat()))],
+            'modules.*' => ['string', Rule::in($entitlementCodes)],
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
+        $this->assertSlugUnique($validated['slug'], $plan);
         $validated['api_access'] = $request->boolean('api_access');
         $validated['advanced_reports'] = $request->boolean('advanced_reports');
         $validated['priority_support'] = $request->boolean('priority_support');
         $validated['custom_integrations'] = $request->boolean('custom_integrations');
         $validated['is_active'] = $request->boolean('is_active');
 
-        $modules = $validated['modules'] ?? array_keys($this->moduleOptionsFlat());
+        $modules = $validated['modules'] ?? [];
         unset($validated['modules']);
+
         $validated['features'] = $plan->withModules($modules);
 
         $plan->update($validated);
@@ -172,4 +182,25 @@ class PlanController extends Controller
         return redirect()->route('super-admin.plans.index')
             ->with('success', 'Paket başarıyla silindi.');
     }
+
+    private function assertSlugUnique(string $slug, ?Plan $current = null): void
+    {
+        $slug = trim($slug);
+        if ($slug === '') {
+            throw ValidationException::withMessages([
+                'name' => 'Paket adı geçersiz.',
+            ]);
+        }
+$query = Plan::query()->where('slug', $slug);
+        if ($current) {
+            $query->where('id', '!=', $current->id);
+        }
+
+        if ($query->exists()) {
+            throw ValidationException::withMessages([
+                'name' => 'Bu paket adı zaten kullanılıyor.',
+            ]);
+        }
+    }
 }
+

@@ -25,8 +25,7 @@ class CreateTicketAction
                 'subscription' => 'Aktif abonelik olmadan destek talebi açamazsınız.',
             ]);
         }
-
-        $plan = $subscription->plan;
+$plan = $subscription->plan;
         $maxTickets = (int) ($plan?->max_tickets_per_month ?? 0);
         if ($maxTickets > 0) {
             $startOfMonth = Carbon::now()->startOfMonth();

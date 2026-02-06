@@ -33,8 +33,7 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+        $request->validate(['name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'ref' => ['nullable', 'integer', 'exists:users,id'],
@@ -52,8 +51,7 @@ class RegisteredUserController extends Controller
                 'referrer_id' => (int) $request->ref,
                 'referred_user_id' => $user->id,
                 'referred_email' => $user->email,
-                'program_id' => $program?->id,
-                'status' => $program ? 'pending' : 'inactive_program',
+                'program_id' => $program?->id, 'status' => $program ? 'pending' : 'inactive_program',
             ]);
         }
 

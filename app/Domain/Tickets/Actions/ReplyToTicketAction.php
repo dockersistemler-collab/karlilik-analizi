@@ -37,8 +37,7 @@ class ReplyToTicketAction
                     'size' => $file->getSize(),
                 ]);
             }
-
-            $statusChanged = false;
+$statusChanged = false;
             $fromStatus = $ticket->status;
             $toStatus = $ticket->status;
 
@@ -56,12 +55,11 @@ class ReplyToTicketAction
                 $ticket->status = $toStatus;
                 $statusChanged = true;
             }
-
-            $ticket->last_activity_at = now();
+$ticket->last_activity_at = now();
             if ($toStatus !== Ticket::STATUS_CLOSED) {
                 $ticket->closed_at = null;
             }
-            $ticket->save();
+$ticket->save();
 
             if ($statusChanged) {
                 TicketStatusHistory::create([

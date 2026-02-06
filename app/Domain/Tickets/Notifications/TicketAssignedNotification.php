@@ -37,8 +37,7 @@ class TicketAssignedNotification extends Notification
         return [
             'ticket_id' => $this->ticket->id,
             'subject' => $this->ticket->subject,
-            'actor' => $this->actor?->name,
-            'type' => 'ticket_assigned',
+            'actor' => $this->actor?->name, 'type' => 'ticket_assigned',
         ];
     }
 }
