@@ -550,7 +550,7 @@
 
                 btn.disabled = true;
 
-                const response = await fetch(`{{ url('/portal/products') }}/${productId}/quick-update`, {
+                const response = await fetch(`{{ url('/products') }}/${productId}/quick-update`, {
 
                     method: 'POST',
 

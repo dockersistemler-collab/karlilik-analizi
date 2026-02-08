@@ -25,6 +25,8 @@ class EnsureSubUserPermission
         'portal.reports.vat' => 'reports.vat',
         'portal.reports.commission' => 'reports.commission',
         'portal.reports.stock-value' => 'reports.stock_value',
+        'portal.reports.order-profitability' => 'reports.profitability',
+        'portal.profitability.' => 'reports.profitability',
         'portal.integrations.' => 'integrations',
         'portal.addons.' => 'addons',
         'portal.subscription' => 'subscription',

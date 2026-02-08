@@ -20,6 +20,18 @@ class ModuleCatalogSeeder extends Seeder
                 'sort_order' => 0,
             ]
         );
+        Module::query()->updateOrCreate(
+            ['code' => 'feature.reports.profitability'],
+            [
+                'name' => 'Siparis Karlilik Analizi',
+                'description' => 'Siparis karlilik analizi raporu.',
+                'type' => 'feature',
+                'billing_type' => 'recurring',
+                'is_active' => true,
+                'sort_order' => 0,
+            ]
+        );
+
 
         Module::query()->updateOrCreate(
             ['code' => 'feature.exports'],

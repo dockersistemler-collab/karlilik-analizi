@@ -332,7 +332,7 @@
 
         const actionUrl = isEdit
 
-            ? `{{ url('/portal/brands') }}/${brandId}`
+            ? `{{ url('/brands') }}/${brandId}`
 
             : '{{ route('portal.brands.store') }}';
 
@@ -424,7 +424,7 @@
 
                         <button type="button" class="text-slate-600 hover:text-slate-900 mr-3 open-brand-edit" data-id="${payload.id}" data-name="${payload.name}">Düzenle</button>
 
-                        <form method="POST" action="{{ url('/portal/brands') }}/${payload.id}" class="inline">
+                        <form method="POST" action="{{ url('/brands') }}/${payload.id}" class="inline">
 
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
 

@@ -1196,7 +1196,7 @@
 
     async function syncMarketplaceCategories(marketplaceId) {
 
-        const response = await fetch(`{{ url('/portal/marketplace-categories') }}/${marketplaceId}/sync`, {
+        const response = await fetch(`{{ url('/marketplace-categories') }}/${marketplaceId}/sync`, {
 
             method: 'POST',
 
@@ -1224,7 +1224,7 @@
 
     async function upsertMapping(categoryId, marketplaceId, externalId) {
 
-        const response = await fetch(`{{ url('/portal/categories') }}/${categoryId}/mappings/${marketplaceId}`, {
+        const response = await fetch(`{{ url('/categories') }}/${categoryId}/mappings/${marketplaceId}`, {
 
             method: 'POST',
 
@@ -1264,7 +1264,7 @@
 
     async function deleteMapping(categoryId, marketplaceId) {
 
-        const response = await fetch(`{{ url('/portal/categories') }}/${categoryId}/mappings/${marketplaceId}`, {
+        const response = await fetch(`{{ url('/categories') }}/${categoryId}/mappings/${marketplaceId}`, {
 
             method: 'DELETE',
 
@@ -1488,7 +1488,7 @@
 
                 window.__mpDebounce.set(key, setTimeout(async () => {
 
-                    const response = await fetch(`{{ url('/portal/marketplace-categories') }}/${marketplaceId}/search?q=${encodeURIComponent(q)}`, {
+                    const response = await fetch(`{{ url('/marketplace-categories') }}/${marketplaceId}/search?q=${encodeURIComponent(q)}`, {
 
                         headers: { 'Accept': 'application/json' },
 
@@ -1582,7 +1582,7 @@
 
         }
 
-        const response = await fetch(`{{ url('/portal/categories') }}/${categoryId}/mappings-status`, {
+        const response = await fetch(`{{ url('/categories') }}/${categoryId}/mappings-status`, {
 
             headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
 

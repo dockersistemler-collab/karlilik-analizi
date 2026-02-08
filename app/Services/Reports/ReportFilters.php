@@ -14,7 +14,7 @@ class ReportFilters
         $dateTo = $request->input('date_to');
         $quickRange = $request->input('quick_range');
 
-        if (!$dateFrom && !$dateTo && $quickRange) {
+        if ($quickRange) {
             [$dateFrom, $dateTo] = self::resolveQuickRange($quickRange);
         }
 
@@ -53,6 +53,14 @@ class ReportFilters
             'last_month' => [
                 $today->copy()->subMonthNoOverflow()->startOfMonth()->toDateString(),
                 $today->copy()->subMonthNoOverflow()->endOfMonth()->toDateString(),
+            ],
+            'last_3_months' => [
+                $today->copy()->subMonthsNoOverflow(2)->startOfMonth()->toDateString(),
+                $today->copy()->toDateString(),
+            ],
+            'last_1_year' => [
+                $today->copy()->subYearNoOverflow()->toDateString(),
+                $today->copy()->toDateString(),
             ],
             'last_7_days' => [$today->copy()->subDays(6)->toDateString(), $today->toDateString()],
             'last_30_days' => [$today->copy()->subDays(29)->toDateString(), $today->toDateString()],

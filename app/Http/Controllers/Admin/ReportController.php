@@ -8,6 +8,7 @@ use App\Models\Marketplace;
 use App\Services\Reports\BrandSalesReportService;
 use App\Services\Reports\CategorySalesReportService;
 use App\Services\Reports\CommissionReportService;
+use App\Services\Reports\OrderProfitabilityReportService;
 use App\Services\Reports\OrdersRevenueReportService;
 use App\Services\Reports\ReportFilters;
 use App\Services\Reports\SoldProductsReportService;
@@ -185,6 +186,27 @@ $selectedMarketplaceId = $filters['marketplace_id'] ?? null;
         ]);
     }
 
+    public function orderProfitability(Request $request, OrderProfitabilityReportService $service): View
+    {
+        $filters = ReportFilters::fromRequest($request, true);
+        $filters['status'] = $request->input('status');
+        $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
+
+        $user = SupportUser::currentUser();
+        $orders = $service->query($user, $filters)
+            ->orderByDesc('order_date')
+            ->get();
+
+        $rows = $service->rows($orders);
+
+        return view('admin.reports.order-profitability', [
+            'filters' => $filters,
+            'marketplaces' => $marketplaces,
+            'quickRanges' => $this->quickRanges(),
+            'rows' => $rows,
+        ]);
+    }
+
     public function ordersRevenueExport(Request $request, OrdersRevenueReportService $service): Response
     {
         $filters = ReportFilters::fromRequest($request, true);
@@ -213,7 +235,7 @@ $line[] = number_format((float) $row['total'], 2, '.', '');
     {
         return response()->streamDownload(function () {
             $handle = fopen('php://output', 'wb');
-            fputcsv($handle, ['Bu rapor, fatura modülü tamamlandığında bağlanacaktır.']);
+            fputcsv($handle, ['Bu rapor, fatura modÃ¼lÃ¼ tamamlandÄ±ÄŸÄ±nda baÄŸlanacaktÄ±r.']);
             fclose($handle);
         }, 'faturali-siparisler.csv', [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -224,11 +246,11 @@ $line[] = number_format((float) $row['total'], 2, '.', '');
     {
         return [
             'today' => 'Bugün',
-            'this_week' => 'Bu Hafta',
-            'this_month' => 'Bu Ay',
-            'last_month' => 'Geçen Ay',
-            'last_7_days' => 'Son 7 Gün',
-            'last_30_days' => 'Son 30 Gün',
+            'this_week' => 'Bu hafta',
+            'this_month' => 'Bu ay',
+            'last_month' => 'Geçen ay',
+            'last_3_months' => 'Son 3 ay',
+            'last_1_year' => 'Son 1 yıl',
         ];
     }
 

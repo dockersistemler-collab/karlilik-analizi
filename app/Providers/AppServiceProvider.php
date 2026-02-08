@@ -17,6 +17,21 @@ use App\Policies\NotificationPolicy;
 use App\Policies\NotificationPreferencePolicy;
 use App\Support\SupportUser;
 use App\Support\CorrelationId;
+use App\Domain\Profitability\ProfitabilityCalculator;
+use App\Domain\Profitability\Contracts\ProductCostResolver;
+use App\Domain\Profitability\Contracts\ShippingFeeResolver;
+use App\Domain\Profitability\Contracts\RefundShippingResolver;
+use App\Domain\Profitability\Contracts\VatRateResolver;
+use App\Domain\Profitability\Resolvers\EloquentProductCostResolver;
+use App\Domain\Profitability\Resolvers\MarketplaceDataShippingFeeResolver;
+use App\Domain\Profitability\Resolvers\MarketplaceDataRefundShippingResolver;
+use App\Domain\Profitability\Resolvers\OrderVatRateResolver;
+use App\Domain\Profitability\Calculators\ProductCostCalculator;
+use App\Domain\Profitability\Calculators\CommissionCalculator;
+use App\Domain\Profitability\Calculators\ShippingFeeCalculator;
+use App\Domain\Profitability\Calculators\PlatformServiceFeeCalculator;
+use App\Domain\Profitability\Calculators\RefundShippingAdjustmentCalculator;
+use App\Domain\Profitability\Calculators\SalesVatCalculator;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Http\Request;
@@ -39,7 +54,23 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(ProductCostResolver::class, EloquentProductCostResolver::class);
+        $this->app->bind(ShippingFeeResolver::class, MarketplaceDataShippingFeeResolver::class);
+        $this->app->bind(RefundShippingResolver::class, MarketplaceDataRefundShippingResolver::class);
+        $this->app->bind(VatRateResolver::class, OrderVatRateResolver::class);
+
+        $this->app->tag([
+            ProductCostCalculator::class,
+            CommissionCalculator::class,
+            ShippingFeeCalculator::class,
+            PlatformServiceFeeCalculator::class,
+            RefundShippingAdjustmentCalculator::class,
+            SalesVatCalculator::class,
+        ], 'profitability.calculators');
+
+        $this->app->bind(ProfitabilityCalculator::class, function ($app) {
+            return new ProfitabilityCalculator($app->tagged('profitability.calculators'));
+        });
     }
 
     /**

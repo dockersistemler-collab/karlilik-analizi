@@ -76,6 +76,7 @@ class PlanSeeder extends Seeder
                     'modules' => [
                         'feature.einvoice_api',
                         'feature.reports',
+                        'feature.reports.profitability',
                         'feature.exports',
                         'feature.integrations',
                         'feature.category_mapping',
@@ -120,6 +121,7 @@ class PlanSeeder extends Seeder
                         'feature.einvoice_api',
                         'feature.einvoice_webhooks',
                         'feature.reports',
+                        'feature.reports.profitability',
                         'feature.exports',
                         'feature.integrations',
                         'feature.category_mapping',

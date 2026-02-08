@@ -20,6 +20,8 @@ use App\Http\Controllers\Admin\CargoIntegrationController;
 use App\Http\Controllers\Admin\ShipmentController;
 use App\Http\Controllers\Admin\EInvoiceApiDocsController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\ProfitabilityController as AdminProfitabilityController;
+use App\Http\Controllers\Admin\ProfitabilityAccountController as AdminProfitabilityAccountController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\SubUserController as AdminSubUserController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
@@ -45,7 +47,6 @@ Route::middleware(['auth', 'verified', 'role:client'])->group(function () {
 });
 
 Route::middleware(['client_or_subuser', 'verified', 'subuser.permission', 'support.readonly'])
-    ->prefix('portal')
     ->name('portal.')
     ->group(function () {
         Route::get('subscription', [SubscriptionController::class, 'index'])->name('subscription');
@@ -92,7 +93,6 @@ Route::middleware(['client_or_subuser', 'verified', 'subuser.permission', 'suppo
     });
 
 Route::middleware(['client_or_subuser', 'verified', 'subscription', 'subuser.permission', 'support.readonly'])
-    ->prefix('portal')
     ->name('portal.')
     ->group(function () {
         Route::get('/', [ClientDashboardController::class, 'index'])->name('dashboard');
@@ -198,7 +198,20 @@ Route::middleware(['client_or_subuser', 'verified', 'subscription', 'subuser.per
             Route::get('vat', [AdminReportController::class, 'vat'])->name('vat');
             Route::get('commission', [AdminReportController::class, 'commission'])->name('commission');
             Route::get('stock-value', [AdminReportController::class, 'stockValue'])->name('stock-value');
+            Route::get('order-profitability', [AdminReportController::class, 'orderProfitability'])->name('order-profitability');
         });
+        Route::prefix('profitability')
+            ->name('profitability.')
+            ->middleware('module:feature.reports.profitability')
+            ->group(function () {
+                Route::get('/', [AdminProfitabilityController::class, 'index'])->name('index');
+                Route::get('accounts', [AdminProfitabilityAccountController::class, 'index'])->name('accounts.index');
+                Route::post('accounts', [AdminProfitabilityAccountController::class, 'store'])->name('accounts.store');
+                Route::get('accounts/{account}/edit', [AdminProfitabilityAccountController::class, 'edit'])->name('accounts.edit');
+                Route::put('accounts/{account}', [AdminProfitabilityAccountController::class, 'update'])->name('accounts.update');
+                Route::delete('accounts/{account}', [AdminProfitabilityAccountController::class, 'destroy'])->name('accounts.destroy');
+                Route::post('accounts/{account}/test', [AdminProfitabilityAccountController::class, 'test'])->name('accounts.test');
+            });
         Route::middleware('module:feature.integrations')->group(function () {
             Route::get('integrations', [IntegrationController::class, 'index'])->name('integrations.index');
             Route::get('integrations/health', [AdminIntegrationHealthController::class, 'index'])

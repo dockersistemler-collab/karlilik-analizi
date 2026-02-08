@@ -223,6 +223,7 @@
                             'reports.commission' => 'Raporlar: Komisyon Raporu',
 
                             'reports.stock_value' => 'Raporlar: Stoktaki Ãœrün Tutarları',
+                            'reports.profitability' => 'Raporlar: SipariÅŸ KÃ¢rlÄ±lÄ±k Analizi',
 
                             'integrations' => 'Entegrasyonlar',
 
@@ -319,6 +320,7 @@
         'reports.commission': 'Raporlar: Komisyon Raporu',
 
         'reports.stock_value': 'Raporlar: Stoktaki Ãœrün Tutarları',
+        'reports.profitability': 'Raporlar: SipariÅŸ KÃ¢rlÄ±lÄ±k Analizi',
 
         integrations: 'Entegrasyonlar',
 
@@ -474,9 +476,9 @@
 
                 <td class="text-right whitespace-nowrap">
 
-                    <a href="{{ url('/portal/sub-users') }}/${payload.id}/edit" class="text-slate-600 hover:text-slate-900 mr-3">Düzenle</a>
+                    <a href="{{ url('/sub-users') }}/${payload.id}/edit" class="text-slate-600 hover:text-slate-900 mr-3">Düzenle</a>
 
-                    <form method="POST" action="{{ url('/portal/sub-users') }}/${payload.id}" class="inline">
+                    <form method="POST" action="{{ url('/sub-users') }}/${payload.id}" class="inline">
 
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
 

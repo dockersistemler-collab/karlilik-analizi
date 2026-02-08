@@ -28,7 +28,6 @@ use App\Http\Controllers\SuperAdmin\NotificationController as SuperAdminNotifica
 use App\Http\Controllers\Admin\BillingEventController as AdminBillingEventController;
 
 Route::middleware(['auth', 'verified', 'role:super_admin'])
-    ->prefix('super-admin')
     ->name('super-admin.')
     ->group(function () {
         Route::get('/', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
@@ -169,7 +168,6 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
     });
 
 Route::middleware(['auth', 'verified', 'role:super_admin'])
-    ->prefix('super-admin')
     ->name('super-admin.')
     ->group(function () {
         Route::post('users/{user}/support-view/start', [SuperAdminSupportViewController::class, 'start'])
@@ -178,7 +176,6 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
     });
 
 Route::middleware(['auth', 'verified', 'role:super_admin,support_agent'])
-    ->prefix('super-admin')
     ->name('super-admin.')
     ->group(function () {
         Route::post('tickets/{ticket}/support-view/start', [SuperAdminSupportViewController::class, 'startTicket'])

@@ -70,6 +70,15 @@ return new class extends Migration
             }
         }
 
+        if (DB::getDriverName() === 'sqlite') {
+            Schema::table('marketplace_carrier_mappings', function (Blueprint $table) {
+                $table->index('external_carrier_code_normalized', 'mkt_carrier_norm_idx');
+                $table->unique(['marketplace_code', 'external_carrier_code_normalized'], 'mkt_carrier_norm_uniq');
+            });
+
+            return;
+        }
+
         $indexes = collect(DB::select('SHOW INDEX FROM `marketplace_carrier_mappings`'))
             ->pluck('Key_name')
             ->unique()

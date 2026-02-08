@@ -7,6 +7,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement('ALTER TABLE orders DROP FOREIGN KEY orders_marketplace_id_foreign');
         DB::statement('ALTER TABLE orders MODIFY marketplace_id BIGINT UNSIGNED NULL');
         DB::statement('ALTER TABLE orders ADD CONSTRAINT orders_marketplace_id_foreign FOREIGN KEY (marketplace_id) REFERENCES marketplaces(id) ON DELETE SET NULL');
@@ -14,8 +18,12 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement('ALTER TABLE orders DROP FOREIGN KEY orders_marketplace_id_foreign');
         DB::statement('ALTER TABLE orders MODIFY marketplace_id BIGINT UNSIGNED NOT NULL');
         DB::statement('ALTER TABLE orders ADD CONSTRAINT orders_marketplace_id_foreign FOREIGN KEY (marketplace_id) REFERENCES marketplaces(id) ON DELETE CASCADE');
     }
-};
+};

@@ -7,6 +7,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement(
             "ALTER TABLE notification_audit_logs MODIFY action ENUM('view','mark_read','settings_change','email_dispatched','email_deferred','email_suppressed','email_failed')"
         );
@@ -14,6 +18,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement(
             "ALTER TABLE notification_audit_logs MODIFY action ENUM('view','mark_read','settings_change')"
         );

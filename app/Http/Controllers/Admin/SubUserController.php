@@ -27,6 +27,7 @@ class SubUserController extends Controller
         'reports.vat' => 'Raporlar: KDV Raporu',
         'reports.commission' => 'Raporlar: Komisyon Raporu',
         'reports.stock_value' => 'Raporlar: Stoktaki Ãœrün Tutarları',
+        'reports.profitability' => 'Raporlar: SipariÅŸ KÃ¢rlÄ±lÄ±k Analizi',
         'integrations' => 'Entegrasyonlar',
         'addons' => 'Ek Modüller',
         'subscription' => 'Paketim',

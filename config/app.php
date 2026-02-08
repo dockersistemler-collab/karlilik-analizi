@@ -1,5 +1,25 @@
 <?php
 
+$rootDomain = env('APP_ROOT_DOMAIN');
+if (!is_string($rootDomain) || $rootDomain === '') {
+    $host = parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST);
+    if (!is_string($host) || $host === '') {
+        $rootDomain = 'localhost';
+    } else {
+        $rootDomain = preg_replace('/^(app|sa|www)\\./', '', $host);
+    }
+}
+
+$appDomain = env('APP_APP_DOMAIN');
+if (!is_string($appDomain) || $appDomain === '') {
+    $appDomain = $rootDomain ? 'app.'.$rootDomain : null;
+}
+
+$saDomain = env('APP_SA_DOMAIN');
+if (!is_string($saDomain) || $saDomain === '') {
+    $saDomain = $rootDomain ? 'sa.'.$rootDomain : null;
+}
+
 return [
 
     /*
@@ -53,6 +73,22 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application Root Domain
+    |--------------------------------------------------------------------------
+    |
+    | Used for subdomain routing (app.{root}, sa.{root}). If not set, the host
+    | part of APP_URL is used with known subdomains stripped.
+    |
+    */
+
+    'root_domain' => $rootDomain,
+
+    'app_domain' => $appDomain,
+
+    'sa_domain' => $saDomain,
 
     /*
     |--------------------------------------------------------------------------

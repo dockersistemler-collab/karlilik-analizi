@@ -132,17 +132,21 @@ $sampleData = $this->sampleDataForTemplate($template, $user);
         $tenMinutesAgo = $now->copy()->subMinutes(10)->format('d.m.Y H:i');
         $userName = $user->name ?: 'Test Kullanıcı';
         $pricingUrl = Route::has('pricing') ? route('pricing') : url('/pricing');
-        $supportUrl = Route::has('portal.help.support') ? route('portal.help.support') : url('/portal/help/support');
+        $dashboardUrl = Route::has('portal.dashboard') ? route('portal.dashboard') : url('/');
+        $supportUrl = Route::has('portal.help.support') ? route('portal.help.support') : url('/help/support');
+        $billingUrl = Route::has('portal.billing') ? route('portal.billing') : url('/billing');
+        $integrationsUrl = Route::has('portal.integrations.index') ? route('portal.integrations.index') : url('/integrations');
+        $portalBase = rtrim($dashboardUrl, '/');
 
         $base = [
             'user_name' => $userName,
-            'dashboard_url' => url('/portal'),
-            'panel_url' => url('/portal'),
+            'dashboard_url' => $dashboardUrl,
+            'panel_url' => $dashboardUrl,
             'pricing_url' => $pricingUrl,
             'plans_url' => $pricingUrl,
-            'billing_url' => url('/portal/billing'),
-            'billing_settings_url' => url('/portal/billing'),
-            'retry_url' => url('/portal/billing'),
+            'billing_url' => $billingUrl,
+            'billing_settings_url' => $billingUrl,
+            'retry_url' => $billingUrl,
             'support_url' => $supportUrl,
         ];
 
@@ -157,7 +161,7 @@ $sampleData = $this->sampleDataForTemplate($template, $user);
                 'marketplace' => 'Trendyol',
                 'days_left' => 7,
                 'expires_at' => $inSevenDays,
-                'reconnect_url' => url('/portal/integrations'),
+                'reconnect_url' => $integrationsUrl,
             ]),
             'payment.succeeded' => array_merge($base, [
                 'amount' => '499.00',
@@ -165,13 +169,13 @@ $sampleData = $this->sampleDataForTemplate($template, $user);
                 'occurred_at' => $nowFormatted,
                 'provider' => 'iyzico',
                 'transaction_id' => 'TX-123456',
-                'receipt_url' => url('/portal/billing/receipt/123'),
+                'receipt_url' => $portalBase.'/billing/receipt/123',
             ]),
             'payment.failed' => array_merge($base, [
                 'amount' => '499.00',
                 'currency' => 'TRY',
                 'error_message' => 'Kart reddedildi',
-                'retry_url' => url('/portal/billing/retry'),
+                'retry_url' => $portalBase.'/billing/retry',
             ]),
             'invoice.created' => array_merge($base, [
                 'invoice_number' => 'INV-1001',
@@ -179,19 +183,19 @@ $sampleData = $this->sampleDataForTemplate($template, $user);
                 'currency' => 'TRY',
                 'marketplace' => 'Trendyol',
                 'order_id' => 'ORDER-123',
-                'invoice_url' => url('/portal/invoices/INV-1001'),
+                'invoice_url' => $portalBase.'/invoices/INV-1001',
             ]),
             'invoice.failed' => array_merge($base, [
                 'marketplace' => 'Trendyol',
                 'order_id' => 'ORDER-123',
                 'error_message' => 'Servis yanıt vermedi',
-                'retry_url' => url('/portal/invoices/retry/ORDER-123'),
+                'retry_url' => $portalBase.'/invoices/retry/ORDER-123',
             ]),
             'subscription.started' => array_merge($base, [
                 'plan_name' => 'Pro',
                 'started_at' => $oneDayAgo,
                 'ends_at' => $inOneMonth,
-                'panel_url' => url('/portal'),
+                'panel_url' => $dashboardUrl,
             ]),
             'subscription.renewed' => array_merge($base, [
                 'plan_name' => 'Pro',
@@ -199,18 +203,18 @@ $sampleData = $this->sampleDataForTemplate($template, $user);
                 'period_end' => $nowFormatted,
                 'amount' => '999.00',
                 'currency' => 'TRY',
-                'panel_url' => url('/portal'),
+                'panel_url' => $dashboardUrl,
             ]),
             'subscription.cancelled' => array_merge($base, [
                 'plan_name' => 'Pro',
                 'access_ends_at' => $inSevenDays,
-                'reactivate_url' => url('/portal/subscription/reactivate'),
+                'reactivate_url' => $portalBase.'/subscription/reactivate',
                 'plans_url' => url('/pricing'),
             ]),
             'trial.ended' => array_merge($base, [
                 'trial_ended_at' => $nowFormatted,
                 'pricing_url' => url('/pricing'),
-                'dashboard_url' => url('/portal'),
+                'dashboard_url' => $dashboardUrl,
             ]),
             'security.support_view_used' => array_merge($base, [
                 'admin_name' => 'Super Admin',

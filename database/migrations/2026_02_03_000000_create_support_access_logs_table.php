@@ -25,6 +25,14 @@ return new class extends Migration {
         }
 
         $indexName = 'support_access_logs_sa_tu_started_idx';
+        if (DB::getDriverName() === 'sqlite') {
+            Schema::table('support_access_logs', function (Blueprint $table) use ($indexName) {
+                $table->index(['super_admin_id', 'target_user_id', 'started_at'], $indexName);
+            });
+
+            return;
+        }
+
         $existing = DB::select('SHOW INDEX FROM support_access_logs WHERE Key_name = ?', [$indexName]);
         if (empty($existing)) {
             Schema::table('support_access_logs', function (Blueprint $table) use ($indexName) {

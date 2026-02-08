@@ -1,6 +1,57 @@
 ﻿# Session Memory
 
-**Last updated:** 2026-02-06
+**Last updated:** 2026-02-08
+
+## Current Work (2026-02-06)
+- Goal: Local dev run for project viewing on subdomains.
+- Status: Local domain set to `pazar.test` with subdomains; server started on port `8020`.
+
+## Changes Made
+- Created `.env` from `.env.example` and generated `APP_KEY`.
+- Switched `SESSION_DRIVER` to `file` for sqlite.
+- Patched sqlite-incompatible migrations to no-op or alternate path:
+  - `database/migrations/2026_01_24_231020_make_customers_user_id_nullable.php` (skip on sqlite)
+  - `database/migrations/2026_02_02_010000_add_normalized_carrier_code_to_marketplace_carrier_mappings.php` (sqlite index path)
+  - `database/migrations/2026_02_02_200000_change_cargo_credentials_to_text.php` (skip on sqlite)
+  - `database/migrations/2026_02_03_000000_create_support_access_logs_table.php` (sqlite index path)
+  - `database/migrations/2026_02_04_000000_make_orders_marketplace_id_nullable.php` (skip on sqlite)
+  - `database/migrations/2026_02_04_000010_add_fake_provider_to_module_purchases.php` (skip on sqlite)
+  - `database/migrations/2026_02_05_120010_expand_notification_audit_log_actions.php` (skip on sqlite)
+  - `database/migrations/2026_02_05_150020_expand_notification_audit_log_actions_for_incidents.php` (skip on sqlite)
+- Ran `php artisan migrate` to completion (sqlite).
+- Updated `.env` for subdomain routing:
+  - `APP_URL=http://pazar.test:8020`
+  - `APP_ROOT_DOMAIN=pazar.test`
+  - `APP_APP_DOMAIN=app.pazar.test`
+  - `APP_SA_DOMAIN=sa.pazar.test`
+  - `SESSION_DOMAIN=.pazar.test`
+- Fixed super-admin login loop by aligning session cookie:
+  - `SA_SESSION_COOKIE=app_session` (matches `APP_SESSION_COOKIE`)
+- Cleared config cache: `php artisan config:clear`.
+- Seeded data:
+  - `php artisan db:seed --class=SuperAdminSeeder`
+  - `php artisan db:seed --class=ModuleCatalogSeeder`
+  - `php artisan db:seed --class=MarketplaceSeeder`
+  - `php artisan db:seed --class=PlanSeeder`
+- Verified login redirect works (no loop) and super-admin pages return 200.
+- Seeded additional data:
+  - `php artisan db:seed --class=MailTemplateSeeder`
+  - `php artisan db:seed --class=CargoFixtureSeeder`
+
+## Next Steps
+- Ensure Windows hosts file has:
+  - `127.0.0.1  pazar.test`
+  - `127.0.0.1  app.pazar.test`
+  - `127.0.0.1  sa.pazar.test`
+- Start server if needed:
+  - `php artisan serve --host=127.0.0.1 --port=8020`
+- Login flow:
+  - `http://pazar.test:8020/login` -> then `http://sa.pazar.test:8020/`
+- If redirect loop persists, clear browser cookies for `pazar.test` and `sa.pazar.test`.
+
+## Notes
+- Host-based routes now use `pazar.test` / `app.pazar.test` / `sa.pazar.test` on port `8020`.
+- Super admin credentials: `admin@pazaryeri.com` / `12345678`.
 
 ## Mail Altyapısı Özeti
 - Akış: Event -> Listener (ShouldQueue) -> MailSender -> mail_logs
@@ -286,3 +337,57 @@ Not:
   - php artisan test --filter=EmailSuppressionTest
 - Integration Health testlerini çalıştır:
   - php artisan test --filter=IntegrationHealthTest
+
+## Current Work (2026-02-07)
+- Goal: Order profitability modular calculation + report service.
+- Status: Domain layer, resolvers, config, and unit tests added.
+
+## Changes Made
+- Added profitability domain (DTOs, contracts, calculators, resolvers) and Decimal helper.
+- Added marketplace config defaults for platform service fee and desi pricing.
+- Bound profitability resolvers/calculators in AppServiceProvider.
+- Added OrderProfitabilityReportService.
+- Added unit tests for profitability scenarios.
+- Added module catalog entry for order profitability report:
+  - `feature.reports.profitability` in `database/seeders/ModuleCatalogSeeder.php`.
+- Added `feature.reports.profitability` to Professional and Enterprise plans in `database/seeders/PlanSeeder.php`.
+- Ran seeders:
+  - `php artisan db:seed --class=ModuleCatalogSeeder`
+  - `php artisan db:seed --class=PlanSeeder`
+- Started dev server in a new terminal:
+  - `php artisan serve --host=127.0.0.1 --port=8020`
+
+## Next Steps
+- Run: php artisan test --filter=ProfitabilityCalculatorTest
+
+## Current Work (2026-02-08)
+- Goal: Marketplace Profitability Dashboard (Phase 1-5 in progress).
+- Status: Phase 1 models+migrations, Phase 2 adapters, Phase 3 sync jobs+command+scheduler, Phase 4 calculator+mart builder, Phase 5 UI routes+controllers+views implemented.
+
+## Changes Made
+- Added profitability tables and models:
+  - `marketplace_accounts`, `raw_marketplace_events`, `core_order_items`, `mart_profitability_daily`.
+  - Models: `MarketplaceAccount`, `RawMarketplaceEvent`, `CoreOrderItem`, `MartProfitabilityDaily`.
+- Added marketplace adapter layer:
+  - `app/Integrations/Marketplaces/*` interface, resolver, base adapter, DTOs, DateRange helpers.
+  - Adapters: Trendyol, Hepsiburada, N11, Amazon (stubbed).
+- Added sync jobs + dispatcher + command:
+  - Jobs: `SyncMarketplaceOrdersJob`, `SyncMarketplaceReturnsJob`, `SyncMarketplaceFeesJob` (queue: integrations).
+  - Dispatcher: `MarketplaceSyncDispatcher`.
+  - Command: `marketplaces:sync`.
+  - Scheduler: hourly orders/returns, daily fees (configurable via `config/marketplace_profitability.php`).
+- Added profitability calculations:
+  - `CoreProfitabilityCalculator`, `MartBuilder`.
+- Added UI + routes:
+  - Routes under `portal.profitability.*`.
+  - Controllers: `ProfitabilityController`, `ProfitabilityAccountController`.
+  - Views: `resources/views/admin/profitability/*`.
+  - Sidebar nav entry for Kârlılık.
+  - Sub-user permission mapping for `portal.profitability.*`.
+- Refreshed admin + customer portal skin with a pastel coral/mint palette in `resources/views/layouts/admin.blade.php`.
+- Updated KPI card gradients and chart colors in `resources/views/admin/profitability/index.blade.php`.
+- Updated admin dashboard KPI card gradients and map label colors in `resources/views/admin/dashboard.blade.php`.
+
+## Next Steps
+- Phase 6/7: Security review, tests (if desired), and finalize deliverables.
+- Implement real marketplace API calls in adapters (roadmap prepared).

@@ -110,21 +110,29 @@
 
         :root {
 
-            --panel-ink: #0f172a;
+            --panel-ink: #2a1f1b;
 
-            --panel-muted: #64748b;
+            --panel-muted: #7b6a62;
 
-            --panel-bg: #ffffff;
+            --panel-bg: #fff7f1;
 
-            --panel-card: #ffffff;
+            --panel-card: #fffdfb;
 
-            --panel-border: #e2e8f0;
+            --panel-border: #f1e3da;
 
-            --panel-primary: #0f172a;
+            --panel-primary: #2a1f1b;
 
-            --panel-primary-dark: #0b1220;
+            --panel-primary-dark: #1e1714;
 
             --panel-accent: {{ $panelThemeAccent }};
+
+            --panel-accent-soft: #ffe3d7;
+
+            --panel-mint: #78c9b2;
+
+            --panel-sky: #8cc9ff;
+
+            --panel-butter: #f7d27b;
 
             --panel-radius: {{ $panelThemeRadius }}px;
 
@@ -136,13 +144,43 @@
 
             font-family: var(--panel-font-family);
 
-            background: radial-gradient(circle at 10% 10%, #eff6ff 0%, transparent 45%),
+            background: radial-gradient(circle at 8% 12%, rgba(255, 226, 214, 0.7) 0%, transparent 48%),
 
-                        radial-gradient(circle at 90% 5%, #ecfeff 0%, transparent 40%),
+                        radial-gradient(circle at 90% 8%, rgba(209, 238, 255, 0.6) 0%, transparent 45%),
+
+                        radial-gradient(circle at 70% 80%, rgba(215, 247, 236, 0.7) 0%, transparent 42%),
 
                         var(--panel-bg);
 
             color: var(--panel-ink);
+
+        }
+
+        body::before {
+
+            content: "";
+
+            position: fixed;
+
+            inset: 0;
+
+            background:
+
+                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.6) 0%, transparent 55%),
+
+                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.5) 0%, transparent 60%);
+
+            pointer-events: none;
+
+            z-index: 0;
+
+        }
+
+        body > * {
+
+            position: relative;
+
+            z-index: 2;
 
         }
 
@@ -432,13 +470,15 @@
 
             gap: 0.7rem;
 
-            padding: 0.65rem 0.85rem;
+            padding: 0.6rem 0.85rem;
 
             border-radius: 14px;
 
             color: #374151;
 
             transition: color 160ms ease, background 160ms ease;
+            font-size: 0.9rem;
+            margin-bottom: 0.18rem;
 
         }
 
@@ -491,6 +531,20 @@
             display: block;
 
         }
+        .sidebar-submenu.is-open {
+            position: relative;
+            padding-left: 2.35rem;
+        }
+        .sidebar-submenu.is-open::before {
+            content: "";
+            position: absolute;
+            left: 1.15rem;
+            top: 0.4rem;
+            bottom: 0.4rem;
+            width: 1px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.7);
+        }
 
         html:not(.admin-sidebar-pinned) .sidebar:not(:hover):not(.is-pinned) .sidebar-submenu.is-open {
 
@@ -500,9 +554,9 @@
 
         .sidebar-submenu .sidebar-link {
 
-            padding: 0.5rem 0.75rem;
+            padding: 0.45rem 0.75rem;
 
-            border-radius: 12px;
+            border-radius: 999px;
 
         }
 
@@ -1192,6 +1246,243 @@
 
         }
 
+        /* Marketplace skin v3: admin + customer portal only (super-admin uses its own layout) */
+        :root {
+            --mk-bg: #f2f2f2;
+            --mk-bg-soft: #e9e9e9;
+            --mk-surface: #ffffff;
+            --mk-surface-2: #f7f7f7;
+            --mk-border: #c0c0c0;
+            --mk-ink: #373737;
+            --mk-muted: #818181;
+            --mk-muted-2: #a1a1a1;
+            --mk-muted-3: #c0c0c0;
+            --mk-accent: #555555;
+            --mk-accent-soft: #e5e5e5;
+            --mk-highlight: #555555;
+            --mk-warn: #818181;
+            --mk-danger: #555555;
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.35) 0%, transparent 40%),
+                radial-gradient(circle at 88% 15%, rgba(255, 255, 255, 0.22) 0%, transparent 36%),
+                linear-gradient(180deg, #f4f4f4 0%, #fafafa 100%);
+            color: var(--mk-ink);
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #ffffff 0%, var(--mk-surface-2) 100%);
+            border: 1px solid var(--mk-border);
+            box-shadow: 0 18px 40px rgba(55, 55, 55, 0.12);
+        }
+
+        .sidebar-brand {
+            border-color: var(--mk-border);
+            border-top: none;
+        }
+
+        .sidebar-link {
+            color: var(--mk-ink);
+            border: 1px solid transparent;
+            padding: 0.6rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            margin-bottom: 0.18rem;
+        }
+
+        .sidebar-link i {
+            color: var(--mk-muted);
+        }
+
+        .sidebar-link:hover {
+            color: var(--mk-ink);
+            background: var(--mk-accent-soft);
+            border-color: var(--mk-muted-3);
+        }
+
+        .sidebar-link:hover i {
+            color: var(--mk-accent);
+        }
+
+        .sidebar-link.is-active {
+            background: rgba(255, 107, 74, 0.32);
+            color: #373737;
+            border-color: rgba(255, 107, 74, 0.5);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            border-radius: 999px;
+        }
+
+        .sidebar-link.is-active i {
+            color: #373737;
+        }
+
+        .sidebar-section {
+            color: var(--mk-muted-2);
+        }
+
+        .sidebar-pin,
+        .sidebar-action,
+        .topbar-icon {
+            border-color: var(--mk-border);
+            background: var(--mk-surface);
+            color: var(--mk-ink) !important;
+            box-shadow: 0 10px 20px rgba(55, 55, 55, 0.1);
+        }
+
+        .sidebar-pin:hover,
+        .sidebar-pin.is-active,
+        .sidebar-action:hover,
+        .topbar-icon:hover {
+            color: var(--mk-ink) !important;
+            border-color: var(--mk-muted-3);
+            background: #ededed;
+        }
+
+        .panel-card {
+            background: var(--mk-surface);
+            border-color: transparent;
+            box-shadow: 0 10px 22px rgba(55, 55, 55, 0.12);
+        }
+
+        .topbar-link {
+            color: var(--mk-ink);
+        }
+
+        .topbar-link:hover {
+            color: var(--mk-ink);
+        }
+
+        main input,
+        main select,
+        main textarea {
+            border-color: var(--mk-border) !important;
+            background: #ffffff !important;
+            color: var(--mk-ink) !important;
+        }
+
+        main input:focus,
+        main select:focus,
+        main textarea:focus {
+            border-color: var(--mk-muted-2) !important;
+            box-shadow: 0 0 0 3px rgba(129, 129, 129, 0.18) !important;
+        }
+
+        .btn {
+            border-radius: 999px !important;
+        }
+
+        .btn-solid-accent {
+            border-color: var(--mk-accent);
+            background: linear-gradient(135deg, #555555 0%, #373737 100%);
+            color: #ffffff;
+        }
+
+        .btn-solid-accent:hover {
+            filter: none;
+            background: linear-gradient(135deg, #4a4a4a 0%, #2f2f2f 100%);
+            color: #ffffff;
+        }
+
+        .btn-outline,
+        .btn-outline-accent {
+            border-color: var(--mk-muted-2) !important;
+            color: var(--mk-ink) !important;
+            background: #f7f7f7 !important;
+            border-style: solid !important;
+        }
+
+        .btn-outline:hover,
+        .btn-outline-accent:hover {
+            border-color: var(--mk-ink) !important;
+            color: #ffffff !important;
+            background: var(--mk-ink) !important;
+        }
+
+        main table {
+            border-spacing: 0 12px !important;
+        }
+
+        main table thead th {
+            color: var(--mk-muted) !important;
+            border-bottom-color: var(--mk-border) !important;
+        }
+
+        main table tbody tr {
+            background: #ffffff !important;
+            box-shadow: 0 12px 24px rgba(55, 55, 55, 0.14);
+            border: 1px solid #e6e6e6;
+        }
+
+        main table tbody tr:hover {
+            background: #f7f7f7 !important;
+        }
+
+        main table tbody td {
+            border-top: 1px solid #ededed;
+            border-bottom: 1px solid #ededed;
+        }
+
+        main table tbody td:first-child {
+            border-left: 1px solid #ededed;
+        }
+
+        main table tbody td:last-child {
+            border-right: 1px solid #ededed;
+        }
+
+        .badge,
+        .panel-pill {
+            border: 1px solid var(--mk-border);
+            background: #efefef;
+            color: var(--mk-ink);
+        }
+
+        .quick-actions-toggle {
+            background: linear-gradient(135deg, #555555 0%, #373737 100%);
+        }
+
+        .quick-actions-menu {
+            background: var(--mk-surface);
+            border-color: var(--mk-border);
+        }
+
+        .quick-actions-item:hover {
+            background: #ffe6da;
+        }
+
+        /* Force grayscale text palette across admin + customer panels */
+        main h1,
+        main h2,
+        main h3,
+        main h4,
+        main h5,
+        main h6 {
+            color: var(--mk-ink) !important;
+        }
+
+        main .text-slate-900,
+        main .text-slate-800,
+        main .text-slate-700 {
+            color: #373737 !important;
+        }
+
+        main .text-slate-600 {
+            color: #555555 !important;
+        }
+
+        main .text-slate-500 {
+            color: #818181 !important;
+        }
+
+        main .text-slate-400 {
+            color: #a1a1a1 !important;
+        }
+
+        main .text-slate-300 {
+            color: #c0c0c0 !important;
+        }
     </style>
 
 </head>
@@ -1258,6 +1549,8 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                 });
 
                 $canReportsAny = $hasModule('feature.reports') && $canReportsAnyPermission;
+                $canProfitability = $hasModule('feature.reports.profitability')
+                    && (!$subUser || $subPermissions->has('reports') || $subPermissions->has('reports.profitability'));
 
                 $canReports = function (string $key) use ($subPermissions, $subUser) {
 
@@ -1287,7 +1580,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 @if($can('dashboard'))
 
-                    <a href="{{ route('portal.dashboard') }}" class="sidebar-link is-active">
+                    <a href="{{ route('portal.dashboard') }}" class="sidebar-link {{ request()->routeIs('portal.dashboard') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-chart-line w-6"></i>
 
@@ -1339,7 +1632,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 @if($can('products'))
 
-                    <button id="products-menu-toggle" type="button" class="sidebar-link w-full text-left">
+                    <button id="products-menu-toggle" type="button" class="sidebar-link w-full text-left {{ request()->routeIs('portal.products.*', 'portal.categories.*', 'portal.brands.*') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-box w-6"></i>
 
@@ -1351,7 +1644,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                     <div id="products-submenu" class="sidebar-submenu">
 
-                        <a href="{{ route('portal.products.index') }}" class="sidebar-link">
+                        <a href="{{ route('portal.products.index') }}" class="sidebar-link {{ request()->routeIs('portal.products.*') ? 'is-active' : '' }}">
 
                             <i class="fa-regular fa-rectangle-list w-6"></i>
 
@@ -1359,7 +1652,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                         </a>
 
-                        <a href="{{ route('portal.categories.index') }}" class="sidebar-link">
+                        <a href="{{ route('portal.categories.index') }}" class="sidebar-link {{ request()->routeIs('portal.categories.*') ? 'is-active' : '' }}">
 
                             <i class="fa-solid fa-tags w-6"></i>
 
@@ -1367,7 +1660,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                         </a>
 
-                        <a href="{{ route('portal.brands.index') }}" class="sidebar-link">
+                        <a href="{{ route('portal.brands.index') }}" class="sidebar-link {{ request()->routeIs('portal.brands.*') ? 'is-active' : '' }}">
 
                             <i class="fa-solid fa-certificate w-6"></i>
 
@@ -1391,7 +1684,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 @if($can('orders'))
 
-                    <a href="{{ route('portal.orders.index') }}" class="sidebar-link">
+                    <a href="{{ route('portal.orders.index') }}" class="sidebar-link {{ request()->routeIs('portal.orders.*') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-cart-shopping w-6"></i>
 
@@ -1401,7 +1694,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                     @if($hasCargoTracking)
 
-                        <a href="{{ route('portal.shipments.index') }}" class="sidebar-link">
+                        <a href="{{ route('portal.shipments.index') }}" class="sidebar-link {{ request()->routeIs('portal.shipments.*') ? 'is-active' : '' }}">
 
                             <i class="fa-solid fa-truck-ramp-box w-6"></i>
 
@@ -1417,7 +1710,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 @if($can('customers'))
 
-                    <a href="{{ route('portal.customers.index') }}" class="sidebar-link">
+                    <a href="{{ route('portal.customers.index') }}" class="sidebar-link {{ request()->routeIs('portal.customers.*') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-user-group w-6"></i>
 
@@ -1439,7 +1732,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 @if($can('settings'))
 
-                    <a href="{{ route('portal.settings.index') }}" class="sidebar-link">
+                    <a href="{{ route('portal.settings.index') }}" class="sidebar-link {{ request()->routeIs('portal.settings.index') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-gear w-6"></i>
 
@@ -1447,7 +1740,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                     </a>
 
-                    <a href="{{ route('portal.settings.cargo.index') }}" class="sidebar-link">
+                    <a href="{{ route('portal.settings.cargo.index') }}" class="sidebar-link {{ request()->routeIs('portal.settings.cargo.*') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-truck-fast w-6"></i>
 
@@ -1457,7 +1750,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
 
 
-                    <button id="api-settings-menu-toggle" type="button" class="sidebar-link w-full text-left">
+                    <button id="api-settings-menu-toggle" type="button" class="sidebar-link w-full text-left {{ request()->routeIs('portal.settings.api', 'portal.docs.einvoice') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-key w-6"></i>
 
@@ -1469,13 +1762,13 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                     <div id="api-settings-submenu" class="sidebar-submenu">
 
-                        <a href="{{ route('portal.settings.api') }}" class="sidebar-link">
+                        <a href="{{ route('portal.settings.api') }}" class="sidebar-link {{ request()->routeIs('portal.settings.api') ? 'is-active' : '' }}">
 
                             <span class="sidebar-label">API Erişimi</span>
 
                         </a>
 
-                        <a href="{{ route('portal.docs.einvoice') }}" class="sidebar-link">
+                        <a href="{{ route('portal.docs.einvoice') }}" class="sidebar-link {{ request()->routeIs('portal.docs.einvoice') ? 'is-active' : '' }}">
 
                             <span class="sidebar-label">E-Fatura API Dokümanı</span>
 
@@ -1485,7 +1778,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
 
 
-                    <button id="notifications-menu-toggle" type="button" class="sidebar-link w-full text-left">
+                    <button id="notifications-menu-toggle" type="button" class="sidebar-link w-full text-left {{ request()->routeIs('portal.notifications.mail-templates.*') ? 'is-active' : '' }}">
 
                         <i class="fa-regular fa-bell w-6"></i>
 
@@ -1507,7 +1800,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
 
 
-                    <button id="system-logs-menu-toggle" type="button" class="sidebar-link w-full text-left">
+                    <button id="system-logs-menu-toggle" type="button" class="sidebar-link w-full text-left {{ request()->routeIs('portal.system.mail-logs.*') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-clipboard-list w-6"></i>
 
@@ -1519,7 +1812,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                     <div id="system-logs-submenu" class="sidebar-submenu">
 
-                        <a href="{{ route('portal.system.mail-logs.index') }}" class="sidebar-link">
+                        <a href="{{ route('portal.system.mail-logs.index') }}" class="sidebar-link {{ request()->routeIs('portal.system.mail-logs.*') ? 'is-active' : '' }}">
 
                             <span class="sidebar-label">E-Posta Kayıtları</span>
 
@@ -1543,7 +1836,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                     @unless(auth('subuser')->check())
 
-                        <a href="{{ route('portal.sub-users.index') }}" class="sidebar-link">
+                        <a href="{{ route('portal.sub-users.index') }}" class="sidebar-link {{ request()->routeIs('portal.sub-users.*') ? 'is-active' : '' }}">
 
                             <i class="fa-solid fa-user-shield w-6"></i>
 
@@ -1559,7 +1852,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 @if($canReportsAny)
 
-                    <button id="reports-menu-toggle" type="button" class="sidebar-link w-full text-left">
+                    <button id="reports-menu-toggle" type="button" class="sidebar-link w-full text-left {{ request()->routeIs('portal.reports.*') ? 'is-active' : '' }}">
 
                         <i class="fa-regular fa-clock w-6"></i>
 
@@ -1573,7 +1866,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                         @if($canReports('reports.top_products'))
 
-                            <a href="{{ route('portal.reports.top-products') }}" class="sidebar-link">
+                            <a href="{{ route('portal.reports.top-products') }}" class="sidebar-link {{ request()->routeIs('portal.reports.top-products') ? 'is-active' : '' }}">
 
                                 <span class="sidebar-label">Çok Satan Ürünler</span>
 
@@ -1583,7 +1876,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                         @if($canReports('reports.sold_products'))
 
-                            <a href="{{ route('portal.reports.sold-products') }}" class="sidebar-link">
+                            <a href="{{ route('portal.reports.sold-products') }}" class="sidebar-link {{ request()->routeIs('portal.reports.sold-products') ? 'is-active' : '' }}">
 
                                 <span class="sidebar-label">Satılan Ürün Listesi</span>
 
@@ -1593,7 +1886,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                         @if($canReports('reports.orders'))
 
-                            <a href="{{ route('portal.reports.index') }}" class="sidebar-link">
+                            <a href="{{ route('portal.reports.index') }}" class="sidebar-link {{ request()->routeIs('portal.reports.index') ? 'is-active' : '' }}">
 
                                 <span class="sidebar-label">Sipariş ve Ciro</span>
 
@@ -1601,9 +1894,19 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                         @endif
 
+                        @if($canReports('reports.profitability'))
+
+                            <a href="{{ route('portal.reports.order-profitability') }}" class="sidebar-link {{ request()->routeIs('portal.reports.order-profitability') ? 'is-active' : '' }}">
+
+                                <span class="sidebar-label">Sipariş Kârlılık</span>
+
+                            </a>
+
+                        @endif
+
                         @if($canReports('reports.category_sales'))
 
-                            <a href="{{ route('portal.reports.category-sales') }}" class="sidebar-link">
+                            <a href="{{ route('portal.reports.category-sales') }}" class="sidebar-link {{ request()->routeIs('portal.reports.category-sales') ? 'is-active' : '' }}">
 
                                 <span class="sidebar-label">Kategori Bazlı Satış</span>
 
@@ -1613,7 +1916,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                         @if($canReports('reports.brand_sales'))
 
-                            <a href="{{ route('portal.reports.brand-sales') }}" class="sidebar-link">
+                            <a href="{{ route('portal.reports.brand-sales') }}" class="sidebar-link {{ request()->routeIs('portal.reports.brand-sales') ? 'is-active' : '' }}">
 
                                 <span class="sidebar-label">Marka Bazlı Satış</span>
 
@@ -1623,7 +1926,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                         @if($canReports('reports.vat'))
 
-                            <a href="{{ route('portal.reports.vat') }}" class="sidebar-link">
+                            <a href="{{ route('portal.reports.vat') }}" class="sidebar-link {{ request()->routeIs('portal.reports.vat') ? 'is-active' : '' }}">
 
                                 <span class="sidebar-label">KDV Raporu</span>
 
@@ -1633,7 +1936,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                         @if($canReports('reports.commission'))
 
-                            <a href="{{ route('portal.reports.commission') }}" class="sidebar-link">
+                            <a href="{{ route('portal.reports.commission') }}" class="sidebar-link {{ request()->routeIs('portal.reports.commission') ? 'is-active' : '' }}">
 
                                 <span class="sidebar-label">Komisyon Raporu</span>
 
@@ -1643,7 +1946,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                         @if($canReports('reports.stock_value'))
 
-                            <a href="{{ route('portal.reports.stock-value') }}" class="sidebar-link">
+                            <a href="{{ route('portal.reports.stock-value') }}" class="sidebar-link {{ request()->routeIs('portal.reports.stock-value') ? 'is-active' : '' }}">
 
                                 <span class="sidebar-label">Stoktaki Ürün Tutarları Raporu</span>
 
@@ -1653,6 +1956,22 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                     </div>
 
+                @endif
+
+                @if($canProfitability)
+                    <button id="profitability-menu-toggle" type="button" class="sidebar-link w-full text-left {{ request()->routeIs('portal.profitability.*') ? 'is-active' : '' }}">
+                        <i class="fa-solid fa-chart-pie w-6"></i>
+                        <span class="sidebar-label flex-1">Kârlılık</span>
+                        <i class="fa-solid fa-chevron-down text-xs sidebar-label"></i>
+                    </button>
+                    <div id="profitability-submenu" class="sidebar-submenu">
+                        <a href="{{ route('portal.profitability.index') }}" class="sidebar-link {{ request()->routeIs('portal.profitability.index') ? 'is-active' : '' }}">
+                            <span class="sidebar-label">Genel Bakış</span>
+                        </a>
+                        <a href="{{ route('portal.profitability.accounts.index') }}" class="sidebar-link {{ request()->routeIs('portal.profitability.accounts.*') ? 'is-active' : '' }}">
+                            <span class="sidebar-label">Hesaplar</span>
+                        </a>
+                    </div>
                 @endif
 
 
@@ -1667,7 +1986,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 @if($hasModule('feature.tickets') && $can('tickets'))
 
-                    <a href="{{ route('portal.tickets.index') }}" class="sidebar-link">
+                    <a href="{{ route('portal.tickets.index') }}" class="sidebar-link {{ request()->routeIs('portal.tickets.*') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-life-ring w-6"></i>
 
@@ -1689,7 +2008,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 @if($hasModule('feature.integrations') && $can('integrations'))
 
-                    <a href="{{ route('portal.integrations.index') }}" class="sidebar-link">
+                    <a href="{{ route('portal.integrations.index') }}" class="sidebar-link {{ request()->routeIs('portal.integrations.*') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-plug w-6"></i>
 
@@ -1701,7 +2020,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 @if($can('addons'))
 
-                    <a href="{{ route('portal.addons.index') }}" class="sidebar-link">
+                    <a href="{{ route('portal.addons.index') }}" class="sidebar-link {{ request()->routeIs('portal.addons.*') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-layer-group w-6"></i>
 
@@ -1709,7 +2028,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                     </a>
 
-                    <a href="{{ route('portal.modules.mine') }}" class="sidebar-link">
+                    <a href="{{ route('portal.modules.mine') }}" class="sidebar-link {{ request()->routeIs('portal.modules.mine') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-puzzle-piece w-6"></i>
 
@@ -1731,7 +2050,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 @if($can('subscription'))
 
-                    <a href="{{ route('portal.subscription') }}" class="sidebar-link">
+                    <a href="{{ route('portal.subscription') }}" class="sidebar-link {{ request()->routeIs('portal.subscription') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-crown w-6"></i>
 
@@ -1745,7 +2064,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 @if($can('invoices'))
 
-                    <a href="{{ route('portal.invoices.index') }}" class="sidebar-link">
+                    <a href="{{ route('portal.invoices.index') }}" class="sidebar-link {{ request()->routeIs('portal.invoices.*') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-file-invoice w-6"></i>
 
@@ -2351,7 +2670,9 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
         if (productsSubmenu) {
 
-            setProductsMenu(false);
+            const hasActive = productsSubmenu.querySelector('.is-active');
+            const parentActive = productsMenuToggle?.classList.contains('is-active');
+            setProductsMenu(Boolean(hasActive || parentActive));
 
         }
 
@@ -2385,7 +2706,9 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
         if (reportsSubmenu) {
 
-            setReportsMenu(false);
+            const hasActive = reportsSubmenu.querySelector('.is-active');
+            const parentActive = reportsMenuToggle?.classList.contains('is-active');
+            setReportsMenu(Boolean(hasActive || parentActive));
 
         }
 
@@ -2400,6 +2723,26 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 	        });
 
 	    </script>
+
+        <script>
+            const profitabilityMenuToggle = document.getElementById('profitability-menu-toggle');
+            const profitabilitySubmenu = document.getElementById('profitability-submenu');
+
+            function setProfitabilityMenu(open) {
+                profitabilitySubmenu?.classList.toggle('is-open', open);
+            }
+
+            if (profitabilitySubmenu) {
+                const hasActive = profitabilitySubmenu.querySelector('.is-active');
+                const parentActive = profitabilityMenuToggle?.classList.contains('is-active');
+                setProfitabilityMenu(Boolean(hasActive || parentActive));
+            }
+
+            profitabilityMenuToggle?.addEventListener('click', () => {
+                const isOpen = profitabilitySubmenu?.classList.contains('is-open');
+                setProfitabilityMenu(!isOpen);
+            });
+        </script>
 
 	    <script>
 
@@ -2419,7 +2762,9 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
 	        if (apiSettingsSubmenu) {
 
-	            setApiSettingsMenu(false);
+	            const hasActive = apiSettingsSubmenu.querySelector('.is-active');
+	            const parentActive = apiSettingsMenuToggle?.classList.contains('is-active');
+	            setApiSettingsMenu(Boolean(hasActive || parentActive));
 
 	        }
 
@@ -2453,7 +2798,9 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
             if (notificationsSubmenu) {
 
-                setNotificationsMenu(false);
+                const hasActive = notificationsSubmenu.querySelector('.is-active');
+                const parentActive = notificationsMenuToggle?.classList.contains('is-active');
+                setNotificationsMenu(Boolean(hasActive || parentActive));
 
             }
 
@@ -2487,7 +2834,9 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
             if (systemLogsSubmenu) {
 
-                setSystemLogsMenu(false);
+                const hasActive = systemLogsSubmenu.querySelector('.is-active');
+                const parentActive = systemLogsMenuToggle?.classList.contains('is-active');
+                setSystemLogsMenu(Boolean(hasActive || parentActive));
 
             }
 
