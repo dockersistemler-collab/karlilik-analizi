@@ -51,6 +51,8 @@ Route::middleware(['client_or_subuser', 'verified', 'subuser.permission', 'suppo
     ->group(function () {
         Route::get('subscription', [SubscriptionController::class, 'index'])->name('subscription');
         Route::get('subscription/history', [SubscriptionController::class, 'history'])->name('subscription.history');
+        Route::get('dashboard-metrics', [ClientDashboardController::class, 'metrics'])->name('dashboard.metrics');
+        Route::get('dashboard-map', [ClientDashboardController::class, 'mapData'])->name('dashboard.map');
         Route::get('billing/plans', [AdminBillingController::class, 'plans'])->name('billing.plans');
         Route::post('billing/checkout', [AdminBillingController::class, 'checkout'])->name('billing.checkout');
         Route::get('billing/iyzico/{checkout}', [AdminBillingController::class, 'showIyzico'])->name('billing.iyzico.show');

@@ -178,7 +178,18 @@ class AmazonAdapter extends BaseMarketplaceAdapter
     private function resolveBaseUrl(MarketplaceAccount $account): string
     {
         $creds = is_array($account->credentials) ? $account->credentials : [];
-        return (string) Arr::get($creds, 'base_url', '');
+        $baseUrl = (string) Arr::get($creds, 'base_url', '');
+        return $this->allowlistedBaseUrl($account, $baseUrl, [
+            'amazon.com',
+            'amazon.com.tr',
+            'amazon.co.uk',
+            'amazon.de',
+            'amazon.fr',
+            'amazon.it',
+            'amazon.es',
+            'amazon.ca',
+            'amazonaws.com',
+        ], 'amazon');
     }
 
     private function hasAuth(MarketplaceAccount $account): bool

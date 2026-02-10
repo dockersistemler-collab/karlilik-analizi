@@ -214,7 +214,9 @@ class TrendyolAdapter extends BaseMarketplaceAdapter
         $creds = is_array($account->credentials) ? $account->credentials : [];
         $baseUrl = (string) Arr::get($creds, 'base_url', '');
         if ($baseUrl !== '') {
-            return $baseUrl;
+            return $this->allowlistedBaseUrl($account, $baseUrl, [
+                'trendyol.com',
+            ], 'trendyol');
         }
 
         $isTest = (bool) Arr::get($creds, 'is_test', false);

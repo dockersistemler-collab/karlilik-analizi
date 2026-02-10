@@ -178,7 +178,10 @@ class N11Adapter extends BaseMarketplaceAdapter
     private function resolveBaseUrl(MarketplaceAccount $account): string
     {
         $creds = is_array($account->credentials) ? $account->credentials : [];
-        return (string) Arr::get($creds, 'base_url', '');
+        $baseUrl = (string) Arr::get($creds, 'base_url', '');
+        return $this->allowlistedBaseUrl($account, $baseUrl, [
+            'n11.com',
+        ], 'n11');
     }
 
     private function hasAuth(MarketplaceAccount $account): bool

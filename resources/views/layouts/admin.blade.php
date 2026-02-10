@@ -1579,54 +1579,22 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
 
                 @if($can('dashboard'))
-
                     <a href="{{ route('portal.dashboard') }}" class="sidebar-link {{ request()->routeIs('portal.dashboard') ? 'is-active' : '' }}">
-
                         <i class="fa-solid fa-chart-line w-6"></i>
-
-                        <span class="sidebar-label">Panel Özeti</span>
-
+                        <span class="sidebar-label">Y&#246;netim Paneli</span>
                     </a>
-
                 @endif
-
-                @if(request()->routeIs('portal.*') || request()->is('portal*'))
-
-                    <p class="sidebar-section">Portal</p>
-
-                    <a href="{{ route('portal.dashboard') }}" class="sidebar-link {{ request()->routeIs('portal.dashboard') ? 'is-active' : '' }}">
-
-                        <i class="fa-solid fa-house w-6"></i>
-
-                        <span class="sidebar-label">Portal Ana Sayfa</span>
-
-                    </a>
-
-                    <a href="{{ route('portal.billing') }}" class="sidebar-link {{ request()->routeIs('portal.billing') ? 'is-active' : '' }}">
-
-                        <i class="fa-regular fa-credit-card w-6"></i>
-
-                        <span class="sidebar-label">Billing</span>
-
-                    </a>
-
-                    <a href="{{ route('portal.invoices.index') }}" class="sidebar-link {{ request()->routeIs('portal.invoices.*') ? 'is-active' : '' }}">
-
-                        <i class="fa-regular fa-file-lines w-6"></i>
-
-                        <span class="sidebar-label">Faturalarım</span>
-
-                    </a>
-
-                @endif
-
-
 
                 @if($showStoreSection)
 
                     <p class="sidebar-section">Mağaza Yönetimi</p>
 
                 @endif
+
+
+
+
+                
 
 
 
@@ -1705,9 +1673,25 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                     @endif
 
                 @endif
+                @if($can('invoices'))
 
+                    <a href="{{ route('portal.invoices.index') }}" class="sidebar-link {{ request()->routeIs('portal.invoices.*') ? 'is-active' : '' }}">
 
+                        <i class="fa-regular fa-file-lines w-6"></i>
 
+                        <span class="sidebar-label">Faturalar&#305;m</span>
+
+                    </a>
+
+                    <a href="{{ route('portal.invoices.index') }}" class="sidebar-link {{ request()->routeIs('portal.invoices.*') ? 'is-active' : '' }}">
+
+                        <i class="fa-solid fa-file-invoice w-6"></i>
+
+                        <span class="sidebar-label">Faturalar</span>
+
+                    </a>
+
+                @endif
                 @if($can('customers'))
 
                     <a href="{{ route('portal.customers.index') }}" class="sidebar-link {{ request()->routeIs('portal.customers.*') ? 'is-active' : '' }}">
@@ -1722,6 +1706,20 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
 
 
+                @if(request()->routeIs('portal.*') || request()->is('portal*'))
+
+                    <p class="sidebar-section">Portal</p>
+
+                    <a href="{{ route('portal.billing') }}" class="sidebar-link {{ request()->routeIs('portal.billing') ? 'is-active' : '' }}">
+
+                        <i class="fa-regular fa-credit-card w-6"></i>
+
+                        <span class="sidebar-label">Billing</span>
+
+                    </a>
+
+                @endif
+
                 @if($showSettingsSection)
 
                     <p class="sidebar-section">Ayarlar</p>
@@ -1730,109 +1728,23 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
 
 
-                @if($can('settings'))
+                
 
-                    <a href="{{ route('portal.settings.index') }}" class="sidebar-link {{ request()->routeIs('portal.settings.index') ? 'is-active' : '' }}">
+                @if($hasModule('feature.tickets') && $can('tickets'))
 
-                        <i class="fa-solid fa-gear w-6"></i>
+                    <a href="{{ route('portal.tickets.index') }}" class="sidebar-link {{ request()->routeIs('portal.tickets.*') ? 'is-active' : '' }}">
 
-                        <span class="sidebar-label">Genel Ayarlar</span>
+                        <i class="fa-solid fa-life-ring w-6"></i>
 
-                    </a>
-
-                    <a href="{{ route('portal.settings.cargo.index') }}" class="sidebar-link {{ request()->routeIs('portal.settings.cargo.*') ? 'is-active' : '' }}">
-
-                        <i class="fa-solid fa-truck-fast w-6"></i>
-
-                        <span class="sidebar-label">Kargo Entegrasyonları</span>
+                        <span class="sidebar-label">Destek</span>
 
                     </a>
-
-
-
-                    <button id="api-settings-menu-toggle" type="button" class="sidebar-link w-full text-left {{ request()->routeIs('portal.settings.api', 'portal.docs.einvoice') ? 'is-active' : '' }}">
-
-                        <i class="fa-solid fa-key w-6"></i>
-
-                        <span class="sidebar-label flex-1">API Ayarları</span>
-
-                        <i class="fa-solid fa-chevron-down text-xs sidebar-label"></i>
-
-                    </button>
-
-                    <div id="api-settings-submenu" class="sidebar-submenu">
-
-                        <a href="{{ route('portal.settings.api') }}" class="sidebar-link {{ request()->routeIs('portal.settings.api') ? 'is-active' : '' }}">
-
-                            <span class="sidebar-label">API Erişimi</span>
-
-                        </a>
-
-                        <a href="{{ route('portal.docs.einvoice') }}" class="sidebar-link {{ request()->routeIs('portal.docs.einvoice') ? 'is-active' : '' }}">
-
-                            <span class="sidebar-label">E-Fatura API Dokümanı</span>
-
-                        </a>
-
-                    </div>
-
-
-
-                    <button id="notifications-menu-toggle" type="button" class="sidebar-link w-full text-left {{ request()->routeIs('portal.notifications.mail-templates.*') ? 'is-active' : '' }}">
-
-                        <i class="fa-regular fa-bell w-6"></i>
-
-                        <span class="sidebar-label flex-1">Bildirimler</span>
-
-                        <i class="fa-solid fa-chevron-down text-xs sidebar-label"></i>
-
-                    </button>
-
-                    <div id="notifications-submenu" class="sidebar-submenu">
-
-                        <a href="{{ route('portal.notifications.mail-templates.index') }}" class="sidebar-link {{ request()->routeIs('portal.notifications.mail-templates.*') ? 'is-active' : '' }}">
-
-                            <span class="sidebar-label">E-Posta Şablonları</span>
-
-                        </a>
-
-                    </div>
-
-
-
-                    <button id="system-logs-menu-toggle" type="button" class="sidebar-link w-full text-left {{ request()->routeIs('portal.system.mail-logs.*') ? 'is-active' : '' }}">
-
-                        <i class="fa-solid fa-clipboard-list w-6"></i>
-
-                        <span class="sidebar-label flex-1">Sistem Logları</span>
-
-                        <i class="fa-solid fa-chevron-down text-xs sidebar-label"></i>
-
-                    </button>
-
-                    <div id="system-logs-submenu" class="sidebar-submenu">
-
-                        <a href="{{ route('portal.system.mail-logs.index') }}" class="sidebar-link {{ request()->routeIs('portal.system.mail-logs.*') ? 'is-active' : '' }}">
-
-                            <span class="sidebar-label">E-Posta Kayıtları</span>
-
-                        </a>
-
-                        @if(auth()->check() && auth()->user()->role === 'super_admin')
-
-                            <a href="{{ route('super-admin.observability.billing-events.index') }}" class="sidebar-link">
-
-                                <span class="sidebar-label">Billing Events</span>
-
-                            </a>
-
-                        @endif
-
-                    </div>
 
                 @endif
 
-                @if($hasModule('feature.sub_users'))
+                
+
+                    @if($hasModule('feature.sub_users'))
 
                     @unless(auth('subuser')->check())
 
@@ -1976,70 +1888,6 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
 
 
-                @if($showSupportSection)
-
-                    <p class="sidebar-section">Destek</p>
-
-                @endif
-
-
-
-                @if($hasModule('feature.tickets') && $can('tickets'))
-
-                    <a href="{{ route('portal.tickets.index') }}" class="sidebar-link {{ request()->routeIs('portal.tickets.*') ? 'is-active' : '' }}">
-
-                        <i class="fa-solid fa-life-ring w-6"></i>
-
-                        <span class="sidebar-label">Destek</span>
-
-                    </a>
-
-                @endif
-
-
-
-                @if($showIntegrationSection)
-
-                    <p class="sidebar-section">Entegrasyon</p>
-
-                @endif
-
-
-
-                @if($hasModule('feature.integrations') && $can('integrations'))
-
-                    <a href="{{ route('portal.integrations.index') }}" class="sidebar-link {{ request()->routeIs('portal.integrations.*') ? 'is-active' : '' }}">
-
-                        <i class="fa-solid fa-plug w-6"></i>
-
-                        <span class="sidebar-label">Mağaza Bağla</span>
-
-                    </a>
-
-                @endif
-
-                @if($can('addons'))
-
-                    <a href="{{ route('portal.addons.index') }}" class="sidebar-link {{ request()->routeIs('portal.addons.*') ? 'is-active' : '' }}">
-
-                        <i class="fa-solid fa-layer-group w-6"></i>
-
-                        <span class="sidebar-label">Ek Modüller</span>
-
-                    </a>
-
-                    <a href="{{ route('portal.modules.mine') }}" class="sidebar-link {{ request()->routeIs('portal.modules.mine') ? 'is-active' : '' }}">
-
-                        <i class="fa-solid fa-puzzle-piece w-6"></i>
-
-                        <span class="sidebar-label">Modüllerim</span>
-
-                    </a>
-
-                @endif
-
-
-
                 @if($showSubscriptionSection)
 
                     <p class="sidebar-section">Abonelik</p>
@@ -2060,22 +1908,60 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 @endif
 
+                
 
+                @if($hasModule('feature.tickets') && $can('tickets'))
 
-                @if($can('invoices'))
+                    <a href="{{ route('portal.tickets.index') }}" class="sidebar-link {{ request()->routeIs('portal.tickets.*') ? 'is-active' : '' }}">
 
-                    <a href="{{ route('portal.invoices.index') }}" class="sidebar-link {{ request()->routeIs('portal.invoices.*') ? 'is-active' : '' }}">
+                        <i class="fa-solid fa-life-ring w-6"></i>
 
-                        <i class="fa-solid fa-file-invoice w-6"></i>
-
-                        <span class="sidebar-label">Faturalar</span>
+                        <span class="sidebar-label">Destek</span>
 
                     </a>
 
                 @endif
 
+                
+                        @if($can('addons'))
+                            <a href="{{ route('portal.addons.index') }}" class="sidebar-link {{ request()->routeIs('portal.addons.*') ? 'is-active' : '' }}">
+                                <span class="sidebar-label">Ek Modüller</span>
+                            </a>
+                            <a href="{{ route('portal.modules.mine') }}" class="sidebar-link {{ request()->routeIs('portal.modules.mine') ? 'is-active' : '' }}">
+                                <span class="sidebar-label">Modüllerim</span>
+                            </a>
+                        @endif
 
 
+
+                @if($can('settings'))
+                    <button id="general-settings-menu-toggle" type="button" class="sidebar-link w-full text-left {{ request()->routeIs('portal.settings.*') ? 'is-active' : '' }}">
+                        <i class="fa-solid fa-gear w-6"></i>
+                        <span class="sidebar-label flex-1">Genel Ayarlar</span>
+                        <i class="fa-solid fa-chevron-down text-xs sidebar-label"></i>
+                    </button>
+                    <div id="general-settings-submenu" class="sidebar-submenu">
+                        <a href="{{ route('portal.settings.cargo.index') }}" class="sidebar-link {{ request()->routeIs('portal.settings.cargo.*') ? 'is-active' : '' }}">
+                            <span class="sidebar-label">Kargo Entegrasyonları</span>
+                        </a>
+                        <a href="{{ route('portal.settings.api') }}" class="sidebar-link {{ request()->routeIs('portal.settings.api') ? 'is-active' : '' }}">
+                            <span class="sidebar-label">API Ayarları</span>
+                        </a>
+                        @if($hasModule('feature.integrations') && $can('integrations'))
+                            <a href="{{ route('portal.integrations.index') }}" class="sidebar-link {{ request()->routeIs('portal.integrations.*') ? 'is-active' : '' }}">
+                                <span class="sidebar-label">Mağaza Bağla</span>
+                            </a>
+                        @endif
+                        @if($can('addons'))
+                            <a href="{{ route('portal.addons.index') }}" class="sidebar-link {{ request()->routeIs('portal.addons.*') ? 'is-active' : '' }}">
+                                <span class="sidebar-label">Ek Modüller</span>
+                            </a>
+                            <a href="{{ route('portal.modules.mine') }}" class="sidebar-link {{ request()->routeIs('portal.modules.mine') ? 'is-active' : '' }}">
+                                <span class="sidebar-label">Modüllerim</span>
+                            </a>
+                        @endif
+                    </div>
+                @endif
             </nav>
 
 
@@ -2154,12 +2040,6 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                         @include('partials.notification-bell')
 
-                        <a href="{{ route('portal.settings.index') }}" class="topbar-icon" title="Ayarlar">
-
-                            <i class="fa-solid fa-gear text-sm"></i>
-
-                        </a>
-
                         <div class="relative">
 
                             <button id="profile-menu-button" type="button" class="topbar-icon" title="Profil">
@@ -2211,14 +2091,6 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                                     </a>
 
                                 @endunless
-
-                                <a href="{{ route('portal.invoices.index') }}" class="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900">
-
-                                    <i class="fa-regular fa-file-lines"></i>
-
-                                    Fatura Bilgileri
-
-                                </a>
 
                                 @if(auth('subuser')->check())
 
@@ -2770,15 +2642,36 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
 
 
-	        apiSettingsMenuToggle?.addEventListener('click', () => {
+        apiSettingsMenuToggle?.addEventListener('click', () => {
 
-	            const isOpen = apiSettingsSubmenu?.classList.contains('is-open');
+            const isOpen = apiSettingsSubmenu?.classList.contains('is-open');
 
-	            setApiSettingsMenu(!isOpen);
+            setApiSettingsMenu(!isOpen);
 
-	        });
+        });
 
-	    </script>
+    </script>
+
+    <script>
+        const generalSettingsMenuToggle = document.getElementById('general-settings-menu-toggle');
+        const generalSettingsSubmenu = document.getElementById('general-settings-submenu');
+
+        function setGeneralSettingsMenu(open) {
+            generalSettingsSubmenu?.classList.toggle('is-open', open);
+        }
+
+        if (generalSettingsSubmenu) {
+            const hasActive = generalSettingsSubmenu.querySelector('.is-active');
+            const parentActive = generalSettingsMenuToggle?.classList.contains('is-active');
+            setGeneralSettingsMenu(Boolean(hasActive || parentActive));
+        }
+
+        generalSettingsMenuToggle?.addEventListener('click', () => {
+            const isOpen = generalSettingsSubmenu?.classList.contains('is-open');
+            setGeneralSettingsMenu(!isOpen);
+        });
+    </script>
+
 
         <script>
 
@@ -3075,6 +2968,29 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

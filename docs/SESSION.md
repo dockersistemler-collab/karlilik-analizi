@@ -387,7 +387,10 @@ Not:
 - Refreshed admin + customer portal skin with a pastel coral/mint palette in `resources/views/layouts/admin.blade.php`.
 - Updated KPI card gradients and chart colors in `resources/views/admin/profitability/index.blade.php`.
 - Updated admin dashboard KPI card gradients and map label colors in `resources/views/admin/dashboard.blade.php`.
+- Iterated admin/customer layout styling: grayscale palette, sidebar sizing, list row emphasis, active menu highlighting, and submenu persistence in `resources/views/layouts/admin.blade.php`.
+- Added active state routing to all admin/customer sidebar links in `resources/views/layouts/admin.blade.php`.
 
 ## Next Steps
 - Phase 6/7: Security review, tests (if desired), and finalize deliverables.
 - Implement real marketplace API calls in adapters (roadmap prepared).
+- Manuel doğrulama: bir marketplace hesabında `base_url` değerini `http://127.0.0.1` veya allowlist dışı bir host yapın, "Bağlantı testi" çalıştırın; generic hata dönmeli ve logda "Marketplace base_url rejected" görünmeli.

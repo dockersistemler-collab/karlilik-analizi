@@ -118,7 +118,14 @@ class ProfitabilityAccountController extends Controller
 
             return back()->with('success', 'BaÄŸlantÄ± testi baÅŸarÄ±lÄ±.');
         } catch (\Throwable $e) {
-            return back()->with('info', 'BaÄŸlantÄ± testi baÅŸarÄ±sÄ±z: ' . $e->getMessage());
+            \Log::warning('Marketplace connection test failed', [
+                'account_id' => $account->id,
+                'tenant_id' => $account->tenant_id,
+                'marketplace' => $account->marketplace,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('info', 'Baðlantý testi baþarýsýz. Lütfen daha sonra tekrar deneyin.');
         }
     }
 
@@ -146,3 +153,4 @@ class ProfitabilityAccountController extends Controller
         return $decoded;
     }
 }
+

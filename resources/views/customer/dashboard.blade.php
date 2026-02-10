@@ -1,68 +1,968 @@
 @extends('layouts.admin')
 
-@section('header', 'Kullanici Paneli')
+@section('header', 'Genel Bakış')
 
 @section('content')
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div class="xl:col-span-2 panel-card p-6">
-            <h3 class="text-2xl font-semibold text-slate-900">Hesabina hos geldin</h3>
-            <p class="mt-2 text-sm text-slate-600">
-                Satis, abonelik ve fatura bilgilerini bu panelden takip edebilirsin.
-            </p>
-
-            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <a href="{{ route('portal.billing') }}" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-700 hover:bg-slate-100">
-                    Odeme ve Abonelik
-                </a>
-                <a href="{{ route('portal.invoices.index') }}" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-700 hover:bg-slate-100">
-                    Faturalar
-                </a>
-                <a href="{{ route('portal.help.support') }}" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-700 hover:bg-slate-100">
-                    Destek Talepleri
-                </a>
-                <a href="{{ route('portal.settings.index') }}" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-700 hover:bg-slate-100">
-                    Hesap Ayarlari
-                </a>
+    <style>
+    .period-tab.is-active {
+        background: #fda4af;
+        border-color: #fb7185;
+        color: #7f1d1d; font-weight: 600;
+        box-shadow: 0 6px 16px rgba(251, 113, 133, 0.35);
+    }
+</style>
+<div class="space-y-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+            <div class="rounded-2xl border border-slate-100 bg-emerald-50/80 p-6 shadow-sm">
+                <div class="text-sm font-semibold text-slate-900">G&uuml;nl&uuml;k Gelen Sipariş</div>
+                <div class="mt-3 text-5xl font-bold text-slate-900" id="kpi-daily-orders-customer">-</div>
+                <div class="mt-3 text-sm text-slate-700">Bugün gelen sipariş sayısı</div>
+            </div>
+            <div class="rounded-2xl border border-slate-100 bg-yellow-50/80 p-6 shadow-sm">
+                <div class="text-sm font-semibold text-slate-900">G&uuml;nl&uuml;k Ürün Satışı</div>
+                <div class="mt-3 text-5xl font-bold text-slate-900" id="kpi-daily-items-customer">-</div>
+                <div class="mt-3 text-sm text-slate-700">Bugün satılan toplam ürün sayısı</div>
+            </div>
+            <div class="rounded-2xl border border-slate-100 bg-sky-50/80 p-6 shadow-sm">
+                <div class="text-sm font-semibold text-slate-900">Bu Ay Gelen Sipariş</div>
+                <div class="mt-3 text-5xl font-bold text-slate-900" id="kpi-monthly-orders-customer">-</div>
+                <div class="mt-3 text-sm text-slate-700">Bu ay gelen sipariş sayısı</div>
+            </div>
+            <div class="rounded-2xl border border-slate-100 bg-rose-50/80 p-6 shadow-sm">
+                <div class="text-sm font-semibold text-slate-900">Toplam Ürün Satışı</div>
+                <div class="mt-3 text-5xl font-bold text-slate-900" id="kpi-monthly-items-customer">-</div>
+                <div class="mt-3 text-sm text-slate-700">Bu ay gelen toplam ürün sayısı</div>
             </div>
         </div>
 
-        <div class="panel-card p-6">
-            <h3 class="text-sm font-semibold text-slate-700 mb-4">Durum Ozeti</h3>
-            @php
-                $badgeClass = match ($portalBilling['badge'] ?? 'unknown') {
-                    'active' => 'badge badge-success',
-                    'past_due' => 'badge badge-warning',
-                    'canceled' => 'badge badge-danger',
-                    default => 'badge badge-muted',
-                };
-                $statusLabel = match ($portalBilling['badge'] ?? 'unknown') {
-                    'active' => 'active',
-                    'past_due' => 'past_due',
-                    'canceled' => 'canceled',
-                    default => 'unknown',
-                };
-            @endphp
-            <div class="flex items-center justify-between">
-                <span class="text-sm text-slate-600">Abonelik</span>
-                <span class="{{ $badgeClass }}">{{ $statusLabel }}</span>
-            </div>
-            <div class="mt-4 text-xs text-slate-500 space-y-1">
-                <div>
-                    Sonraki deneme:
-                    <span class="font-medium text-slate-700">
-                        {{ !empty($portalBilling['next_retry_at']) ? optional($portalBilling['next_retry_at'])->format('d.m.Y H:i') : '-' }}
-                    </span>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+            <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col h-[408px] min-h-0">
+                                <div class="flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-semibold text-slate-900">Bugünkü Net Kar</h2>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <button type="button" data-range="day" class="net-kar-range-pill range-pill shrink-0 whitespace-nowrap rounded-full border border-slate-200 px-3 py-1 text-[11px] text-slate-600">G&uuml;nl&uuml;k</button>
+                        <button type="button" data-range="week" class="net-kar-range-pill range-pill shrink-0 whitespace-nowrap rounded-full border border-slate-200 px-3 py-1 text-[11px] text-slate-600">Haftal&#305;k</button>
+                        <button type="button" data-range="month" class="net-kar-range-pill range-pill shrink-0 whitespace-nowrap rounded-full border border-slate-200 px-3 py-1 text-[11px] text-slate-600">Ayl&#305;k</button>
+                        <button type="button" data-range="quarter" class="net-kar-range-pill range-pill shrink-0 whitespace-nowrap rounded-full border border-slate-200 px-3 py-1 text-[11px] text-slate-600">3 Ayl&#305;k</button>
+                        <button type="button" data-range="half" class="net-kar-range-pill range-pill shrink-0 whitespace-nowrap rounded-full border border-slate-200 px-3 py-1 text-[11px] text-slate-600">6 Ayl&#305;k</button>
+                        <button type="button" data-range="year" class="net-kar-range-pill range-pill shrink-0 whitespace-nowrap rounded-full border border-slate-200 px-3 py-1 text-[11px] text-slate-600">Y&#305;ll&#305;k</button>
+                    </div>
                 </div>
-                <div>
-                    Son hata:
-                    <span class="font-medium text-slate-700">{{ $portalBilling['last_failure_message'] ?? '-' }}</span>
+                <div class="mt-6 rounded-2xl border border-slate-100 bg-rose-50/40 p-4 flex-1">
+                    <div class="relative h-full w-full">
+                        <canvas id="net-kar-chart-customer"></canvas>
+                    </div>
                 </div>
             </div>
-            @if(($portalBilling['is_past_due'] ?? false))
-                <a href="{{ route('portal.billing.card-update') }}" class="btn btn-solid-accent mt-5 w-full">
-                    Kart Guncelle
-                </a>
-            @endif
+
+            <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col h-[408px] min-h-0">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-semibold text-slate-900">G&uuml;nl&uuml;k Pazaryeri Satış</h2>
+                    <div class="relative">
+                        <button id="platform-toggle-customer" type="button" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600">
+                            <span id="platform-label-customer">PLATFORM</span>
+                            <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M5.25 7.5 10 12.25 14.75 7.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div id="platform-menu-customer" class="absolute right-0 z-10 mt-2 hidden w-40 rounded-xl border border-slate-200 bg-white p-2 text-xs shadow-lg">
+                            <button type="button" data-platform="all" class="w-full rounded-lg px-3 py-2 text-left text-slate-600 hover:bg-slate-100">Tümü</button>
+                            @foreach(($marketplaces ?? []) as $marketplace)
+                                <button type="button" data-platform="{{ $marketplace->code ?? $marketplace->name }}" class="w-full rounded-lg px-3 py-2 text-left text-slate-600 hover:bg-slate-100">{{ $marketplace->name }}</button>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-200/60 text-rose-700">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M5 12h14M7 7h10M7 17h6" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="text-sm font-semibold text-slate-900">GÜNLÜK CİRO</div>
+                    </div>
+                    <div class="rounded-2xl border border-rose-200/40 bg-transparent px-6 py-3 text-center text-sm font-semibold text-slate-900 shadow-lg shadow-rose-200/60 min-w-[120px]" id="daily-sales-total-customer">
+                        0 TL
+                    </div>
+                </div>
+
+                <div class="mt-8 flex-1 min-h-0">
+                    <div class="space-y-3 pr-2 pb-3" id="daily-sales-marketplaces-customer"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 items-stretch">
+            <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col w-full min-w-0 mini-metric-card">
+                <div class="flex items-center justify-between gap-3">
+                    <h3 class="text-base font-semibold text-slate-900">En Çok Satılan 10 Ürün</h3>
+                </div>
+                <div class="mt-3 period-tabs grid grid-cols-3 gap-x-3 gap-y-0.5 items-center w-full">
+    <button type="button" data-period="day" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">G&uuml;nl&uuml;k</button>
+    <button type="button" data-period="week" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">Haftal&#305;k</button>
+    <button type="button" data-period="month" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">Ayl&#305;k</button>
+    <button type="button" data-period="quarter" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">3 Ayl&#305;k</button>
+    <button type="button" data-period="half" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">6 Ayl&#305;k</button>
+    <button type="button" data-period="year" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">Y&#305;ll&#305;k</button>
+</div>
+                <div class="mt-4 space-y-3">
+                    @foreach([
+                        ['Ayakkabı', 42, 'bg-amber-400'],
+                        ['Palto', 56, 'bg-orange-400'],
+                        ['Bluz', 85, 'bg-violet-300'],
+                        ['Etek', 45, 'bg-emerald-200'],
+                        ['Ceket', 35, 'bg-slate-900 text-white'],
+                    ] as $row)
+                        <div class="flex items-center gap-3 text-xs">
+                            <div class="w-20 font-semibold text-slate-800 truncate">{{ $row[0] }}</div>
+                            <div class="flex-1 h-8 rounded-full bg-slate-100 overflow-hidden">
+                                <div class="h-full rounded-full {{ $row[2] }}" style="width: {{ min(100, $row[1]) }}%;">
+                                    <span class="flex h-full items-center justify-end pr-3 text-xs font-semibold text-slate-900">
+                                        {{ $row[1] }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col w-full min-w-0 mini-metric-card">
+                <div class="flex items-center justify-between gap-3">
+                    <h3 class="text-base font-semibold text-slate-900">En Çok Satılan Marka</h3>
+                </div>
+                <div class="mt-3 period-tabs grid grid-cols-3 gap-x-3 gap-y-0.5 items-center w-full">
+    <button type="button" data-period="day" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">G&uuml;nl&uuml;k</button>
+    <button type="button" data-period="week" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">Haftal&#305;k</button>
+    <button type="button" data-period="month" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">Ayl&#305;k</button>
+    <button type="button" data-period="quarter" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">3 Ayl&#305;k</button>
+    <button type="button" data-period="half" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">6 Ayl&#305;k</button>
+    <button type="button" data-period="year" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">Y&#305;ll&#305;k</button>
+</div>
+                <div class="mt-4 space-y-3">
+                    @foreach([
+                        ['Luna', 65, 'bg-amber-400'],
+                        ['Vera', 48, 'bg-orange-400'],
+                        ['Atlas', 72, 'bg-violet-300'],
+                        ['Mira', 39, 'bg-emerald-200'],
+                        ['Nova', 30, 'bg-slate-900 text-white'],
+                    ] as $row)
+                        <div class="flex items-center gap-3 text-xs">
+                            <div class="w-20 font-semibold text-slate-800 truncate">{{ $row[0] }}</div>
+                            <div class="flex-1 h-8 rounded-full bg-slate-100 overflow-hidden">
+                                <div class="h-full rounded-full {{ $row[2] }}" style="width: {{ min(100, $row[1]) }}%;">
+                                    <span class="flex h-full items-center justify-end pr-3 text-xs font-semibold text-slate-900">
+                                        {{ $row[1] }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col w-full min-w-0 mini-metric-card">
+                <div class="flex items-center justify-between gap-3">
+                    <h3 class="text-base font-semibold text-slate-900">En Çok Satış Yapılan Kategoriler</h3>
+                </div>
+                <div class="mt-3 period-tabs grid grid-cols-3 gap-x-3 gap-y-0.5 items-center w-full">
+    <button type="button" data-period="day" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">G&uuml;nl&uuml;k</button>
+    <button type="button" data-period="week" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">Haftal&#305;k</button>
+    <button type="button" data-period="month" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">Ayl&#305;k</button>
+    <button type="button" data-period="quarter" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">3 Ayl&#305;k</button>
+    <button type="button" data-period="half" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">6 Ayl&#305;k</button>
+    <button type="button" data-period="year" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">Y&#305;ll&#305;k</button>
+</div>
+                <div class="mt-4 space-y-3">
+                    @foreach([
+                        ['Ayakkabı', 58, 'bg-amber-400'],
+                        ['Giyim', 62, 'bg-orange-400'],
+                        ['Aksesuar', 44, 'bg-violet-300'],
+                        ['Çanta', 36, 'bg-emerald-200'],
+                        ['Ev', 28, 'bg-slate-900 text-white'],
+                    ] as $row)
+                        <div class="flex items-center gap-3 text-xs">
+                            <div class="w-20 font-semibold text-slate-800 truncate">{{ $row[0] }}</div>
+                            <div class="flex-1 h-8 rounded-full bg-slate-100 overflow-hidden">
+                                <div class="h-full rounded-full {{ $row[2] }}" style="width: {{ min(100, $row[1]) }}%;">
+                                    <span class="flex h-full items-center justify-end pr-3 text-xs font-semibold text-slate-900">
+                                        {{ $row[1] }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col w-full min-w-0 mini-metric-card">
+                <div class="flex items-center justify-between gap-3">
+                    <h3 class="text-base font-semibold text-slate-900">Pazaryeri Satış Adedi Dağılımı</h3>
+                </div>
+                <div class="mt-3 period-tabs grid grid-cols-3 gap-x-3 gap-y-0.5 items-center w-full">
+    <button type="button" data-period="day" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">G&uuml;nl&uuml;k</button>
+    <button type="button" data-period="week" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">Haftal&#305;k</button>
+    <button type="button" data-period="month" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">Ayl&#305;k</button>
+    <button type="button" data-period="quarter" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">3 Ayl&#305;k</button>
+    <button type="button" data-period="half" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">6 Ayl&#305;k</button>
+    <button type="button" data-period="year" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">Y&#305;ll&#305;k</button>
+</div>
+                <div class="mt-4 space-y-3">
+                    @foreach([
+                        ['Trendyol', 42, 'bg-amber-400'],
+                        ['Hepsiburada', 56, 'bg-orange-400'],
+                        ['N11', 85, 'bg-violet-300'],
+                        ['Çiçek Sepeti', 45, 'bg-emerald-200'],
+                        ['Amazon', 35, 'bg-slate-900 text-white'],
+                    ] as $row)
+                        <div class="flex items-center gap-3 text-xs">
+                            <div class="w-24 font-semibold text-slate-800 truncate">{{ $row[0] }}</div>
+                            <div class="flex-1 h-8 rounded-full bg-slate-100 overflow-hidden">
+                                <div class="h-full rounded-full {{ $row[2] }}" style="width: {{ min(100, $row[1]) }}%;">
+                                    <span class="flex h-full items-center justify-end pr-3 text-xs font-semibold text-slate-900">
+                                        {{ $row[1] }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+            <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col lg:col-span-2">
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-semibold text-slate-900 whitespace-nowrap">Türkiye Sipariş Dağılımı</h2>
+                        <div class="relative">
+                            <button id="map-range-toggle-customer" type="button" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600">
+                                <span id="map-range-label-customer">Haftal&#305;k</span>
+                                <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M5.25 7.5 10 12.25 14.75 7.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <div id="map-range-menu-customer" class="absolute right-0 z-10 mt-2 hidden w-40 rounded-xl border border-slate-200 bg-white p-2 text-xs shadow-lg">
+                                <button type="button" data-range="day" class="w-full rounded-lg px-3 py-2 text-left text-slate-600 hover:bg-slate-100">G&uuml;nl&uuml;k</button>
+                                <button type="button" data-range="week" class="w-full rounded-lg px-3 py-2 text-left text-slate-600 hover:bg-slate-100">Haftal&#305;k</button>
+                                <button type="button" data-range="month" class="w-full rounded-lg px-3 py-2 text-left text-slate-600 hover:bg-slate-100">Ayl&#305;k</button>
+                                <button type="button" data-range="quarter" class="w-full rounded-lg px-3 py-2 text-left text-slate-600 hover:bg-slate-100">3 Ayl&#305;k</button>
+                                <button type="button" data-range="half" class="w-full rounded-lg px-3 py-2 text-left text-slate-600 hover:bg-slate-100">6 Ayl&#305;k</button>
+                                <button type="button" data-range="year" class="w-full rounded-lg px-3 py-2 text-left text-slate-600 hover:bg-slate-100">Y&#305;ll&#305;k</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <button type="button" data-range="day" class="map-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">G&uuml;nl&uuml;k</button>
+                        <button type="button" data-range="week" class="map-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">Haftal&#305;k</button>
+                        <button type="button" data-range="month" class="map-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">Ayl&#305;k</button>
+                        <button type="button" data-range="quarter" class="map-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">3 Ayl&#305;k</button>
+                        <button type="button" data-range="half" class="map-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">6 Ayl&#305;k</button>
+                        <button type="button" data-range="year" class="map-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">Y&#305;ll&#305;k</button>
+                    </div>
+                </div>
+                <div class="mt-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-3 h-[420px] overflow-hidden">
+                    <div id="turkey-map-customer" class="h-full w-full"></div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <link rel="stylesheet" href="{{ asset('vendor/leaflet/leaflet.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('vendor/leaflet/leaflet.js') }}"></script>
+    <script>
+        const customerMapStyles = document.createElement('style');
+        customerMapStyles.textContent = `
+            #turkey-map-customer .leaflet-pane,
+            #turkey-map-customer .leaflet-layer,
+            #turkey-map-customer .leaflet-marker-icon,
+            #turkey-map-customer .leaflet-marker-shadow,
+            #turkey-map-customer .leaflet-tile,
+            #turkey-map-customer .leaflet-tile-container,
+            #turkey-map-customer .leaflet-pane > svg,
+            #turkey-map-customer .leaflet-pane > canvas,
+            #turkey-map-customer .leaflet-zoom-animated,
+            #turkey-map-customer .leaflet-zoom-animated g,
+            #turkey-map-customer .leaflet-interactive {
+                transform-origin: center center;
+            }
+            #turkey-map-customer .leaflet-container {
+                background: transparent;
+            }
+            #turkey-map-customer .leaflet-tooltip {
+                background: transparent;
+                border: none;
+                box-shadow: none;
+                padding: 0;
+            }
+            #turkey-map-customer .map-tooltip {
+                display: inline-flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1px;
+                min-width: 40px;
+            }
+            #turkey-map-customer .map-name {
+                font-size: 10px;
+                font-weight: 700;
+                color: #1f2937;
+                line-height: 1.1;
+                text-align: center;
+                text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+            }
+            #turkey-map-customer .map-count {
+                font-size: 9px;
+                font-weight: 700;
+                color: #f97316;
+                line-height: 1;
+            }
+            #turkey-map-customer .leaflet-interactive {
+                transition: stroke 0.15s ease, stroke-width 0.15s ease;
+            }
+            #turkey-map-customer .leaflet-zoom-box {
+                display: none !important;
+            }
+            .mini-range-row {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                gap: 6px;
+                width: 100%;
+                text-align: left;
+            }
+            .mini-range-row .mini-range-pill {
+                padding: 0;
+                font-size: 6px;
+                line-height: 1;
+                letter-spacing: -0.08em;
+                text-align: left;
+                white-space: nowrap;
+                transform: scaleX(0.92);
+                transform-origin: left center;
+            }
+            .mini-range-row .mini-range-pill.is-active {
+                background: #fda4af;
+                border-color: #fb7185;
+                color: #7f1d1d; font-weight: 600;
+                box-shadow: 0 6px 16px rgba(251, 113, 133, 0.35);
+            }
+            .mini-metric-card {
+                min-height: 380px;
+            }
+            .range-pill.is-active {
+                background: #111827;
+                color: #ffffff;
+                border-color: #111827;
+            }
+            .map-label-wrapper {
+                background: transparent;
+                border: none;
+                box-shadow: none;
+            }
+        `;
+        document.head.appendChild(customerMapStyles);
+        const metricsEndpointCustomer = @json(route('portal.dashboard.metrics'));
+        const mapEndpointCustomer = @json(route('portal.dashboard.map'));
+        const netKarCtxCustomer = document.getElementById('net-kar-chart-customer');
+        let netKarChartCustomer = null;
+        let netKarRangeCustomer = 'day';
+        let netKarMetaCustomer = { range: 'day', start: null, end: null };
+        let selectedPlatformCustomer = 'all';
+        let mapRangeCustomer = 'week';
+        let mapInstanceCustomer = null;
+        let mapLayerCustomer = null;
+
+        const formatNumber = (value) => Number(value || 0).toLocaleString('tr-TR');
+        const formatCurrency = (value) => `${formatNumber(value)} TL`;
+        const fallbackMarketplacesCustomer = @json($fallbackMarketplaces ?? []);
+
+        const palette = [
+            'bg-amber-400/90',
+            'bg-amber-300/90',
+            'bg-violet-300/90',
+            'bg-emerald-200/90',
+            'bg-slate-900',
+        ];
+        const textPalette = [
+            'text-slate-900',
+            'text-slate-900',
+            'text-slate-900',
+            'text-slate-900',
+            'text-white',
+        ];
+
+        const formatNetKarTitleCustomer = (index, labels, timestamps) => {
+            const range = netKarMetaCustomer?.range ?? 'week';
+            const ts = timestamps?.[index];
+            const date = ts ? new Date(ts) : null;
+            const baseDate = date ?? (netKarMetaCustomer?.start ? new Date(netKarMetaCustomer.start) : null);
+            if (!baseDate) {
+                return labels[index] ?? '';
+            }
+
+            if (range === 'day') {
+                const datePart = new Intl.DateTimeFormat('tr-TR', {
+                    timeZone: 'Europe/Istanbul',
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                }).format(baseDate);
+                const timePart = new Intl.DateTimeFormat('tr-TR', {
+                    timeZone: 'Europe/Istanbul',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                }).format(baseDate);
+                return `${datePart} ${timePart} (GMT+3)`;
+            }
+
+            return new Intl.DateTimeFormat('tr-TR', {
+                timeZone: 'Europe/Istanbul',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            }).format(baseDate);
+        };
+
+        const resolveNetKarScaleCustomer = (range) => {
+            switch (range) {
+                case 'day':
+                    return { max: 50000, step: 10000 };
+                case 'week':
+                    return { max: 200000, step: 40000 };
+                case 'month':
+                    return { max: 400000, step: 80000 };
+                case 'quarter':
+                    return { max: 600000, step: 120000 };
+                case 'half':
+                    return { max: 1000000, step: 200000 };
+                case 'year':
+                    return { max: 5000000, step: 1000000 };
+                default:
+                    return { max: null, step: null };
+            }
+        };
+
+        const applyNetKarScaleCustomer = (values) => {
+            const scale = resolveNetKarScaleCustomer(netKarMetaCustomer?.range ?? 'week');
+            const maxValue = Math.max(...(values ?? []), 0);
+            const maxRounded = scale.max
+                ? Math.max(scale.max, Math.ceil(maxValue / scale.max) * scale.max)
+                : maxValue;
+            return { maxRounded, step: scale.step };
+        };
+
+        const updateChartCustomer = (labels, values) => {
+            if (!netKarCtxCustomer) return;
+            const scale = applyNetKarScaleCustomer(values);
+            if (!netKarChartCustomer) {
+                netKarChartCustomer = new Chart(netKarCtxCustomer, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            data: values,
+                            borderColor: '#4fb6ff',
+                            backgroundColor: 'rgba(79, 182, 255, 0.15)',
+                            tension: 0.35,
+                            fill: true,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#4fb6ff',
+                            pointBorderWidth: 0,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+    legend: { display: false },
+    tooltip: {
+        callbacks: {
+                                                title: (items) => {
+                if (!items?.length) return '';
+                const idx = items[0].dataIndex ?? 0;
+                const ts = netKarMetaCustomer?.timestamps ?? [];
+                return formatNetKarTitleCustomer(idx, labels, ts);
+            },
+            label: (ctx) => `${formatNumber(ctx.parsed.y || 0)} TL`
+        }
+    }
+},
+scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#6b7280', font: { size: 11 } }
+                            },
+                            y: {
+                                grid: { color: 'rgba(148,163,184,0.25)' },
+                                min: 0,
+                                suggestedMax: scale.maxRounded,
+                                ticks: {
+                                    color: '#6b7280',
+                                    font: { size: 11 },
+                                    callback: (value) => `${Number(value || 0).toLocaleString('tr-TR')} TL`,
+                                    stepSize: scale.step ?? undefined,
+                                }
+                            }
+                        }
+                    }
+                });
+                return;
+            }
+
+            netKarChartCustomer.data.labels = labels;
+            netKarChartCustomer.data.datasets[0].data = values;
+            netKarChartCustomer.options.scales.y.min = 0;
+            netKarChartCustomer.options.scales.y.suggestedMax = scale.maxRounded;
+            if (scale.step) {
+                netKarChartCustomer.options.scales.y.ticks.stepSize = scale.step;
+            } else {
+                delete netKarChartCustomer.options.scales.y.ticks.stepSize;
+            }
+            netKarChartCustomer.update();
+        };
+
+        const marketplaceIconCustomer = (row) => {
+            const code = (row.code || row.name || '').toString().toLowerCase();
+            if (code.includes('trendyol')) return 'T';
+            if (code.includes('hepsi')) return 'H';
+            if (code.includes('n11')) return 'N';
+            if (code.includes('cicek') || code.includes('çiçek')) return 'Ç';
+            if (code.includes('amazon')) return 'A';
+            return (row.name || '?').toString().charAt(0).toUpperCase();
+        };
+
+        const renderMarketplacesCustomer = (rows) => {
+            const container = document.getElementById('daily-sales-marketplaces-customer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            rows.forEach((row, index) => {
+                const colorClass = palette[index % palette.length];
+                const textClass = textPalette[index % textPalette.length];
+                const item = document.createElement('div');
+                item.className = 'flex items-center gap-3';
+                item.innerHTML = `
+                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-white/80 text-sm font-semibold text-slate-700 shadow-sm border border-slate-200/60">
+                        ${marketplaceIconCustomer(row)}
+                    </div>
+                    <div class="flex-1">
+                        <div class="rounded-lg ${colorClass} px-3 py-2 text-sm font-semibold ${textClass}">
+                            ${row.name}
+                        </div>
+                    </div>
+                    <div class="text-sm font-semibold text-slate-700">${formatCurrency(row.total)}</div>
+                `;
+                container.appendChild(item);
+            });
+        };
+
+        const applyMetricsCustomer = (data) => {
+            if (!data) return;
+            document.getElementById('kpi-daily-orders-customer').textContent = formatNumber(data.kpis?.daily_orders ?? 0);
+            document.getElementById('kpi-daily-items-customer').textContent = formatNumber(data.kpis?.daily_items ?? 0);
+            document.getElementById('kpi-monthly-orders-customer').textContent = formatNumber(data.kpis?.monthly_orders ?? 0);
+            document.getElementById('kpi-monthly-items-customer').textContent = formatNumber(data.kpis?.monthly_items ?? 0);
+            const totalEl = document.getElementById('daily-sales-total-customer');
+            const rowsAll = data.daily_sales?.marketplaces ?? [];
+            const rows = rowsAll.length ? rowsAll : fallbackMarketplacesCustomer;
+            const filtered = selectedPlatformCustomer === 'all'
+                ? rows
+                : rows.filter((row) => {
+                    const key = (row.code || row.name || '').toString().toLowerCase();
+                    return key === selectedPlatformCustomer || (row.name || '').toString().toLowerCase() === selectedPlatformCustomer;
+                });
+            const filteredTotal = filtered.reduce((sum, row) => sum + Number(row.total || 0), 0);
+            if (totalEl) {
+                totalEl.childNodes[0].textContent = formatCurrency(filteredTotal) + ' ';
+            }
+            renderMarketplacesCustomer(filtered);
+            const chart = data.net_profit_chart ?? {};
+            if (chart.range) {
+                netKarRangeCustomer = chart.range;
+                netKarMetaCustomer = {
+                    range: chart.range,
+                    start: chart.start ?? null,
+                    end: chart.end ?? null,
+                    timestamps: chart.timestamps ?? [],
+                };
+                const labelMap = {
+                    day: 'GÜNLÜK (GMT+3)',
+                    week: 'Haftal&#305;k',
+                    month: 'Ayl&#305;k',
+                    quarter: '3 Ayl&#305;k',
+                    half: '6 Ayl&#305;k',
+                    year: 'Y&#305;ll&#305;k',
+                };
+                const labelEl = document.getElementById('net-kar-range-label-customer');
+                if (labelEl) labelEl.textContent = labelMap[chart.range] ?? 'Haftal&#305;k';
+                setActiveNetKarPillCustomer(chart.range);
+            }
+            updateChartCustomer(chart.labels ?? [], chart.values ?? []);
+        };
+
+        const fetchMetricsCustomer = async (range = netKarRangeCustomer) => {
+            try {
+                const url = `${metricsEndpointCustomer}?range=${encodeURIComponent(range)}`;
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                if (!res.ok) return;
+                const data = await res.json();
+                applyMetricsCustomer(data);
+            } catch (error) {
+                // no-op
+            }
+        };
+
+        if (netKarCtxCustomer) {
+            setActiveNetKarPillCustomer(netKarRangeCustomer);
+            fetchMetricsCustomer();
+            setInterval(fetchMetricsCustomer, 15000);
+        }
+
+        const normalizeMapKeyCustomer = (value = '') => {
+            let normalized = value.toString().toLowerCase();
+            normalized = normalized.replace(/ç/g, 'c')
+                .replace(/ğ/g, 'g')
+                .replace(/ı/g, 'i')
+                .replace(/ö/g, 'o')
+                .replace(/ş/g, 's')
+                .replace(/ü/g, 'u');
+            normalized = normalized.replace(/[^a-z0-9\s]/g, ' ');
+            normalized = normalized.replace(/\s+/g, ' ').trim();
+            return normalized;
+        };
+
+        const initMapCustomer = () => {
+            const container = document.getElementById('turkey-map-customer');
+            if (!container || typeof L === 'undefined') return;
+
+            mapInstanceCustomer = L.map(container, {
+                zoomControl: false,
+                attributionControl: false,
+                scrollWheelZoom: false,
+                dragging: false,
+                doubleClickZoom: false,
+                boxZoom: false,
+                touchZoom: false,
+                keyboard: false,
+            }).setView([39.0, 35.0], 5);
+
+            mapInstanceCustomer.boxZoom.disable();
+            mapInstanceCustomer.dragging.disable();
+            mapInstanceCustomer.touchZoom.disable();
+            mapInstanceCustomer.doubleClickZoom.disable();
+            mapInstanceCustomer.scrollWheelZoom.disable();
+            mapInstanceCustomer.keyboard.disable();
+            container.addEventListener('mousedown', (e) => e.preventDefault());
+            container.addEventListener('mousemove', (e) => e.preventDefault());
+
+            fetch('/maps/turkey-provinces.geojson')
+                .then(response => response.json())
+                .then((geojson) => {
+                    mapLayerCustomer = L.geoJSON(geojson, {
+                        style: () => ({
+                            fillColor: '#f1f5f9',
+                            color: '#ffffff',
+                            weight: 1,
+                            fillOpacity: 0.5,
+                        }),
+                        onEachFeature: (feature, layer) => {
+                            const name = feature.properties?.name || 'Bilinmeyen';
+                            const tooltipContent = `<div class="map-tooltip"><span class="map-name">${name}</span><span class="map-count">0 adet</span></div>`;
+                            layer.bindTooltip(tooltipContent, {
+                                permanent: true,
+                                direction: 'center',
+                                className: 'map-label-wrapper',
+                                });
+                        },
+                    }).addTo(mapInstanceCustomer);
+
+                    const bounds = mapLayerCustomer.getBounds().pad(0.0);
+                    mapInstanceCustomer.fitBounds(bounds, { padding: [0, 0] });
+                    mapInstanceCustomer.setZoom(mapInstanceCustomer.getZoom() + 0.7);
+                    setTimeout(() => mapInstanceCustomer.invalidateSize(), 0);
+                });
+        };
+
+        const updateMapCustomer = (mapData) => {
+            if (!mapLayerCustomer) return;
+            const values = Object.values(mapData || {});
+            const maxValue = Math.max(...values, 1);
+
+            mapLayerCustomer.eachLayer((layer) => {
+                const name = layer.feature?.properties?.name || '';
+                const key = normalizeMapKeyCustomer(name);
+                const value = mapData?.[key] ?? 0;
+                const lightness = 70 - Math.min(50, (value / maxValue) * 50);
+                layer.setStyle({
+                    fillColor: value ? `hsl(26, 72%, ${lightness}%)` : '#f1f5f9',
+                    fillOpacity: value ? 0.82 : 0.4,
+                });
+                const tooltipContent = `<div class="map-tooltip"><span class="map-name">${name}</span><span class="map-count">${value} adet</span></div>`;
+                layer.bindTooltip(tooltipContent, {
+                    permanent: true,
+                    direction: 'center',
+                    className: 'map-label-wrapper',
+                });
+
+                layer.on('mouseover', () => {
+                    layer.setStyle({ weight: 2.5, color: '#f97316' });
+                });
+                layer.on('mouseout', () => {
+                    layer.setStyle({ weight: 1, color: '#ffffff' });
+                });
+            });
+        };
+
+        function setActiveMapPillCustomer(range) {
+            document.querySelectorAll('.map-range-pill').forEach((pill) => {
+                if (pill.dataset.range === range) {
+                    pill.classList.add('is-active');
+                    pill.classList.add('text-white');
+                    pill.style.backgroundColor = '#fca5a5';
+                    pill.style.borderColor = '#f87171';
+                    pill.style.color = '#111827';
+                    pill.style.boxShadow = '0 2px 8px rgba(248,113,113,0.35)';
+                } else {
+                    pill.classList.remove('is-active');
+                    pill.classList.remove('text-white');
+                    pill.style.backgroundColor = '';
+                    pill.style.borderColor = '';
+                    pill.style.color = '';
+                    pill.style.boxShadow = '';
+                }
+            });
+        }
+
+        function setActiveNetKarPillCustomer(range) {
+            document.querySelectorAll('.net-kar-range-pill').forEach((pill) => {
+                if (pill.dataset.range === range) {
+                    pill.classList.add('is-active');
+                    pill.classList.add('text-white');
+                    pill.style.backgroundColor = '#fca5a5';
+                    pill.style.borderColor = '#f87171';
+                    pill.style.color = '#111827';
+                    pill.style.boxShadow = '0 2px 8px rgba(248,113,113,0.35)';
+                } else {
+                    pill.classList.remove('is-active');
+                    pill.classList.remove('text-white');
+                    pill.style.backgroundColor = '';
+                    pill.style.borderColor = '';
+                    pill.style.color = '';
+                    pill.style.boxShadow = '';
+                }
+            });
+        }
+        const fetchMapCustomer = async (range = mapRangeCustomer) => {
+            try {
+                const url = `${mapEndpointCustomer}?range=${encodeURIComponent(range)}`;
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                if (!res.ok) return;
+                const data = await res.json();
+                updateMapCustomer(data.map || {});
+                setActiveMapPillCustomer(range);
+            } catch (error) {
+                // no-op
+            }
+        };
+
+        initMapCustomer();
+        if (mapEndpointCustomer) {
+            setActiveMapPillCustomer(mapRangeCustomer);
+            fetchMapCustomer();
+            setInterval(fetchMapCustomer, 60000);
+        }
+
+        const mapToggleCustomer = document.getElementById('map-range-toggle-customer');
+        const mapMenuCustomer = document.getElementById('map-range-menu-customer');
+        if (mapToggleCustomer && mapMenuCustomer) {
+            mapToggleCustomer.addEventListener('click', (event) => {
+                event.stopPropagation();
+                mapMenuCustomer.classList.toggle('hidden');
+            });
+            mapMenuCustomer.querySelectorAll('button[data-range]').forEach((btn) => {
+                btn.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    mapRangeCustomer = btn.dataset.range;
+                    const labelEl = document.getElementById('map-range-label-customer');
+                    if (labelEl) labelEl.textContent = btn.textContent.trim().toUpperCase();
+                mapMenuCustomer.classList.add('hidden');
+                    fetchMapCustomer(mapRangeCustomer);
+                });
+            });
+            document.addEventListener('click', (event) => {
+                if (!mapMenuCustomer.contains(event.target) && !mapToggleCustomer.contains(event.target)) {
+                    mapMenuCustomer.classList.add('hidden');
+                }
+            });
+        }
+
+        document.querySelectorAll('.map-range-pill').forEach((pill) => {
+            pill.addEventListener('click', () => {
+                mapRangeCustomer = pill.dataset.range;
+                const labelEl = document.getElementById('map-range-label-customer');
+                if (labelEl) labelEl.textContent = pill.textContent.trim().toUpperCase();
+                fetchMapCustomer(mapRangeCustomer);
+            });
+        });
+
+        document.querySelectorAll('.net-kar-range-pill').forEach((pill) => {
+            pill.addEventListener('click', () => {
+                netKarRangeCustomer = pill.dataset.range;
+                setActiveNetKarPillCustomer(netKarRangeCustomer);
+                fetchMetricsCustomer(netKarRangeCustomer);
+            });
+        });
+
+        const platformToggleCustomer = document.getElementById('platform-toggle-customer');
+        const platformMenuCustomer = document.getElementById('platform-menu-customer');
+        if (platformToggleCustomer && platformMenuCustomer) {
+            platformToggleCustomer.addEventListener('click', (event) => {
+                event.stopPropagation();
+                platformMenuCustomer.classList.toggle('hidden');
+            });
+            platformMenuCustomer.querySelectorAll('button[data-platform]').forEach((btn) => {
+                btn.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    selectedPlatformCustomer = (btn.dataset.platform || 'all').toString().toLowerCase();
+                    const labelEl = document.getElementById('platform-label-customer');
+                    if (labelEl) labelEl.textContent = btn.textContent.trim();
+                platformMenuCustomer.classList.add('hidden');
+                    fetchMetricsCustomer();
+                });
+            });
+            document.addEventListener('click', (event) => {
+                if (!platformMenuCustomer.contains(event.target) && !platformToggleCustomer.contains(event.target)) {
+                    platformMenuCustomer.classList.add('hidden');
+                }
+            });
+        }
+
+        const rangeToggleCustomer = document.getElementById('net-kar-range-toggle-customer');
+        const rangeMenuCustomer = document.getElementById('net-kar-range-menu-customer');
+        if (rangeToggleCustomer && rangeMenuCustomer) {
+            rangeToggleCustomer.addEventListener('click', (event) => {
+                event.stopPropagation();
+                rangeMenuCustomer.classList.toggle('hidden');
+            });
+            const netKarLabelMapCustomer = {
+                day: 'GÜNLÜK (GMT+3)',
+                week: 'Haftal&#305;k',
+                month: 'Ayl&#305;k',
+                quarter: '3 Ayl&#305;k',
+                half: '6 Ayl&#305;k',
+                year: 'Y&#305;ll&#305;k',
+            };
+            rangeMenuCustomer.querySelectorAll('button[data-range]').forEach((btn) => {
+                btn.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    netKarRangeCustomer = btn.dataset.range;
+                    const labelEl = document.getElementById('net-kar-range-label-customer');
+                    if (labelEl) labelEl.textContent = netKarLabelMapCustomer[netKarRangeCustomer] ?? btn.textContent.trim().toUpperCase();
+                rangeMenuCustomer.classList.add('hidden');
+                    fetchMetricsCustomer(netKarRangeCustomer);
+                });
+            });
+            document.addEventListener('click', (event) => {
+                if (!rangeMenuCustomer.contains(event.target) && !rangeToggleCustomer.contains(event.target)) {
+                    rangeMenuCustomer.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.period-tabs').forEach((row) => {
+            const pills = Array.from(row.querySelectorAll('.period-tab'));
+            if (!pills.length) return;
+            const setActive = (target) => {
+                pills.forEach((pill) => pill.classList.toggle('is-active', pill === target));
+            };
+            setActive(pills[0]);
+            pills.forEach((pill) => {
+                pill.addEventListener('click', () => setActive(pill));
+            });
+        });
+    });
+</script>
+@endpush
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

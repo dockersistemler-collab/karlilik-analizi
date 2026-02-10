@@ -180,7 +180,10 @@ class HepsiburadaAdapter extends BaseMarketplaceAdapter
     private function resolveBaseUrl(MarketplaceAccount $account): string
     {
         $creds = is_array($account->credentials) ? $account->credentials : [];
-        return (string) Arr::get($creds, 'base_url', '');
+        $baseUrl = (string) Arr::get($creds, 'base_url', '');
+        return $this->allowlistedBaseUrl($account, $baseUrl, [
+            'hepsiburada.com',
+        ], 'hepsiburada');
     }
 
     private function hasAuth(MarketplaceAccount $account): bool

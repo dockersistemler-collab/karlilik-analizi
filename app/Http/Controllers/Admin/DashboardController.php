@@ -13,6 +13,7 @@ use App\Services\Reports\SoldProductsReportService;
 use App\Support\SupportUser;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class DashboardController extends Controller
 {
@@ -118,6 +119,8 @@ $stats = [
 
         $mapData = $this->buildCityOrderCounts($rangeOrders);
 
+        $netProfitChart = $this->buildAmountChartForRange($orderQuery, (string) $request->input('range', 'week'));
+
         $portalBilling = null;
         if ($isPortal && $user) {
             $subscription = BillingSubscription::query()
@@ -155,13 +158,21 @@ $failureEvent = BillingEvent::query()
                 'last_failure_message' => $lastFailureMessage,
             ];
         }
-$payload = compact(
+        $fallbackMarketplaces = $marketplaces->map(fn ($marketplace) => [
+            'name' => $marketplace->name,
+            'code' => $marketplace->code,
+            'total' => 0,
+        ])->values();
+
+        $payload = compact(
             'stats',
             'recent_orders',
             'marketplaces',
             'kpis',
             'topProducts',
             'mapData',
+            'netProfitChart',
+            'fallbackMarketplaces',
             'range',
             'portalBilling',
             'isPortal'
@@ -224,6 +235,220 @@ $counts[$normalized] = ($counts[$normalized] ?? 0) + $qty;
         }
 
         return $counts;
+    }
+
+    public function mapData(Request $request): JsonResponse
+    {
+        $user = SupportUser::currentUser();
+        $range = (string) $request->input('range', 'week');
+
+        $orderQuery = Order::query();
+        if ($user && !$user->isSuperAdmin()) {
+            $orderQuery->where('user_id', $user->id);
+        }
+        $orderQuery = $this->applyRealOrderFilters($orderQuery);
+
+        [$start, $end] = $this->resolveMapRange($range);
+
+        $rangeOrders = (clone $orderQuery)
+            ->whereNotNull('shipping_address')
+            ->whereBetween('order_date', [$start->toDateTimeString(), $end->toDateTimeString()])
+            ->get(['shipping_address']);
+
+        return response()->json([
+            'range' => $range,
+            'start' => $start->toDateString(),
+            'end' => $end->toDateString(),
+            'map' => $this->buildCityOrderCountsByOrders($rangeOrders),
+        ]);
+    }
+
+    private function buildCityOrderCountsByOrders($orders): array
+    {
+        $provinceMap = $this->provinceMap();
+        $counts = [];
+
+        foreach ($orders as $order) {
+            $city = $this->extractCity($order->shipping_address);
+            if (!$city) {
+                continue;
+            }
+            $normalized = $this->normalizeCity($city);
+            $province = $provinceMap[$normalized] ?? null;
+            if (!$province) {
+                continue;
+            }
+            $counts[$normalized] = ($counts[$normalized] ?? 0) + 1;
+        }
+
+        return $counts;
+    }
+
+    private function resolveMapRange(string $range): array
+    {
+        $range = strtolower(trim($range));
+        Carbon::setLocale('tr');
+        $end = Carbon::now();
+
+        return match ($range) {
+            'day' => [Carbon::today(), Carbon::today()->endOfDay()],
+            'month' => [Carbon::now()->startOfMonth(), $end],
+            'quarter' => [Carbon::now()->subMonthsNoOverflow(2)->startOfMonth(), $end],
+            'half' => [Carbon::now()->subMonthsNoOverflow(5)->startOfMonth(), $end],
+            'year' => [Carbon::now()->startOfYear(), $end],
+            default => [Carbon::now()->startOfWeek(), $end],
+        };
+    }
+
+    public function metrics(Request $request): JsonResponse
+    {
+        $user = SupportUser::currentUser();
+
+        $orderQuery = Order::query();
+        if ($user && !$user->isSuperAdmin()) {
+            $orderQuery->where('user_id', $user->id);
+        }
+        $orderQuery = $this->applyRealOrderFilters($orderQuery);
+
+        $today = Carbon::today();
+        $monthStart = Carbon::now()->startOfMonth();
+        $monthEnd = Carbon::now()->endOfMonth();
+
+        $todayOrders = (clone $orderQuery)
+            ->whereDate('order_date', $today->toDateString())
+            ->get(['items', 'total_amount', 'marketplace_id']);
+        $monthOrders = (clone $orderQuery)
+            ->whereBetween('order_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
+            ->get(['items']);
+
+        $todayOrderCount = (clone $orderQuery)
+            ->whereDate('order_date', $today->toDateString())
+            ->count();
+        $monthOrderCount = (clone $orderQuery)
+            ->whereBetween('order_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
+            ->count();
+
+        $todayQty = $this->sumSoldQuantity($todayOrders);
+        $monthQty = $this->sumSoldQuantity($monthOrders);
+        $todayAmount = (float) $todayOrders->sum('total_amount');
+
+        $marketplaceTotals = (clone $orderQuery)
+            ->whereDate('order_date', $today->toDateString())
+            ->selectRaw('marketplace_id, SUM(total_amount) as total')
+            ->groupBy('marketplace_id')
+            ->orderByDesc('total')
+            ->get();
+
+        $activeMarketplaces = Marketplace::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'code']);
+
+        $totalsByMarketplace = $marketplaceTotals->pluck('total', 'marketplace_id')->all();
+
+        $marketplaceBreakdown = $activeMarketplaces->map(function ($marketplace) use ($totalsByMarketplace) {
+            return [
+                'name' => $marketplace->name,
+                'code' => $marketplace->code,
+                'total' => (float) ($totalsByMarketplace[$marketplace->id] ?? 0),
+            ];
+        })->values();
+
+        $netProfitChart = $this->buildAmountChartForRange($orderQuery, (string) $request->input('range', 'week'));
+
+        return response()->json([
+            'kpis' => [
+                'daily_orders' => $todayOrderCount,
+                'daily_items' => $todayQty,
+                'monthly_orders' => $monthOrderCount,
+                'monthly_items' => $monthQty,
+            ],
+            'daily_sales' => [
+                'total' => $todayAmount,
+                'marketplaces' => $marketplaceBreakdown,
+            ],
+            'net_profit_chart' => $netProfitChart,
+            'generated_at' => now()->toIso8601String(),
+        ]);
+    }
+
+    private function buildAmountChartForRange($orderQuery, string $range): array
+    {
+        $range = strtolower(trim($range));
+        $end = Carbon::now();
+
+        $range = match ($range) {
+            'day', 'week', 'month', 'quarter', 'half', 'year' => $range,
+            default => 'week',
+        };
+
+        $start = match ($range) {
+            'day' => $end->copy()->startOfDay(),
+            'month' => $end->copy()->startOfMonth()->startOfDay(),
+            'quarter' => $end->copy()->subMonthsNoOverflow(2)->startOfMonth()->startOfDay(),
+            'half' => $end->copy()->subMonthsNoOverflow(5)->startOfMonth()->startOfDay(),
+            'year' => $end->copy()->startOfYear()->startOfDay(),
+            default => $end->copy()->subDays(6)->startOfDay(),
+        };
+
+        $labels = [];
+        $values = [];
+        $timestamps = [];
+
+        if ($range === 'day') {
+            $driver = $orderQuery->getModel()->getConnection()->getDriverName();
+            $hourExpr = match ($driver) {
+                'sqlite' => "strftime('%H', order_date)",
+                'pgsql' => "to_char(order_date, 'HH24')",
+                default => "DATE_FORMAT(order_date, '%H')",
+            };
+
+            $rows = (clone $orderQuery)
+                ->whereBetween('order_date', [$start->toDateTimeString(), $end->toDateTimeString()])
+                ->selectRaw("$hourExpr as hour, SUM(total_amount) as total")
+                ->groupBy('hour')
+                ->orderBy('hour')
+                ->get();
+
+            $totalsByHour = $rows->pluck('total', 'hour')->all();
+            for ($hour = 0; $hour <= 23; $hour++) {
+                $key = str_pad((string) $hour, 2, '0', STR_PAD_LEFT);
+                $labels[] = $key . ':00';
+                $values[] = (float) ($totalsByHour[$key] ?? 0);
+                $timestamps[] = $start->copy()->setTime($hour, 0)->toIso8601String();
+            }
+        } else {
+            $rows = (clone $orderQuery)
+                ->whereBetween('order_date', [$start->toDateTimeString(), $end->toDateTimeString()])
+                ->selectRaw('DATE(order_date) as date, SUM(total_amount) as total')
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get();
+
+            $totalsByDate = $rows->pluck('total', 'date')->all();
+            for ($day = $start->copy(); $day->lte($end); $day->addDay()) {
+                $dateKey = $day->toDateString();
+                $labels[] = $day->translatedFormat('d M');
+                $values[] = (float) ($totalsByDate[$dateKey] ?? 0);
+                $timestamps[] = $day->copy()->startOfDay()->toIso8601String();
+            }
+        }
+
+        return [
+            'range' => $range,
+            'start' => $start->toIso8601String(),
+            'end' => $end->toIso8601String(),
+            'labels' => $labels,
+            'values' => $values,
+            'timestamps' => $timestamps,
+        ];
+    }
+
+    private function applyRealOrderFilters($orderQuery)
+    {
+        return $orderQuery
+            ->whereNotNull('marketplace_id')
+            ->whereNotNull('marketplace_order_id');
     }
 
     private function extractCity($shippingAddress): ?string
