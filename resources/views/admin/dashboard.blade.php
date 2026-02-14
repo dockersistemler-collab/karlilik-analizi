@@ -219,7 +219,7 @@
                         ['Hepsiburada', 56, 'bg-orange-400'],
                         ['N11', 85, 'bg-violet-300'],
                         ['Çiçek Sepeti', 45, 'bg-emerald-200'],
-                        ['Amazon', 35, 'bg-slate-900 text-white'],
+                        ['Amazon', 35, 'bg-sky-400 text-slate-900'],
                     ] as $row)
                         <div class="flex items-center gap-3 text-xs">
                             <div class="w-24 font-semibold text-slate-800 truncate">{{ $row[0] }}</div>

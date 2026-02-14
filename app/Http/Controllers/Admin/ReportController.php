@@ -235,7 +235,7 @@ $line[] = number_format((float) $row['total'], 2, '.', '');
     {
         return response()->streamDownload(function () {
             $handle = fopen('php://output', 'wb');
-            fputcsv($handle, ['Bu rapor, fatura modÃ¼lÃ¼ tamamlandÄ±ÄŸÄ±nda baÄŸlanacaktÄ±r.']);
+            fputcsv($handle, ['Bu rapor, fatura modülü tamamlandığında bağlanacaktır.']);
             fclose($handle);
         }, 'faturali-siparisler.csv', [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -274,3 +274,4 @@ $line[] = number_format((float) $row['total'], 2, '.', '');
         return (bool) AppSetting::getValue('reports_exports_enabled', true);
     }
 }
+

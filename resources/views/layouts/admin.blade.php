@@ -1569,6 +1569,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                 $showSubscriptionSection = $can('subscription') || $can('invoices');
 
                 $hasCargoTracking = $ownerUser && app(\App\Services\Entitlements\EntitlementService::class)->hasModule($ownerUser, 'feature.cargo_tracking');
+                $inventoryModuleEnabled = $ownerUser && app(\App\Services\Modules\ModuleGate::class)->isEnabledForUser($ownerUser, 'feature.inventory');
 
             @endphp
 
@@ -1648,6 +1649,32 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 @endif
 
+                @if($inventoryModuleEnabled && $can('products'))
+
+                    @if(auth('subuser')->check())
+
+                        <a href="{{ route('portal.inventory.user.products.index') }}" class="sidebar-link {{ request()->routeIs('portal.inventory.user.*') ? 'is-active' : '' }}">
+
+                            <i class="fa-solid fa-warehouse w-6"></i>
+
+                            <span class="sidebar-label">Stok</span>
+
+                        </a>
+
+                    @else
+
+                        <a href="{{ route('portal.inventory.admin.products.index') }}" class="sidebar-link {{ request()->routeIs('portal.inventory.admin.*') ? 'is-active' : '' }}">
+
+                            <i class="fa-solid fa-warehouse w-6"></i>
+
+                            <span class="sidebar-label">Stok</span>
+
+                        </a>
+
+                    @endif
+
+                @endif
+
 
 
                 @if($can('orders'))
@@ -1679,17 +1706,10 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                         <i class="fa-regular fa-file-lines w-6"></i>
 
-                        <span class="sidebar-label">Faturalar&#305;m</span>
-
-                    </a>
-
-                    <a href="{{ route('portal.invoices.index') }}" class="sidebar-link {{ request()->routeIs('portal.invoices.*') ? 'is-active' : '' }}">
-
-                        <i class="fa-solid fa-file-invoice w-6"></i>
-
                         <span class="sidebar-label">Faturalar</span>
 
                     </a>
+
 
                 @endif
                 @if($can('customers'))
@@ -2309,6 +2329,16 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                     <div class="panel-card px-4 py-3 mb-4 border-green-200 text-green-700">
 
                         {{ session('success') }}
+
+                    </div>
+
+                @endif
+
+                @if(session('error'))
+
+                    <div class="panel-card px-4 py-3 mb-4 border-red-200 text-red-700">
+
+                        {{ session('error') }}
 
                     </div>
 
@@ -2968,12 +2998,6 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 </body>
 
 </html>
-
-
-
-
-
-
 
 
 

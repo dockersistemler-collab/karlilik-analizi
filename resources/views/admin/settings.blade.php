@@ -58,7 +58,7 @@
 
                         <button type="button" data-settings-tab="product_list" class="settings-tab-btn w-full text-left px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50">
 
-                            Ãœrün Listesi Ayarları
+                            Ürün Listesi Ayarları
 
                         </button>
 
@@ -88,7 +88,7 @@
 
                         <button type="button" data-settings-tab="products" class="settings-tab-btn w-full text-left px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50">
 
-                            Ãœrün Ayarları
+                            Ürün Ayarları
 
                         </button>
 
@@ -144,7 +144,7 @@
 
                                         <input type="file" name="company_logo" class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-white">
 
-                                        <p class="text-xs text-slate-400 mt-1">Ã–nerilen: 512x512 px, PNG/JPG</p>
+                                        <p class="text-xs text-slate-400 mt-1">Önerilen: 512x512 px, PNG/JPG</p>
 
                                     </div>
 
@@ -242,7 +242,7 @@
 
                             <div>
 
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Fatura Ãœnvanı</label>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Fatura Ünvanı</label>
 
                                 <input type="text" name="billing_name" value="{{ old('billing_name', $user?->billing_name) }}" class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-white">
 
@@ -324,7 +324,7 @@
 
                                 <input type="email" name="notification_email" value="{{ old('notification_email', $supportViewEnabled ? \App\Support\SupportUser::maskEmail($user?->notification_email) : $user?->notification_email) }}" class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-white">
 
-                                <p class="text-xs text-slate-400 mt-1">Kullanıcı giriÅŸ e-postası: <span class="font-medium text-slate-600">{{ $user?->email }}</span></p>
+                                <p class="text-xs text-slate-400 mt-1">Kullanıcı giriş e-postası: <span class="font-medium text-slate-600">{{ $user?->email }}</span></p>
 
                             </div>
 
@@ -352,7 +352,7 @@
 
                             <div class="text-base font-semibold text-slate-900">Pazaryeri Ayarları</div>
 
-                            <p class="mt-1 text-sm text-slate-500">Pazaryeri baÄŸlantılarını â€œPazaryeri BaÄŸlantılarıâ€ ekranından yönetebilirsin.</p>
+                            <p class="mt-1 text-sm text-slate-500">Pazaryeri bağlantılarını "Pazaryeri Bağlantıları" ekranından yönetebilirsin.</p>
 
                         </div>
 
@@ -360,7 +360,7 @@
 
                             <a href="{{ route('portal.integrations.index') }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50">
 
-                                Pazaryeri BaÄŸlantılarına Git
+                                Pazaryeri Bağlantılarına Git
 
                             </a>
 
@@ -376,7 +376,7 @@
 
                             <div class="text-base font-semibold text-slate-900">Kargo Etiket Ayarları</div>
 
-                            <p class="mt-1 text-sm text-slate-500">Kargo etiketi süreçleri pazaryeri baÄŸlantılarına göre deÄŸiÅŸebilir. Şimdilik bu bölüm pazaryeri ayarları üzerinden yönetiliyor.</p>
+                            <p class="mt-1 text-sm text-slate-500">Kargo etiketi süreçleri pazaryeri bağlantılarına göre değişebilir. Şimdilik bu bölüm pazaryeri ayarları üzerinden yönetiliyor.</p>
 
                         </div>
 
@@ -384,7 +384,7 @@
 
                             <a href="{{ route('portal.integrations.index') }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50">
 
-                                Pazaryeri BaÄŸlantılarına Git
+                                Pazaryeri Bağlantılarına Git
 
                             </a>
 
@@ -398,9 +398,9 @@
 
                         <div>
 
-                            <div class="text-base font-semibold text-slate-900">Ãœrün Listesi Ayarları</div>
+                            <div class="text-base font-semibold text-slate-900">Ürün Listesi Ayarları</div>
 
-                            <p class="mt-1 text-sm text-slate-500">Bu bölüm henüz eklenmedi. İstersen ürün listesi ekranındaki filtreleri/varsayılanları buraya taÅŸıyabiliriz.</p>
+                            <p class="mt-1 text-sm text-slate-500">Bu bölüm henüz eklenmedi. İstersen ürün listesi ekranındaki filtreleri/varsayılanları buraya taşıyabiliriz.</p>
 
                         </div>
 
@@ -408,7 +408,7 @@
 
                             <a href="{{ route('portal.products.index') }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50">
 
-                                Ãœrün Listesine Git
+                                Ürün Listesine Git
 
                             </a>
 
@@ -424,7 +424,7 @@
 
                             <div class="text-base font-semibold text-slate-900">Fatura Açıklama Alanı Tanımları</div>
 
-                            <p class="mt-1 text-sm text-slate-500">Bu bölüm henüz eklenmedi. Hangi alanları (ör. â€œKargo Notuâ€, â€œMüşteri Notuâ€, vb.) tanımlamak istediÄŸini söylersen buraya ekleyebilirim.</p>
+                            <p class="mt-1 text-sm text-slate-500">Bu bölüm henüz eklenmedi. Hangi alanları (ör. "Kargo Notu", "Müşteri Notu", vb.) tanımlamak istediğini söylersen buraya ekleyebilirim.</p>
 
                         </div>
 
@@ -436,9 +436,9 @@
 
                         <div>
 
-                            <div class="text-base font-semibold text-slate-900">Ãœrün Ayarları</div>
+                            <div class="text-base font-semibold text-slate-900">Ürün Ayarları</div>
 
-                            <p class="mt-1 text-sm text-slate-500">Bu bölüm henüz eklenmedi. Ãœrün açıklaması, varsayılan KDV, desi hesaplama vb. ayarları buraya toplayabiliriz.</p>
+                            <p class="mt-1 text-sm text-slate-500">Bu bölüm henüz eklenmedi. Ürün açıklaması, varsayılan KDV, desi hesaplama vb. ayarları buraya toplayabiliriz.</p>
 
                         </div>
 
@@ -555,6 +555,7 @@
     </script>
 
 @endsection
+
 
 
 

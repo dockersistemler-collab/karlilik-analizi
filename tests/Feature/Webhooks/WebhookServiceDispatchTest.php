@@ -68,7 +68,7 @@ class WebhookServiceDispatchTest extends TestCase
 
         Module::create([
             'code' => 'feature.einvoice_webhooks',
-            'name' => 'E-Fatura WebhooklarÄ±',
+            'name' => 'E-Fatura Webhookları',
             'type' => 'feature',
             'billing_type' => 'recurring',
             'is_active' => true,
@@ -165,3 +165,4 @@ class WebhookServiceDispatchTest extends TestCase
         Bus::assertNotDispatched(SendWebhookDeliveryJob::class);
     }
 }
+

@@ -4,7 +4,7 @@
 
 @section('header')
 
-    Ürünler
+    {{ ($isInventoryView ?? false) ? 'Stok Takip' : 'Ürünler' }}
 
 @endsection
 
@@ -17,18 +17,78 @@
     $ownerUser = auth()->user();
 
     $canExport = $ownerUser ? app(\App\Services\Entitlements\EntitlementService::class)->hasModule($ownerUser, 'feature.exports') : false;
+    $inventoryMarketplaceBadgeClass = static function (?string $marketplaceName): string {
+        $name = strtolower(trim((string) $marketplaceName));
+
+        if (str_contains($name, 'trendyol')) {
+            return 'bg-amber-400 text-slate-900';
+        }
+        if (str_contains($name, 'hepsiburada')) {
+            return 'bg-orange-400 text-slate-900';
+        }
+        if (str_contains($name, 'n11')) {
+            return 'bg-violet-300 text-slate-900';
+        }
+        if (str_contains($name, 'cicek') || str_contains($name, 'çiçek')) {
+            return 'bg-emerald-200 text-slate-900';
+        }
+        if (str_contains($name, 'amazon')) {
+            return 'bg-slate-900 text-white';
+        }
+
+        return 'bg-slate-200 text-slate-700';
+    };
 
 @endphp
+@if($isInventoryView ?? false)
+<style>
+    .inventory-sticky-shell {
+        position: sticky;
+        top: 0;
+        z-index: 70;
+        background: #fff;
+        padding-top: 8px;
+    }
+    .inventory-sticky-shell .inventory-top-card {
+        margin-bottom: 0;
+        border-bottom: 0;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    .inventory-sticky-shell .inventory-search-card {
+        margin-bottom: 0;
+        border-top: 0;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
 
-<div class="mb-4">
-
-    @include('admin.products.partials.catalog-tabs')
-
+    @media (max-width: 1024px) {
+        .inventory-sticky-shell {
+            top: 0;
+        }
+    }
+</style>
+@endif
+@if($isInventoryView ?? false)
+<div class="inventory-sticky-shell">
+<div class="panel-card p-3 mb-4 inventory-top-card">
+        @include('admin.products.partials.catalog-tabs', [
+            'isInventoryView' => ($isInventoryView ?? false),
+            'inventoryMarketplaces' => ($inventoryMarketplaces ?? collect()),
+            'selectedMarketplaceId' => ($selectedMarketplaceId ?? 0),
+        ])
 </div>
-
-
-
+<div class="panel-card p-4 mb-4 inventory-search-card">
+@else
+<div class="mb-4">
+    @include('admin.products.partials.catalog-tabs', [
+        'isInventoryView' => ($isInventoryView ?? false),
+        'inventoryMarketplaces' => ($inventoryMarketplaces ?? collect()),
+        'selectedMarketplaceId' => ($selectedMarketplaceId ?? 0),
+    ])
+</div>
 <div class="panel-card p-4 mb-4">
+@endif
 
     <div class="flex flex-col gap-3">
 
@@ -105,13 +165,16 @@
     </div>
 
 </div>
+@if($isInventoryView ?? false)
+</div>
+@endif
 
 
 
 <div id="products-results">
 
-    <div id="products-table-wrap" class="panel-card table-shell overflow-hidden">
-
+    <div id="products-table-wrap" class="panel-card table-shell overflow-hidden {{ ($isInventoryView ?? false) ? 'rounded-t-none border-t-0' : '' }}">
+        
         <table class="min-w-full border-separate border-spacing-y-2">
 
             <thead>
@@ -157,6 +220,12 @@
             @endphp
 
             <tr>
+
+                @if($isInventoryView ?? false)
+                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
+                    <input type="checkbox" id="inventory-select-all" class="rounded border-slate-300 text-[#ff4439] focus:ring-[#ff4439]">
+                </th>
+                @endif
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Görsel</th>
 
@@ -255,6 +324,11 @@
             @forelse($products as $product)
 
             <tr class="bg-white shadow-sm">
+                @if($isInventoryView ?? false)
+                <td class="px-4 py-4 whitespace-nowrap">
+                    <input type="checkbox" class="inventory-row-select rounded border-slate-300 text-[#ff4439] focus:ring-[#ff4439]" value="{{ $product->id }}" data-product-id="{{ $product->id }}">
+                </td>
+                @endif
 
                 <td class="px-6 py-4 whitespace-nowrap">
 
@@ -330,82 +404,25 @@
 
                     @php
 
-                        $marketplaces = $product->marketplaceProducts
-
+                        $marketplaceNames = $product->marketplaceProducts
                             ->pluck('marketplace')
-
                             ->filter()
-
-                            ->unique('id');
+                            ->unique('id')
+                            ->pluck('name')
+                            ->filter()
+                            ->shuffle()
+                            ->values();
 
                     @endphp
 
-                    <div class="flex items-center gap-2">
-
-                        <div class="flex -space-x-1">
-
-                            @foreach($marketplaces as $marketplace)
-
-                                @php
-
-                                    $settings = $marketplace->settings ?? [];
-
-                                    $logoPath = $settings['logo_path'] ?? null;
-
-                                    $logo = $logoPath ? '/storage/' . ltrim($logoPath, '/') : ($settings['logo_url'] ?? $settings['logo'] ?? null);
-
-                                    if ($logo && \Illuminate\Support\Str::startsWith($logo, ['http://', 'https://'])) {
-
-                                        $path = parse_url($logo, PHP_URL_PATH);
-
-                                        if ($path && \Illuminate\Support\Str::startsWith($path, '/storage/')) {
-
-                                            $logo = $path;
-
-                                        }
-
-                                    } elseif ($logo && !\Illuminate\Support\Str::startsWith($logo, ['/'])) {
-
-                                        $logo = '/' . ltrim($logo, '/');
-
-                                    }
-
-                                    $labelBase = $marketplace->code ?: $marketplace->name;
-
-                                    $codeLabel = $labelBase ? strtoupper(substr($labelBase, 0, 2)) : '?';
-
-                                @endphp
-
-                                @if($logo)
-
-                                    <img src="{{ $logo }}" alt="{{ $marketplace->name }} logo"
-
-                                         class="w-7 h-7 rounded-full border border-white shadow-sm bg-white object-contain"
-
-                                         title="{{ $marketplace->name }}">
-
-                                @else
-
-                                    <span class="w-7 h-7 rounded-full border border-white shadow-sm bg-slate-100 text-[10px] font-semibold text-slate-600 flex items-center justify-center"
-
-                                          title="{{ $marketplace->name }}">
-
-                                        {{ $codeLabel }}
-
-                                    </span>
-
-                                @endif
-
-                            @endforeach
-
-                        </div>
-
-                        <span class="panel-pill text-xs bg-blue-100 text-blue-700">
-
-                            {{ $product->marketplace_products_count }}
-
-                        </span>
-
+                    <div class="flex flex-wrap items-center gap-2 max-w-[280px]">
+                        @forelse($marketplaceNames as $marketplaceName)
+                            <span class="panel-pill text-xs {{ $inventoryMarketplaceBadgeClass($marketplaceName) }}">
+                                {{ $marketplaceName }}
+                            </span>
+                        @empty
+                            <span class="text-xs text-slate-400">-</span>
+                        @endforelse
                     </div>
 
                 </td>
@@ -441,6 +458,13 @@
                         <i class="fas fa-edit"></i>
 
                     </a>
+                    @if($isInventoryView ?? false)
+                    <button type="button"
+                            class="text-violet-600 hover:text-violet-800 mr-3"
+                            data-toggle-marketplace-row="{{ $product->id }}">
+                        <i class="fas fa-store"></i>
+                    </button>
+                    @endif
 
                     <form action="{{ route('portal.products.destroy', $product) }}" method="POST" class="inline">
 
@@ -460,11 +484,44 @@
 
             </tr>
 
+            @if($isInventoryView ?? false)
+            <tr class="hidden bg-slate-50" data-marketplace-row="{{ $product->id }}">
+                <td colspan="{{ ($isInventoryView ?? false) ? 10 : 9 }}" class="px-6 py-4">
+                    <div class="rounded-xl border border-slate-200 bg-white p-4">
+                        <div class="text-sm font-semibold text-slate-800 mb-3">Pazaryerine Ac</div>
+                        <form method="POST"
+                              action="{{ route('portal.marketplace-products.assign') }}"
+                              class="flex flex-col md:flex-row md:items-end gap-3"
+                              data-marketplace-assign-form="{{ $product->id }}">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                            <input type="hidden" name="price" value="{{ $product->price }}" data-hidden-price="{{ $product->id }}">
+                            <input type="hidden" name="stock_quantity" value="{{ $product->stock_quantity }}" data-hidden-stock="{{ $product->id }}">
+
+                            <div class="w-full md:w-72">
+                                <label class="block text-xs text-slate-600 mb-1">Pazaryeri</label>
+                                <select name="marketplace_id" class="w-full" required>
+                                    <option value="">Seciniz</option>
+                                    @foreach(($inventoryMarketplaces ?? collect()) as $inventoryMarketplace)
+                                        <option value="{{ $inventoryMarketplace->id }}">{{ $inventoryMarketplace->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-solid-accent">
+                                Gonder
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            @endif
+
             @empty
 
             <tr>
 
-                <td colspan="9" class="px-6 py-4 text-center text-slate-500">Henüz ürün bulunmuyor</td>
+                <td colspan="{{ ($isInventoryView ?? false) ? 10 : 9 }}" class="px-6 py-4 text-center text-slate-500">Henüz ürün bulunmuyor</td>
 
             </tr>
 
@@ -486,9 +543,13 @@
 
             <select id="per-page" name="per_page" class="w-24" onchange="this.form.submit()">
 
-                @foreach([10, 20, 50, 100] as $size)
+                @php
+                    $perPageOptions = ($isInventoryView ?? false) ? [25, 50, 100] : [10, 20, 50, 100];
+                    $defaultPerPage = ($isInventoryView ?? false) ? 25 : 20;
+                @endphp
+                @foreach($perPageOptions as $size)
 
-                    <option value="{{ $size }}" @selected((int) request('per_page', 20) === $size)>{{ $size }}</option>
+                    <option value="{{ $size }}" @selected((int) request('per_page', $defaultPerPage) === $size)>{{ $size }}</option>
 
                 @endforeach
 
@@ -525,64 +586,155 @@
     let searchTimer;
 
     let searchAbortController;
+    const inventoryFlashMessage = @json(session('error') ?? (session('success') ?? ($errors->any() ? $errors->first() : null)));
+    const inventoryFlashType = @json(session('error') || $errors->any() ? 'error' : (session('success') ? 'success' : null));
 
+    const inlineSaveTimers = {};
+    const inlineLastSavedState = {};
+
+    async function submitInlineUpdate(productId, triggerButton = null) {
+        const priceInput = document.querySelector(`[data-product-price="${productId}"]`);
+        const stockInput = document.querySelector(`[data-product-stock="${productId}"]`);
+
+        if (!priceInput || !stockInput) {
+            return;
+        }
+
+        const stateKey = `${priceInput.value}|${stockInput.value}`;
+        if (inlineLastSavedState[productId] === stateKey) {
+            return;
+        }
+
+        if (triggerButton) {
+            triggerButton.disabled = true;
+        }
+
+        const response = await fetch(`{{ url('/products') }}/${productId}/quick-update`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                price: priceInput.value,
+                stock_quantity: stockInput.value,
+            }),
+        });
+
+        if (triggerButton) {
+            triggerButton.disabled = false;
+        }
+
+        if (!response.ok) {
+            alert('Kaydedilemedi. Lutfen degerleri kontrol edin.');
+            return;
+        }
+
+        inlineLastSavedState[productId] = stateKey;
+    }
 
 
     function bindQuickSave() {
 
         const quickSaveButtons = document.querySelectorAll('.quick-save');
-
-
+        const priceInputs = Array.from(document.querySelectorAll('[data-product-price]'));
+        const stockInputs = Array.from(document.querySelectorAll('[data-product-stock]'));
 
         quickSaveButtons.forEach((btn) => {
 
             btn.addEventListener('click', async () => {
 
                 const productId = btn.dataset.productId;
+                await submitInlineUpdate(productId, btn);
 
-                const priceInput = document.querySelector(`[data-product-price="${productId}"]`);
+            });
 
-                const stockInput = document.querySelector(`[data-product-stock="${productId}"]`);
+        });
 
-                if (!priceInput || !stockInput) return;
+        const registerAutoSave = (inputEl) => {
+            const productId = inputEl.getAttribute('data-product-price') || inputEl.getAttribute('data-product-stock');
+            if (!productId) {
+                return;
+            }
 
+            const scheduleSave = () => {
+                window.clearTimeout(inlineSaveTimers[productId]);
+                inlineSaveTimers[productId] = window.setTimeout(() => {
+                    submitInlineUpdate(productId);
+                }, 500);
+            };
 
+            inputEl.addEventListener('input', scheduleSave);
+            inputEl.addEventListener('change', scheduleSave);
+            inputEl.addEventListener('blur', scheduleSave);
+        };
 
-                btn.disabled = true;
+        priceInputs.forEach(registerAutoSave);
+        stockInputs.forEach(registerAutoSave);
 
-                const response = await fetch(`{{ url('/products') }}/${productId}/quick-update`, {
+        const seenProductIds = new Set();
+        [...priceInputs, ...stockInputs].forEach((inputEl) => {
+            const productId = inputEl.getAttribute('data-product-price') || inputEl.getAttribute('data-product-stock');
+            if (!productId || seenProductIds.has(productId)) {
+                return;
+            }
 
-                    method: 'POST',
+            seenProductIds.add(productId);
+            const priceInput = document.querySelector(`[data-product-price="${productId}"]`);
+            const stockInput = document.querySelector(`[data-product-stock="${productId}"]`);
+            if (priceInput && stockInput) {
+                inlineLastSavedState[productId] = `${priceInput.value}|${stockInput.value}`;
+            }
+        });
 
-                    headers: {
+    }
+    function bindInventoryMarketplaceActions() {
 
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        const toggleButtons = document.querySelectorAll('[data-toggle-marketplace-row]');
 
-                        'X-Requested-With': 'XMLHttpRequest',
+        toggleButtons.forEach((btn) => {
 
-                        'Accept': 'application/json',
+            btn.addEventListener('click', () => {
 
-                        'Content-Type': 'application/json',
+                const productId = btn.getAttribute('data-toggle-marketplace-row');
 
-                    },
+                const row = document.querySelector(`[data-marketplace-row="${productId}"]`);
 
-                    body: JSON.stringify({
+                if (!row) return;
 
-                        price: priceInput.value,
+                row.classList.toggle('hidden');
 
-                        stock_quantity: stockInput.value,
+            });
 
-                    }),
+        });
 
-                });
+        const assignForms = document.querySelectorAll('[data-marketplace-assign-form]');
 
-                btn.disabled = false;
+        assignForms.forEach((form) => {
 
+            form.addEventListener('submit', () => {
 
+                const productId = form.getAttribute('data-marketplace-assign-form');
 
-                if (!response.ok) {
+                const currentPrice = document.querySelector(`[data-product-price="${productId}"]`);
 
-                    alert('Kaydedilemedi. Lütfen değerleri kontrol edin.');
+                const currentStock = document.querySelector(`[data-product-stock="${productId}"]`);
+
+                const hiddenPrice = form.querySelector(`[data-hidden-price="${productId}"]`);
+
+                const hiddenStock = form.querySelector(`[data-hidden-stock="${productId}"]`);
+
+                if (currentPrice && hiddenPrice) {
+
+                    hiddenPrice.value = currentPrice.value;
+
+                }
+
+                if (currentStock && hiddenStock) {
+
+                    hiddenStock.value = currentStock.value;
 
                 }
 
@@ -592,6 +744,123 @@
 
     }
 
+
+
+    function bindInventorySelection() {
+
+        const selectAll = document.getElementById('inventory-select-all');
+
+        const rowCheckboxes = Array.from(document.querySelectorAll('.inventory-row-select'));
+        const selectedSyncForm = document.querySelector('[data-inventory-sync-selected-form]');
+        const selectedSyncCsvInput = selectedSyncForm ? selectedSyncForm.querySelector('input[name="selected_product_ids_csv"]') : null;
+        const selectedSyncSubmit = selectedSyncForm ? selectedSyncForm.querySelector('[data-inventory-sync-selected-submit]') : null;
+        const selectedSyncMarketplaceInput = selectedSyncForm ? selectedSyncForm.querySelector('input[name="marketplace_id"]') : null;
+        const openForm = document.querySelector('[data-inventory-open-form]');
+        const openToggle = openForm ? openForm.querySelector('[data-inventory-open-toggle]') : null;
+        const openPanel = openForm ? openForm.querySelector('[data-inventory-open-panel]') : null;
+        const openMarketplaceSelect = openForm ? openForm.querySelector('select[name="marketplace_id"]') : null;
+        const openSelectedCsvInput = openForm ? openForm.querySelector('input[name="selected_product_ids_csv"]') : null;
+        const openSubmit = openForm ? openForm.querySelector('[data-inventory-open-submit]') : null;
+        try {
+            window.sessionStorage.removeItem('inventory_selected_product_ids_v1');
+        } catch (error) {
+            // no-op
+        }
+
+        const updateOpenSubmitState = (selectedCount) => {
+            if (!openSubmit) {
+                return;
+            }
+
+            const hasMarketplace = !!(openMarketplaceSelect && openMarketplaceSelect.value);
+            openSubmit.disabled = !(selectedCount > 0 && hasMarketplace);
+        };
+
+        const updateSelectedSyncSubmitState = (selectedCount) => {
+            if (!selectedSyncSubmit) {
+                return;
+            }
+
+            selectedSyncSubmit.disabled = selectedCount === 0;
+        };
+
+        const syncBulkFormState = () => {
+            const selectedIds = rowCheckboxes
+                .filter((checkbox) => checkbox.checked)
+                .map((checkbox) => checkbox.value);
+            const selectedCount = selectedIds.length;
+
+            if (selectedSyncCsvInput) {
+                selectedSyncCsvInput.value = selectedIds.join(',');
+            }
+            if (selectedSyncMarketplaceInput) {
+                const marketplaceFromQuery = new URLSearchParams(window.location.search).get('marketplace_id') || '';
+                selectedSyncMarketplaceInput.value = (marketplaceFromQuery && marketplaceFromQuery !== '0') ? marketplaceFromQuery : '';
+            }
+            if (openSelectedCsvInput) {
+                openSelectedCsvInput.value = selectedIds.join(',');
+            }
+            updateSelectedSyncSubmitState(selectedCount);
+
+            updateOpenSubmitState(selectedCount);
+            if (selectedCount === 0 && openPanel) {
+                openPanel.classList.add('hidden');
+            }
+        };
+
+        if (openToggle && openPanel) {
+            openToggle.addEventListener('click', () => {
+                openPanel.classList.toggle('hidden');
+            });
+        }
+
+        if (openMarketplaceSelect) {
+            openMarketplaceSelect.addEventListener('change', () => {
+                const selectedCount = rowCheckboxes.filter((checkbox) => checkbox.checked).length;
+                updateOpenSubmitState(selectedCount);
+            });
+        }
+
+        if (!selectAll || rowCheckboxes.length === 0) {
+            syncBulkFormState();
+            return;
+        }
+
+        const syncSelectAllState = () => {
+            const checkedCount = rowCheckboxes.filter((checkbox) => checkbox.checked).length;
+            selectAll.checked = checkedCount > 0 && checkedCount === rowCheckboxes.length;
+            selectAll.indeterminate = checkedCount > 0 && checkedCount < rowCheckboxes.length;
+            syncBulkFormState();
+        };
+
+        selectAll.addEventListener('change', () => {
+            rowCheckboxes.forEach((checkbox) => {
+                checkbox.checked = selectAll.checked;
+            });
+            syncSelectAllState();
+        });
+
+        rowCheckboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', syncSelectAllState);
+        });
+
+        if (selectedSyncForm) {
+            selectedSyncForm.addEventListener('submit', () => {
+                syncBulkFormState();
+            });
+        }
+
+        if (openForm) {
+            openForm.addEventListener('submit', () => {
+                syncBulkFormState();
+                if (openPanel) {
+                    openPanel.classList.add('hidden');
+                }
+            });
+        }
+
+        syncSelectAllState();
+    }
 
 
     async function fetchResults(url) {
@@ -648,6 +917,9 @@
 
                 bindQuickSave();
 
+                bindInventoryMarketplaceActions();
+                bindInventorySelection();
+
                 if (searchInput) {
 
                     searchInput.focus();
@@ -701,6 +973,23 @@
 
 
     bindQuickSave();
+
+    bindInventoryMarketplaceActions();
+    bindInventorySelection();
+    if (inventoryFlashMessage) {
+        const toast = document.createElement('div');
+        toast.className = 'fixed right-4 bottom-4 z-[120] px-4 py-3 rounded-xl shadow-lg border text-sm max-w-sm';
+        if (inventoryFlashType === 'error') {
+            toast.classList.add('bg-red-50', 'border-red-200', 'text-red-700');
+        } else {
+            toast.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-700');
+        }
+        toast.textContent = inventoryFlashMessage;
+        document.body.appendChild(toast);
+        window.setTimeout(() => {
+            toast.remove();
+        }, 4500);
+    }
 
 
 
@@ -775,6 +1064,14 @@
 </script>
 
 @endpush
+
+
+
+
+
+
+
+
 
 
 

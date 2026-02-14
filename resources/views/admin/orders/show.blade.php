@@ -7,7 +7,7 @@
 @section('header')
 
 
-    SipariÅŸ Detay
+    Sipariş Detay
 
 
 @endsection
@@ -25,7 +25,7 @@
     <div class="bg-white rounded-lg shadow p-6">
 
 
-        <h3 class="text-lg font-semibold mb-4">SipariÅŸ Bilgileri</h3>
+        <h3 class="text-lg font-semibold mb-4">Sipariş Bilgileri</h3>
 
 
         <dl class="space-y-2">
@@ -34,7 +34,7 @@
             <div>
 
 
-                <dt class="text-sm text-gray-500">SipariÅŸ No</dt>
+                <dt class="text-sm text-gray-500">Sipariş No</dt>
 
 
                 <dd><code class="bg-gray-100 px-2 py-1 rounded">{{ $order->marketplace_order_id }}</code></dd>
@@ -58,7 +58,7 @@
             <div>
 
 
-                <dt class="text-sm text-gray-500">SipariÅŸ Tarihi</dt>
+                <dt class="text-sm text-gray-500">Sipariş Tarihi</dt>
 
 
                 <dd>{{ $order->order_date->format('d.m.Y H:i') }}</dd>
@@ -322,7 +322,7 @@
 
                 <div class="text-sm font-semibold text-slate-800">{{ $order->shipment->status }}</div>
 
-                <div class="mt-2 text-xs text-slate-500">Son event: {{ $order->shipment->last_event_at?->format('d.m.Y H:i') ?? 'â€”' }}</div>
+                <div class="mt-2 text-xs text-slate-500">Son event: {{ $order->shipment->last_event_at?->format('d.m.Y H:i') ?? '-' }}</div>
 
                 <a href="{{ route('portal.shipments.show', $order->shipment) }}" class="btn btn-outline mt-3">Takip Detayı</a>
 
@@ -444,7 +444,7 @@
     <div class="bg-white rounded-lg shadow p-6">
 
 
-        <h3 class="text-lg font-semibold mb-4">Durum GeçmiÅŸi</h3>
+        <h3 class="text-lg font-semibold mb-4">Durum Geçmişi</h3>
 
 
         <div class="space-y-3">
@@ -459,7 +459,7 @@
                     <div class="text-sm font-semibold text-gray-900">
 
 
-                        {{ ucfirst($log->old_status ?? 'baÅŸlangıç') }} â†’ {{ ucfirst($log->new_status) }}
+                        {{ ucfirst($log->old_status ?? 'başlangıç') }} -> {{ ucfirst($log->new_status) }}
 
 
                     </div>
@@ -474,7 +474,7 @@
                         @if($log->user)
 
 
-                            â€¢ {{ $log->user->name }}
+                            • {{ $log->user->name }}
 
 
                         @endif
@@ -498,7 +498,7 @@
             @empty
 
 
-                <p class="text-sm text-gray-500">Durum geçmiÅŸi bulunmuyor.</p>
+                <p class="text-sm text-gray-500">Durum geçmişi bulunmuyor.</p>
 
 
             @endforelse
@@ -516,7 +516,7 @@
     <div class="bg-white rounded-lg shadow p-6">
 
 
-        <h3 class="text-lg font-semibold mb-4">SipariÅŸ Kalemleri</h3>
+        <h3 class="text-lg font-semibold mb-4">Sipariş Kalemleri</h3>
 
 
         @if($order->items && is_array($order->items))
@@ -531,7 +531,7 @@
                 <div class="border-b pb-2">
 
 
-                    <div class="font-semibold text-sm">{{ $item['name'] ?? 'Ãœrün Adı' }}</div>
+                    <div class="font-semibold text-sm">{{ $item['name'] ?? 'Ürün Adı' }}</div>
 
 
                     <div class="text-xs text-gray-500">
@@ -558,7 +558,7 @@
         @else
 
 
-            <p class="text-sm text-gray-500">SipariÅŸ kalemleri bilgisi mevcut deÄŸil</p>
+            <p class="text-sm text-gray-500">Sipariş kalemleri bilgisi mevcut değil</p>
 
 
         @endif
@@ -571,6 +571,7 @@
 
 
 @endsection
+
 
 
 

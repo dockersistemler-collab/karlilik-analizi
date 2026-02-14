@@ -188,5 +188,64 @@ class ModuleCatalogSeeder extends Seeder
                 'sort_order' => 0,
             ]
         );
+        Module::query()->updateOrCreate(
+            ['code' => 'feature.inventory'],
+            [
+                'name' => 'Stok Takibi',
+                'description' => 'Stok hareketleri, kritik stok uyarÄ±larÄ± ve envanter ekranlarÄ±.',
+                'type' => 'feature',
+                'billing_type' => 'recurring',
+                'is_active' => false,
+                'sort_order' => 0,
+            ]
+        );
+
+        Module::query()->updateOrCreate(
+            ['code' => 'integration.inventory.trendyol'],
+            [
+                'name' => 'Stok - Trendyol Connector',
+                'description' => 'Stok modÃ¼lÃ¼ iÃ§in Trendyol stok senkronizasyon connectorÃ¼.',
+                'type' => 'integration',
+                'billing_type' => 'recurring',
+                'is_active' => false,
+                'sort_order' => 0,
+            ]
+        );
+
+        Module::query()->updateOrCreate(
+            ['code' => 'integration.inventory.hepsiburada'],
+            [
+                'name' => 'Stok - Hepsiburada Connector',
+                'description' => 'Stok modÃ¼lÃ¼ iÃ§in Hepsiburada stok senkronizasyon connectorÃ¼.',
+                'type' => 'integration',
+                'billing_type' => 'recurring',
+                'is_active' => false,
+                'sort_order' => 0,
+            ]
+        );
+
+        Module::query()->updateOrCreate(
+            ['code' => 'integration.inventory.n11'],
+            [
+                'name' => 'Stok - N11 Connector',
+                'description' => 'Stok modÃ¼lÃ¼ iÃ§in N11 stok senkronizasyon connectorÃ¼.',
+                'type' => 'integration',
+                'billing_type' => 'recurring',
+                'is_active' => false,
+                'sort_order' => 0,
+            ]
+        );
+
+        Module::query()->updateOrCreate(
+            ['code' => 'integration.inventory.amazon'],
+            [
+                'name' => 'Stok - Amazon Connector',
+                'description' => 'Stok modÃ¼lÃ¼ iÃ§in Amazon stok senkronizasyon connectorÃ¼.',
+                'type' => 'integration',
+                'billing_type' => 'recurring',
+                'is_active' => false,
+                'sort_order' => 0,
+            ]
+        );
     }
 }

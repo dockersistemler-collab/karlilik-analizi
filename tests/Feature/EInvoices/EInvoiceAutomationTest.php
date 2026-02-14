@@ -50,7 +50,7 @@ class EInvoiceAutomationTest extends TestCase
             'billing_address' => 'Bill',
             'order_date' => now(),
             'items' => [
-                ['sku' => 'SKU1', 'name' => 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¼n 1', 'quantity' => 1, 'price' => 10],
+                ['sku' => 'SKU1', 'name' => 'Ürün 1', 'quantity' => 1, 'price' => 10],
             ],
             'marketplace_data' => [],
         ]);
@@ -103,7 +103,7 @@ class EInvoiceAutomationTest extends TestCase
             'billing_address' => 'Bill',
             'order_date' => now(),
             'items' => [
-                ['sku' => 'SKU1', 'name' => 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¼n 1', 'quantity' => 1, 'price' => 10],
+                ['sku' => 'SKU1', 'name' => 'Ürün 1', 'quantity' => 1, 'price' => 10],
             ],
             'marketplace_data' => [],
         ]);
@@ -150,7 +150,7 @@ class EInvoiceAutomationTest extends TestCase
             'billing_address' => 'Bill',
             'order_date' => now(),
             'items' => [
-                ['sku' => 'SKU1', 'name' => 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¼n 1', 'quantity' => 1, 'price' => 10],
+                ['sku' => 'SKU1', 'name' => 'Ürün 1', 'quantity' => 1, 'price' => 10],
             ],
             'marketplace_data' => [],
         ]);
@@ -191,7 +191,7 @@ class EInvoiceAutomationTest extends TestCase
             'billing_address' => 'Bill',
             'order_date' => now(),
             'items' => [
-                ['sku' => 'SKU1', 'name' => 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¼n 1', 'quantity' => 1, 'price' => 10],
+                ['sku' => 'SKU1', 'name' => 'Ürün 1', 'quantity' => 1, 'price' => 10],
             ],
             'marketplace_data' => [],
         ]);
@@ -238,3 +238,4 @@ class EInvoiceAutomationTest extends TestCase
         });
     }
 }
+

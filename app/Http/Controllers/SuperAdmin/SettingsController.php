@@ -184,7 +184,7 @@ $validated['invoice_number_tracking'] = $request->boolean('invoice_number_tracki
         AppSetting::setValue('reports_exports_enabled', $enabled);
 
         return redirect()->route('super-admin.settings.index')
-            ->with('success', 'Rapor dıÅŸa aktarma ayarı güncellendi.');
+            ->with('success', 'Rapor dışa aktarma ayarı güncellendi.');
     }
     public function updateVatColors(Request $request): RedirectResponse
     {
@@ -198,7 +198,7 @@ $validated['invoice_number_tracking'] = $request->boolean('invoice_number_tracki
             }
             if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
                 return redirect()->route('super-admin.settings.index')
-                    ->with('info', 'KDV renkleri iÃƒÂ§in geÃƒÂ§erli HEX formatÃ„Â± kullanÃ„Â±n (ÃƒÂ¶rn: #ff4439).');
+                    ->with('info', 'KDV renkleri için geçerli HEX formatı kullanın (örn: #ff4439).');
             }
 $payload[$marketplaceId] = $color;
         }
@@ -206,7 +206,7 @@ $payload[$marketplaceId] = $color;
         AppSetting::setValue('vat_report_marketplace_colors', json_encode($payload));
 
         return redirect()->route('super-admin.settings.index')
-            ->with('success', 'KDV raporu renkleri gÃƒÂ¼ncellendi.');
+            ->with('success', 'KDV raporu renkleri güncellendi.');
     }
 
     public function updateQuickActions(Request $request): RedirectResponse
@@ -244,7 +244,7 @@ $payload[] = [
         AppSetting::setValue('admin_quick_actions_v2', json_encode($payload));
 
         return redirect()->route('super-admin.settings.index')
-            ->with('success', 'HÃ„Â±zlÃ„Â± menÃƒÂ¼ ayarlarÃ„Â± gÃƒÂ¼ncellendi.');
+            ->with('success', 'Hızlı menü ayarları güncellendi.');
     }
 
     public function updateCategoryMappingSettings(Request $request): RedirectResponse
@@ -263,7 +263,7 @@ $payload[] = [
         AppSetting::setValue('category_import_create_mappings_default', $request->boolean('category_import_create_mappings_default'));
 
         return redirect()->route('super-admin.settings.index')
-            ->with('success', 'Kategori eÅŸitleme ayarları güncellendi.');
+            ->with('success', 'Kategori eşitleme ayarları güncellendi.');
     }
 
     public function updateTheme(Request $request): RedirectResponse
@@ -278,7 +278,7 @@ $payload[] = [
         AppSetting::setValue('panel_theme_radius', (int) $validated['panel_theme_radius']);
 
         return redirect()->route('super-admin.settings.index')
-            ->with('success', 'Panel gÃƒÂ¶rÃƒÂ¼nÃƒÂ¼m ayarlarÃ„Â± gÃƒÂ¼ncellendi.');
+            ->with('success', 'Panel görünüm ayarları güncellendi.');
     }
 
     public function updateMailSettings(Request $request, SettingsRepository $settings): RedirectResponse
@@ -300,7 +300,7 @@ $payload[] = [
         $end = $validated['default_quiet_hours_end'] ?? '08:00';
         if (!$this->isValidTimeString($start) || !$this->isValidTimeString($end)) {
             return redirect()->route('super-admin.settings.index', ['tab' => 'mail'])
-                ->with('error', 'Quiet hours formatÃ„Â± HH:MM olmalÃ„Â± (ÃƒÂ¶rn: 22:00).');
+                ->with('error', 'Quiet hours formatı HH:MM olmalı (örn: 22:00).');
         }
 $userId = $request->user()?->id;
 $settings->set('mail', 'override_enabled', $request->boolean('override_enabled'), false, $userId);
@@ -319,7 +319,7 @@ $settings->set('mail', 'override_enabled', $request->boolean('override_enabled')
         }
 
         return redirect()->route('super-admin.settings.index', ['tab' => 'mail'])
-            ->with('success', 'Mail ayarlarÃ„Â± gÃƒÂ¼ncellendi.');
+            ->with('success', 'Mail ayarları güncellendi.');
     }
 
     public function sendTestMail(Request $request): RedirectResponse
@@ -337,7 +337,7 @@ $settings->set('mail', 'override_enabled', $request->boolean('override_enabled')
             ]);
 
             return redirect()->route('super-admin.settings.index', ['tab' => 'mail'])
-            ->with('success', 'Test mail gÃƒÂ¶nderildi.');
+            ->with('success', 'Test mail gönderildi.');
         } catch (\Throwable $exception) {
             Log::error('system_settings.test_mail_failed', [
                 'to' => $validated['to_email'],
@@ -345,7 +345,7 @@ $settings->set('mail', 'override_enabled', $request->boolean('override_enabled')
             ]);
 
             return redirect()->route('super-admin.settings.index', ['tab' => 'mail'])
-                ->with('error', 'Test mail gÃƒÂ¶nderilemedi.');
+                ->with('error', 'Test mail gönderilemedi.');
         }
     }
 
@@ -360,7 +360,7 @@ $settings->set('incident_sla', 'ack_sla_minutes', (int) $validated['ack_sla_minu
         $settings->set('incident_sla', 'resolve_sla_minutes', (int) $validated['resolve_sla_minutes'], false, $userId);
 
         return redirect()->route('super-admin.settings.index', ['tab' => 'incident-sla'])
-            ->with('success', 'Incident SLA ayarlarÃ„Â± gÃƒÂ¼ncellendi.');
+            ->with('success', 'Incident SLA ayarları güncellendi.');
     }
 
     public function updateIntegrationHealthSettings(Request $request, SettingsRepository $settings): RedirectResponse
@@ -378,7 +378,7 @@ $settings->set('integration_health', 'stale_minutes', (int) $validated['stale_mi
         $settings->set('integration_health', 'down_requires_critical', $request->boolean('down_requires_critical'), false, $userId);
 
         return redirect()->route('super-admin.settings.index', ['tab' => 'health'])
-            ->with('success', 'Integration Health ayarlarÃ„Â± gÃƒÂ¼ncellendi.');
+            ->with('success', 'Integration Health ayarları güncellendi.');
     }
 
     public function updateFeatureMatrix(Request $request, SettingsRepository $settings, FeatureGate $features): RedirectResponse
@@ -398,7 +398,7 @@ $settings->set('integration_health', 'stale_minutes', (int) $validated['stale_mi
         $settings->set('features', 'plan_matrix', json_encode($matrix), false, $request->user()?->id);
 
         return redirect()->route('super-admin.settings.index', ['tab' => 'features'])
-            ->with('success', 'Feature plan matrisi gÃƒÂ¼ncellendi.');
+            ->with('success', 'Feature plan matrisi güncellendi.');
     }
 
     public function updateBillingPlansCatalog(Request $request, SettingsRepository $settings, FeatureGate $features): RedirectResponse
@@ -451,7 +451,7 @@ $normalized[$code] = [
 
         if ($normalized === []) {
             return redirect()->route('super-admin.settings.index', ['tab' => 'billing'])
-                ->with('error', 'Kaydedilecek plan bulunamadÃ„Â±.');
+                ->with('error', 'Kaydedilecek plan bulunamadı.');
         }
 $settings->set('billing', 'plans_catalog', json_encode($normalized), false, $request->user()?->id);
 $settings->set('billing', 'iyzico.enabled', $request->boolean('iyzico_enabled'), false, $request->user()?->id);
@@ -473,7 +473,7 @@ $settings->set('billing', 'iyzico.sandbox', $request->boolean('iyzico_sandbox'),
         $settings->set('billing', 'dunning.auto_downgrade', $request->boolean('dunning_auto_downgrade', true), false, $request->user()?->id);
 
         return redirect()->route('super-admin.settings.index', ['tab' => 'billing'])
-            ->with('success', 'Plan kataloÃ„Å¸u gÃƒÂ¼ncellendi.');
+            ->with('success', 'Plan kataloğu güncellendi.');
     }
 
     public function createIyzicoProduct(Request $request, SettingsRepository $settings, IyzicoSubscriptionClient $client): RedirectResponse|JsonResponse
@@ -789,7 +789,7 @@ $normalized[strtolower($plan)] = array_values(array_filter($features, fn ($value
                 'route' => 'portal.brands.create',
             ],
             'products.create' => [
-                'label' => 'Ãœrün Ekle',
+                'label' => 'Ürün Ekle',
                 'route' => 'portal.products.create',
             ],
         ];
@@ -868,6 +868,7 @@ $defaults = [];
         return $defaults;
     }
 }
+
 
 
 

@@ -54,7 +54,7 @@
 
                 <div>
 
-                    <label class="block text-sm font-medium text-slate-700 mb-1">SaÄŸlayıcı</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Sağlayıcı</label>
 
                     <select name="provider_key" class="w-full">
 
@@ -107,6 +107,7 @@
     </div>
 
 @endsection
+
 
 
 

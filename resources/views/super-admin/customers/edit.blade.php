@@ -28,7 +28,7 @@
 
                 <select id="client-select" name="user_id" class="mt-1 w-full">
 
-                    <option value="">BaÄŸlı deÄŸil</option>
+                    <option value="">Bağlı değil</option>
 
                     @foreach($clients as $client)
 
@@ -415,6 +415,7 @@
 </script>
 
 @endpush
+
 
 
 

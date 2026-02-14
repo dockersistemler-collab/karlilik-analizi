@@ -15,19 +15,19 @@ class SubUserController extends Controller
 {
         private const PERMISSIONS = [
         'dashboard' => 'Panel',
-        'products' => 'Ãœrünler',
-        'orders' => 'SipariÅŸler',
+        'products' => 'Ürünler',
+        'orders' => 'Siparişler',
         'customers' => 'Müşteriler',
         'reports' => 'Raporlar (Tümü)',
-        'reports.orders' => 'Raporlar: SipariÅŸ ve Ciro',
-        'reports.top_products' => 'Raporlar: Ã‡ok Satan Ãœrünler',
-        'reports.sold_products' => 'Raporlar: Satılan Ãœrün Listesi',
-        'reports.category_sales' => 'Raporlar: Kategori Bazlı SatıÅŸ',
-        'reports.brand_sales' => 'Raporlar: Marka Bazlı SatıÅŸ',
+        'reports.orders' => 'Raporlar: Sipariş ve Ciro',
+        'reports.top_products' => 'Raporlar: Çok Satan Ürünler',
+        'reports.sold_products' => 'Raporlar: Satılan Ürün Listesi',
+        'reports.category_sales' => 'Raporlar: Kategori Bazlı Satış',
+        'reports.brand_sales' => 'Raporlar: Marka Bazlı Satış',
         'reports.vat' => 'Raporlar: KDV Raporu',
         'reports.commission' => 'Raporlar: Komisyon Raporu',
-        'reports.stock_value' => 'Raporlar: Stoktaki Ãœrün Tutarları',
-        'reports.profitability' => 'Raporlar: SipariÅŸ KÃ¢rlÄ±lÄ±k Analizi',
+        'reports.stock_value' => 'Raporlar: Stoktaki Ürün Tutarları',
+        'reports.profitability' => 'Raporlar: Sipariş Kârlılık Analizi',
         'integrations' => 'Entegrasyonlar',
         'addons' => 'Ek Modüller',
         'subscription' => 'Paketim',
@@ -95,7 +95,7 @@ class SubUserController extends Controller
         }
 
         return redirect()->route('portal.sub-users.index')
-            ->with('success', 'Alt kullanıcı oluÅŸturuldu.');
+            ->with('success', 'Alt kullanıcı oluşturuldu.');
     }
 
     public function edit(Request $request, SubUser $subUser): View
@@ -172,6 +172,7 @@ class SubUserController extends Controller
         }
     }
 }
+
 
 
 

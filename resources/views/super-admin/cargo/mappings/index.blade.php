@@ -34,7 +34,7 @@
 
                     <select name="provider_key">
 
-                        <option value="">SaÄŸlayıcı</option>
+                        <option value="">Sağlayıcı</option>
 
                         @foreach($providers as $key => $meta)
 
@@ -179,6 +179,7 @@
     </div>
 
 @endsection
+
 
 
 

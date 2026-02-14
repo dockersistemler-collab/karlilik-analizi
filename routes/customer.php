@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SubscriptionController;
@@ -35,6 +35,10 @@ use App\Http\Controllers\Admin\NotificationSuppressionController as AdminNotific
 use App\Http\Controllers\Admin\IntegrationHealthController as AdminIntegrationHealthController;
 use App\Http\Controllers\Admin\IncidentController as AdminIncidentController;
 use App\Http\Controllers\Admin\BillingController as AdminBillingController;
+use App\Http\Controllers\Admin\InventoryMappingController;
+use App\Http\Controllers\Admin\InventoryMovementController;
+use App\Http\Controllers\Admin\InventoryProductController;
+use App\Http\Controllers\Admin\InventoryUserController;
 use App\Http\Controllers\Customer\TicketController as CustomerTicketController;
 use App\Http\Controllers\SubUser\PasswordController as SubUserPasswordController;
 use App\Http\Controllers\Admin\System\MailLogController as AdminMailLogController;
@@ -113,6 +117,27 @@ Route::middleware(['client_or_subuser', 'verified', 'subscription', 'subuser.per
         });
 
         Route::resource('products', ProductController::class);
+        Route::prefix('admin/inventory')
+            ->name('inventory.admin.')
+            ->middleware('module:feature.inventory,404')
+            ->group(function () {
+                Route::get('products', [InventoryProductController::class, 'index'])->name('products.index');
+                Route::get('products/{product}/edit', [InventoryProductController::class, 'edit'])->name('products.edit');
+                Route::put('products/{product}', [InventoryProductController::class, 'update'])->name('products.update');
+                Route::post('sync-marketplace', [InventoryProductController::class, 'syncMarketplace'])->name('sync-marketplace');
+                Route::post('assign-marketplace', [InventoryProductController::class, 'assignMarketplace'])->name('assign-marketplace');
+                Route::get('movements', [InventoryMovementController::class, 'index'])->name('movements.index');
+                Route::get('mappings', [InventoryMappingController::class, 'index'])->name('mappings.index');
+                Route::post('mappings', [InventoryMappingController::class, 'store'])->name('mappings.store');
+                Route::put('mappings/{listing}', [InventoryMappingController::class, 'update'])->name('mappings.update');
+                Route::delete('mappings/{listing}', [InventoryMappingController::class, 'destroy'])->name('mappings.destroy');
+            });
+        Route::prefix('user/inventory')
+            ->name('inventory.user.')
+            ->middleware('module:feature.inventory,404')
+            ->group(function () {
+                Route::get('products', [InventoryUserController::class, 'index'])->name('products.index');
+            });
         Route::post('products/{product}/quick-update', [ProductController::class, 'quickUpdate'])
             ->name('products.quick-update');
         Route::resource('categories', AdminCategoryController::class)->except(['show']);

@@ -102,7 +102,7 @@
 
             <p class="text-xs text-slate-500">Fatura Bilgileri</p>
 
-            <p class="text-sm text-slate-800">{{ $invoice->billing_name ?? 'â€”' }}</p>
+            <p class="text-sm text-slate-800">{{ $invoice->billing_name ?? '-' }}</p>
 
             <p class="text-sm text-slate-600">{{ $invoice->billing_email ?? '' }}</p>
 

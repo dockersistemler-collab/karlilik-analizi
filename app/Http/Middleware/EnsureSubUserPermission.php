@@ -36,6 +36,8 @@ class EnsureSubUserPermission
         'portal.tickets.' => 'tickets',
         'portal.invoices.' => 'invoices',
         'portal.notification-hub.' => 'settings',
+        'portal.inventory.admin.' => 'products',
+        'portal.inventory.user.' => 'products',
     ];
 
     public function handle(Request $request, Closure $next): Response

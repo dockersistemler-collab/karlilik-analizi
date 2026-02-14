@@ -143,8 +143,9 @@ $newSubscription = Subscription::create([
         }
 
         return redirect()->route('super-admin.users.index')
-            ->with('success', 'Kullanıcı baÅŸarıyla güncellendi.');
+            ->with('success', 'Kullanıcı başarıyla güncellendi.');
     }
 }
+
 
 

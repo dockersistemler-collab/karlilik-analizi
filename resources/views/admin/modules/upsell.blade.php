@@ -94,7 +94,7 @@
 
                                 <button type="submit" class="btn btn-solid-accent">
 
-                                    Ã–deme BaÅŸlat
+                                    Ödeme Başlat
 
                                 </button>
 
@@ -153,6 +153,7 @@
     </div>
 
 @endsection
+
 
 
 

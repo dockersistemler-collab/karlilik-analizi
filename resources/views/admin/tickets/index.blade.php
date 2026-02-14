@@ -38,7 +38,7 @@
 
                     <p class="text-sm text-slate-600 mt-2 max-w-2xl">
 
-                        Taleplerini buradan takip edebilir, yanıtları tek bir akıÅŸta görebilirsin.
+                        Taleplerini buradan takip edebilir, yanıtları tek bir akışta görebilirsin.
 
                     </p>
 
@@ -50,7 +50,7 @@
 
                         <i class="fa-regular fa-life-ring"></i>
 
-                        Destek Talebi OluÅŸtur
+                        Destek Talebi Oluştur
 
                     </a>
 
@@ -72,7 +72,7 @@
 
                 <div class="rounded-xl border border-rose-200/70 bg-rose-50/60 p-4">
 
-                    <p class="text-xs uppercase tracking-[0.22em] text-slate-500">1. Talep OluÅŸtur</p>
+                    <p class="text-xs uppercase tracking-[0.22em] text-slate-500">1. Talep Oluştur</p>
 
                     <p class="text-sm text-slate-700 mt-2">Konu, öncelik ve mesajını yaz. Gerekirse dosya ekle.</p>
 
@@ -88,9 +88,9 @@
 
                 <div class="rounded-xl border border-emerald-200/70 bg-emerald-50/60 p-4">
 
-                    <p class="text-xs uppercase tracking-[0.22em] text-slate-500">3. Ã‡özüm</p>
+                    <p class="text-xs uppercase tracking-[0.22em] text-slate-500">3. Çözüm</p>
 
-                    <p class="text-sm text-slate-700 mt-2">Ã‡özülen talepler kapanır ve geçmiÅŸte saklanır.</p>
+                    <p class="text-sm text-slate-700 mt-2">Çözülen talepler kapanır ve geçmişte saklanır.</p>
 
                 </div>
 
@@ -126,7 +126,7 @@
 
                 <option value="waiting_customer" @selected(($filters['status'] ?? '') === 'waiting_customer')>Müşteri Bekleniyor</option>
 
-                <option value="resolved" @selected(($filters['status'] ?? '') === 'resolved')>Ã‡özüldü</option>
+                <option value="resolved" @selected(($filters['status'] ?? '') === 'resolved')>Çözüldü</option>
 
                 <option value="closed" @selected(($filters['status'] ?? '') === 'closed')>Kapatıldı</option>
 
@@ -172,7 +172,7 @@
 
                     <th class="px-4 py-3 text-left">Konu</th>
 
-                    <th class="px-4 py-3 text-left">Ã–ncelik</th>
+                    <th class="px-4 py-3 text-left">Öncelik</th>
 
                     <th class="px-4 py-3 text-left">Durum</th>
 
@@ -277,6 +277,7 @@
     </div>
 
 @endsection
+
 
 
 

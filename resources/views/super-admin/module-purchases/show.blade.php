@@ -98,7 +98,7 @@
 
                         {{ $modulePurchase->starts_at?->format('Y-m-d H:i') ?? '-' }}
 
-                        â†’
+                        ->
 
                         {{ $modulePurchase->ends_at?->format('Y-m-d H:i') ?? '-' }}
 
@@ -130,7 +130,7 @@
 
             <div class="text-lg font-semibold text-slate-900">İşlemler</div>
 
-            <p class="text-sm text-slate-500 mt-1">Durumu güncellemek entitlementâ€™ı otomatik aç/kapatır.</p>
+            <p class="text-sm text-slate-500 mt-1">Durumu güncellemek entitlement'ı otomatik aç/kapatır.</p>
 
 
 

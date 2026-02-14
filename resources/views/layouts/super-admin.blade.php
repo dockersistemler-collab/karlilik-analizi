@@ -786,7 +786,7 @@
 
                     <i class="fa-solid fa-gauge-high w-6"></i>
 
-                    <span class="sidebar-label">Genel Ã–zet</span>
+                    <span class="sidebar-label">Genel Özet</span>
 
                 </a>
 
@@ -1058,7 +1058,7 @@
 
                                 <i class="fa-solid fa-key"></i>
 
-                                Şifre DeÄŸiÅŸtirme
+                                Şifre Değiştirme
 
                             </a>
 
@@ -1243,6 +1243,7 @@
 </body>
 
 </html>
+
 
 
 

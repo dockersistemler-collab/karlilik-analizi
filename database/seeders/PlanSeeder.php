@@ -43,6 +43,7 @@ class PlanSeeder extends Seeder
                     ],
                     'modules' => [
                         'feature.tickets',
+                        'feature.inventory',
                     ],
                 ],
                 'is_active' => true,
@@ -84,6 +85,7 @@ class PlanSeeder extends Seeder
                         'feature.tickets',
                         'feature.quick_actions',
                         'feature.cargo_tracking',
+                        'feature.inventory',
                     ],
                 ],
                 'is_active' => true,
@@ -130,6 +132,7 @@ class PlanSeeder extends Seeder
                         'feature.quick_actions',
                         'feature.cargo_tracking',
                         'feature.cargo_webhooks',
+                        'feature.inventory',
                         'integration.cargo.trendyol_express',
                         'integration.cargo.aras',
                         'integration.cargo.yurtici',

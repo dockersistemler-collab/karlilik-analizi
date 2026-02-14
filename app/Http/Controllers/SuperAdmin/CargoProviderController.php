@@ -39,7 +39,7 @@ $moduleCode = "integration.cargo.{$providerKey}";
             $module = Module::query()->create([
                 'code' => $moduleCode,
                 'name' => ($providers[$providerKey]['label'] ?? $providerKey).' Entegrasyonu',
-                'description' => 'Kargo saÄŸlayıcı entegrasyonu.',
+                'description' => 'Kargo sağlayıcı entegrasyonu.',
                 'type' => 'integration',
                 'billing_type' => 'recurring',
                 'is_active' => true,
@@ -50,8 +50,9 @@ $moduleCode = "integration.cargo.{$providerKey}";
             $module->save();
         }
 
-        return back()->with('success', 'SaÄŸlayıcı durumu güncellendi.');
+        return back()->with('success', 'Sağlayıcı durumu güncellendi.');
     }
 }
+
 
 

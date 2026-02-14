@@ -120,7 +120,7 @@
 
                         <input type="radio" name="customer_type" value="corporate" class="rounded" @checked(old('customer_type', 'individual') === 'corporate')>
 
-                        <span>Tüzel KiÅŸi</span>
+                        <span>Tüzel Kişi</span>
 
                     </label>
 
@@ -128,7 +128,7 @@
 
                         <input type="radio" name="customer_type" value="individual" class="rounded" @checked(old('customer_type', 'individual') === 'individual')>
 
-                        <span>Gerçek KiÅŸi</span>
+                        <span>Gerçek Kişi</span>
 
                     </label>
 
@@ -138,7 +138,7 @@
 
                     <div id="company-title-field" class="md:col-span-2">
 
-                        <label class="block text-sm font-medium text-slate-700">Firma Ãœnvanı</label>
+                        <label class="block text-sm font-medium text-slate-700">Firma Ünvanı</label>
 
                         <input name="company_title" type="text" class="mt-1 w-full" value="{{ old('company_title') }}">
 
@@ -333,6 +333,7 @@
 </script>
 
 @endpush
+
 
 
 

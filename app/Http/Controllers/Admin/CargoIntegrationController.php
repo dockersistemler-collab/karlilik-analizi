@@ -53,7 +53,7 @@ class CargoIntegrationController extends Controller
 
         $providers = (array) config('cargo_providers.providers', []);
         if (!array_key_exists($providerKey, $providers)) {
-            throw ValidationException::withMessages(['provider' => 'SaÄŸlayıcı bulunamadı.']);
+            throw ValidationException::withMessages(['provider' => 'Sağlayıcı bulunamadı.']);
         }
 
         if (!$entitlements->hasModule($user, 'feature.cargo_tracking')) {
@@ -61,7 +61,7 @@ class CargoIntegrationController extends Controller
         }
 $moduleCode = "integration.cargo.{$providerKey}";
         if (!$entitlements->hasModule($user, $moduleCode)) {
-            return back()->withErrors(['provider' => 'Bu saÄŸlayıcı için lisansınız yok.']);
+            return back()->withErrors(['provider' => 'Bu sağlayıcı için lisansınız yok.']);
         }
 $provider = $providers[$providerKey];
         $credentialsMeta = is_array($provider['credentials'] ?? null) ? $provider['credentials'] : [];
@@ -94,7 +94,7 @@ $credentials[$key] = $validated[$key] ?? null;
             ]
         );
 
-        return back()->with('success', 'Kargo saÄŸlayıcı ayarları güncellendi.');
+        return back()->with('success', 'Kargo sağlayıcı ayarları güncellendi.');
     }
 
     public function test(Request $request, string $providerKey, CargoProviderManager $manager): RedirectResponse
@@ -122,13 +122,14 @@ $installation = CargoProviderInstallation::query()
         }
 
         if ($result->success) {
-            return back()->with('success', 'BaÄŸlantı testi baÅŸarılı.');
+            return back()->with('success', 'Bağlantı testi başarılı.');
         }
 
-        return back()->with('error', 'BaÄŸlantı testi baÅŸarısız.');
+        return back()->with('error', 'Bağlantı testi başarısız.');
     }
 
 }
+
 
 
 

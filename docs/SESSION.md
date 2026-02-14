@@ -1,6 +1,84 @@
 ﻿# Session Memory
 
-**Last updated:** 2026-02-08
+**Last updated:** 2026-02-14
+
+## Current Work (2026-02-14)
+- Goal: Add Inventory module integrated into existing Manageable Modules system.
+- Status: Inventory module + connector sub-modules added; admin/user routes and screens implemented; module-off now returns 404 on inventory routes.
+
+## Changes Made (2026-02-14)
+- Super Admin module management:
+  - Added module catalog seeds:
+    - `feature.inventory` (default disabled)
+    - `integration.inventory.trendyol`
+    - `integration.inventory.hepsiburada`
+    - `integration.inventory.n11`
+    - `integration.inventory.amazon`
+  - Added quick toggle action to `super-admin/modules` list.
+- Middleware and gating:
+  - Extended `EnsureModuleEnabled` with optional fail mode (`module:code,404`).
+  - Inventory routes now use 404 gating when module is disabled.
+  - Added sub-user permission route mapping for inventory routes.
+- Inventory data model:
+  - Added `products.critical_stock_level`.
+  - Added `stock_movements`, `marketplace_listings`, `stock_alerts` tables.
+  - Extended existing `marketplace_accounts` with inventory-compatible columns:
+    - `connector_key`, `credentials_json`, `is_active`, `last_sync_at`
+  - Added models: `StockMovement`, `MarketplaceListing`, `StockAlert`.
+- Inventory integration (stub):
+  - Added `ProductStockUpdated` event.
+  - Added `PushStockToMarketplacesJob` + listener (`QueueStockSync`).
+  - Added marketplace connector contract/factory and stub connectors:
+    - Trendyol, Hepsiburada, N11, Amazon.
+  - Job exits if inventory module is disabled; connector-specific module toggles are respected.
+- Admin/User inventory UI:
+  - Admin:
+    - `/admin/inventory/products` (list)
+    - `/admin/inventory/products/{id}/edit` (manual increase/decrease + movement + alert + event)
+    - `/admin/inventory/movements`
+    - `/admin/inventory/mappings` (create/delete + sync toggle)
+  - User (read-only):
+    - `/user/inventory/products`
+  - Sidebar now shows inventory links only when inventory module is enabled.
+- Tests:
+  - Added `InventoryModuleGateTest` (module-off => 404).
+  - Added `InventoryStockUpdateTest` (stock update => movement + critical alert + queue job).
+
+## Next Steps (2026-02-14)
+1) Run migrations and seeders on target env:
+   - `php artisan migrate`
+   - `php artisan db:seed --class=ModuleCatalogSeeder`
+2) Verify super-admin module toggles for inventory and connectors in UI.
+3) Optionally add edit form fields for listing updates in mappings screen (currently create/delete + quick sync toggle).
+
+## Current Work (2026-02-12)
+- Goal: Stabilize local run, fix encoding regressions, and clean admin sidebar/menu.
+- Status: Local app is running on port `8200`; critical PHP fatal (namespace/BOM) fixed; duplicate invoice menu item removed.
+
+## Changes Made (2026-02-12)
+- Local dev/runtime:
+  - Standardized run target to port `8200`.
+  - Updated `.env` `APP_URL` to `http://pazar.test:8200`.
+  - Verified listener on `127.0.0.1:8200`.
+- Fatal error fix:
+  - Resolved `Namespace declaration statement has to be the very first statement` caused by BOM.
+  - Removed UTF-8 BOM from affected PHP/Blade files (38 files), including `app/Models/Marketplace.php`.
+- Encoding cleanup:
+  - Fixed widespread mojibake (`Ã/Å/Ä` style) in many UI and backend strings.
+  - Corrected key strings in orders/settings/sub-users/super-admin views and related controllers/tests.
+- Sidebar/menu cleanup:
+  - Unified invoice label to `Faturalar`.
+  - Removed duplicate `Faturalar` menu entry in `resources/views/layouts/admin.blade.php`.
+  - Identified route groups currently not exposed in sidebar (webhooks, incidents, notification hub, mail templates, e-invoice settings/docs, system mail logs).
+
+## Next Steps (2026-02-12)
+1) Validate remaining Turkish text across key pages in browser (`dashboard`, `orders`, `settings`, `sub-users`, `super-admin` panels).
+2) Decide which hidden route groups should be added to sidebar and under which section.
+3) Keep `orders` row styling untouched (per user request).
+
+## Notes (2026-02-12)
+- Active run URL: `http://app.pazar.test:8200` (and root domain on `:8200`).
+- User instruction: do not modify `orders` row edge/oval styling again.
 
 ## Current Work (2026-02-06)
 - Goal: Local dev run for project viewing on subdomains.

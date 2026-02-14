@@ -89,9 +89,15 @@
                             </td>
 
                             <td class="py-3 pr-4 text-right">
-
-                                <a class="btn btn-outline" href="{{ route('super-admin.modules.edit', $module) }}">Düzenle</a>
-
+                                <div class="inline-flex items-center gap-2">
+                                    <form method="POST" action="{{ route('super-admin.modules.toggle', $module) }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline">
+                                            {{ $module->is_active ? 'Pasif Yap' : 'Aktif Et' }}
+                                        </button>
+                                    </form>
+                                    <a class="btn btn-outline" href="{{ route('super-admin.modules.edit', $module) }}">Düzenle</a>
+                                </div>
                             </td>
 
                         </tr>

@@ -13,19 +13,27 @@ class MarketplaceAccount extends Model
     protected $fillable = [
         'tenant_id',
         'marketplace',
+        'connector_key',
         'store_name',
         'credentials',
+        'credentials_json',
         'status',
+        'is_active',
         'last_synced_at',
+        'last_sync_at',
     ];
 
     protected $casts = [
         'credentials' => 'encrypted:array',
+        'credentials_json' => 'encrypted:array',
+        'is_active' => 'boolean',
         'last_synced_at' => 'datetime',
+        'last_sync_at' => 'datetime',
     ];
 
     protected $hidden = [
         'credentials',
+        'credentials_json',
     ];
 
     public function tenant()
@@ -36,5 +44,10 @@ class MarketplaceAccount extends Model
     public function scopeForTenant(Builder $query, int $tenantId): Builder
     {
         return $query->where('tenant_id', $tenantId);
+    }
+
+    public function listings()
+    {
+        return $this->hasMany(MarketplaceListing::class);
     }
 }

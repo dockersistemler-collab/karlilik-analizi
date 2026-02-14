@@ -145,5 +145,12 @@ $meta = $decoded;
 
         return back()->with('success', 'Modül ataması kaldırıldı.');
     }
+    public function toggle(Module $module): RedirectResponse
+    {
+        $module->is_active = !$module->is_active;
+        $module->save();
+
+        return back()->with('success', 'ModÃ¼l durumu gÃ¼ncellendi.');
+    }
 }
 

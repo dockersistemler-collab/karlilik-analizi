@@ -110,7 +110,7 @@
 
                     <div class="text-sm font-semibold text-slate-800">Cargo Health</div>
 
-                    <div class="text-xs text-slate-500">Entegrasyon saÄŸlık durumu</div>
+                    <div class="text-xs text-slate-500">Entegrasyon sağlık durumu</div>
 
                 </div>
 
@@ -139,6 +139,7 @@
     </div>
 
 @endsection
+
 
 
 

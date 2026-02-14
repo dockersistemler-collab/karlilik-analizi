@@ -23,6 +23,7 @@ class Product extends Model
         'price',
         'cost_price',
         'stock_quantity',
+        'critical_stock_level',
         'currency',
         'weight',
         'desi',
@@ -68,6 +69,7 @@ class Product extends Model
         'weight' => 'decimal:2',
         'desi' => 'decimal:2',
         'vat_rate' => 'integer',
+        'critical_stock_level' => 'integer',
     ];
 
     // İlişkiler
@@ -91,6 +93,21 @@ class Product extends Model
         return $this->belongsToMany(Marketplace::class, 'marketplace_products')
             ->withPivot('marketplace_product_id', 'price', 'stock_quantity', 'status')
             ->withTimestamps();
+    }
+
+    public function stockMovements()
+    {
+        return $this->hasMany(StockMovement::class);
+    }
+
+    public function stockAlerts()
+    {
+        return $this->hasMany(StockAlert::class);
+    }
+
+    public function marketplaceListings()
+    {
+        return $this->hasMany(MarketplaceListing::class);
     }
 }
 

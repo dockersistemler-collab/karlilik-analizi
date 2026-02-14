@@ -90,8 +90,8 @@ $banner->delete();
     private function placements(): array
     {
         return [
-            'admin_header' => 'Müşteri Paneli Ãœst Bar',
-            'public_header' => 'Public Site Ãœst Bar',
+            'admin_header' => 'Müşteri Paneli Üst Bar',
+            'public_header' => 'Public Site Üst Bar',
         ];
     }
 
@@ -114,5 +114,6 @@ $banner->delete();
         ]);
     }
 }
+
 
 

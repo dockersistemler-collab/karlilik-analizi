@@ -217,7 +217,7 @@
                         ['Hepsiburada', 56, 'bg-orange-400'],
                         ['N11', 85, 'bg-violet-300'],
                         ['Çiçek Sepeti', 45, 'bg-emerald-200'],
-                        ['Amazon', 35, 'bg-slate-900 text-white'],
+                        ['Amazon', 35, 'bg-sky-400 text-slate-900'],
                     ] as $row)
                         <div class="flex items-center gap-3 text-xs">
                             <div class="w-24 font-semibold text-slate-800 truncate">{{ $row[0] }}</div>
@@ -234,7 +234,8 @@
             </div>
         </div>
 
-            <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col lg:col-span-2">
+        <div class="mt-6 flex flex-col lg:flex-row gap-4">
+            <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col w-full lg:w-[65%]">
                 <div class="flex flex-col gap-3">
                     <div class="flex items-center justify-between">
                         <h2 class="text-xl font-semibold text-slate-900 whitespace-nowrap">Türkiye Sipariş Dağılımı</h2>
@@ -268,6 +269,35 @@
                     <div id="turkey-map-customer" class="h-full w-full"></div>
                 </div>
             </div>
+            <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col w-full lg:w-[35%]">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-base font-semibold text-slate-900">Dağılım Tablosu</h3>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-2 text-[11px]">
+                    <button type="button" data-range="day" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">Günlük</button>
+                    <button type="button" data-range="week" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">Haftalık</button>
+                    <button type="button" data-range="month" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">Aylık</button>
+                    <button type="button" data-range="quarter" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">3 Aylık</button>
+                    <button type="button" data-range="half" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">6 Aylık</button>
+                    <button type="button" data-range="year" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">Yıllık</button>
+                </div>
+                <div class="mt-3">
+                    <input id="map-table-search-customer" type="text" placeholder="İl ara..." class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-200">
+                </div>
+                <div class="mt-3">
+                    <div class="max-h-[420px] overflow-auto pr-1">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="text-left text-slate-500">
+                                    <th class="pb-2">Şehir</th>
+                                    <th class="pb-2 text-right">Adet</th>
+                                </tr>
+                            </thead>
+                            <tbody id="map-table-body-customer" class="text-slate-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
@@ -292,8 +322,10 @@
             #turkey-map-customer .leaflet-interactive {
                 transform-origin: center center;
             }
+            #turkey-map-customer,
+            #turkey-map-customer.leaflet-container,
             #turkey-map-customer .leaflet-container {
-                background: transparent;
+                background: transparent !important;
             }
             #turkey-map-customer .leaflet-tooltip {
                 background: transparent;
@@ -309,7 +341,7 @@
                 min-width: 40px;
             }
             #turkey-map-customer .map-name {
-                font-size: 10px;
+                font-size: 11px;
                 font-weight: 700;
                 color: #1f2937;
                 line-height: 1.1;
@@ -317,7 +349,7 @@
                 text-shadow: 0 1px 0 rgba(255,255,255,0.8);
             }
             #turkey-map-customer .map-count {
-                font-size: 9px;
+                font-size: 11px;
                 font-weight: 700;
                 color: #f97316;
                 line-height: 1;
@@ -374,9 +406,14 @@
         let netKarRangeCustomer = 'day';
         let netKarMetaCustomer = { range: 'day', start: null, end: null };
         let selectedPlatformCustomer = 'all';
-        let mapRangeCustomer = 'week';
+        let mapRangeCustomer = 'day';
+        let mapTableRangeCustomer = 'day';
         let mapInstanceCustomer = null;
         let mapLayerCustomer = null;
+        let activeMapPopupCustomer = null;
+        let activeMapLayerCustomer = null;
+        let mapDataCustomer = null;
+        let tableDataCustomer = null;
 
         const formatNumber = (value) => Number(value || 0).toLocaleString('tr-TR');
         const formatCurrency = (value) => `${formatNumber(value)} TL`;
@@ -667,18 +704,13 @@ scales: {
                     mapLayerCustomer = L.geoJSON(geojson, {
                         style: () => ({
                             fillColor: '#f1f5f9',
-                            color: '#ffffff',
+                            color: '#cbd5e1',
                             weight: 1,
                             fillOpacity: 0.5,
                         }),
                         onEachFeature: (feature, layer) => {
                             const name = feature.properties?.name || 'Bilinmeyen';
-                            const tooltipContent = `<div class="map-tooltip"><span class="map-name">${name}</span><span class="map-count">0 adet</span></div>`;
-                            layer.bindTooltip(tooltipContent, {
-                                permanent: true,
-                                direction: 'center',
-                                className: 'map-label-wrapper',
-                                });
+                            setLayerLabelCustomer(layer, name, 0);
                         },
                     }).addTo(mapInstanceCustomer);
 
@@ -686,11 +718,77 @@ scales: {
                     mapInstanceCustomer.fitBounds(bounds, { padding: [0, 0] });
                     mapInstanceCustomer.setZoom(mapInstanceCustomer.getZoom() + 0.7);
                     setTimeout(() => mapInstanceCustomer.invalidateSize(), 0);
+
+                    if (mapDataCustomer) {
+                        updateMapCustomer(mapDataCustomer);
+                    }
+                    if (tableDataCustomer || mapDataCustomer) {
+                        renderTableCustomer(tableDataCustomer ?? mapDataCustomer ?? {});
+                    }
+                });
+        };
+
+        const setLayerLabelCustomer = (layer, name, value) => {
+            const tooltipContent = `<div class="map-tooltip"><span class="map-name">${name}</span><span class="map-count">${value} adet</span></div>`;
+            if (layer.getTooltip()) {
+                layer.setTooltipContent(tooltipContent);
+            } else {
+                layer.bindTooltip(tooltipContent, {
+                    permanent: true,
+                    direction: 'center',
+                    className: 'map-label-wrapper',
+                });
+            }
+
+            if (layer.getBounds && layer.getTooltip()) {
+                const center = layer.getBounds().getCenter();
+                layer.getTooltip().setLatLng(center);
+            }
+        };
+
+        const renderTableCustomer = (mapData) => {
+            if (!mapLayerCustomer) return;
+            const tableBody = document.getElementById('map-table-body-customer');
+            if (!tableBody) return;
+
+            const searchInput = document.getElementById('map-table-search-customer');
+            const searchTerm = searchInput?.value?.trim().toLowerCase() ?? '';
+            const tableRows = [];
+
+            mapLayerCustomer.eachLayer((layer) => {
+                const name = layer.feature?.properties?.name || '';
+                const key = normalizeMapKeyCustomer(name);
+                const value = mapData?.[key] ?? 0;
+                tableRows.push({ name, value });
+            });
+
+            tableBody.innerHTML = '';
+            tableRows
+                .sort((a, b) => b.value - a.value || a.name.localeCompare(b.name, 'tr'))
+                .filter((row) => (searchTerm ? row.name.toLowerCase().includes(searchTerm) : true))
+                .forEach((row) => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-slate-100 last:border-0';
+
+                    const nameTd = document.createElement('td');
+                    nameTd.className = 'py-2 font-semibold';
+                    nameTd.textContent = row.name;
+
+                    const valueTd = document.createElement('td');
+                    valueTd.className = 'py-2 text-right font-semibold text-slate-900';
+                    valueTd.textContent = row.value.toLocaleString('tr-TR');
+
+                    tr.appendChild(nameTd);
+                    tr.appendChild(valueTd);
+                    tableBody.appendChild(tr);
                 });
         };
 
         const updateMapCustomer = (mapData) => {
-            if (!mapLayerCustomer) return;
+            if (!mapLayerCustomer) {
+                mapDataCustomer = mapData;
+                return;
+            }
             const values = Object.values(mapData || {});
             const maxValue = Math.max(...values, 1);
 
@@ -703,24 +801,74 @@ scales: {
                     fillColor: value ? `hsl(26, 72%, ${lightness}%)` : '#f1f5f9',
                     fillOpacity: value ? 0.82 : 0.4,
                 });
-                const tooltipContent = `<div class="map-tooltip"><span class="map-name">${name}</span><span class="map-count">${value} adet</span></div>`;
-                layer.bindTooltip(tooltipContent, {
-                    permanent: true,
-                    direction: 'center',
-                    className: 'map-label-wrapper',
-                });
+                setLayerLabelCustomer(layer, name, value);
 
                 layer.on('mouseover', () => {
                     layer.setStyle({ weight: 2.5, color: '#f97316' });
                 });
                 layer.on('mouseout', () => {
-                    layer.setStyle({ weight: 1, color: '#ffffff' });
+                    if (activeMapLayerCustomer === layer) return;
+                    layer.setStyle({ weight: 1, color: '#cbd5e1' });
+                });
+
+                layer.off('click').on('click', (event) => {
+                    if (!mapInstanceCustomer) return;
+                    if (activeMapLayerCustomer === layer) {
+                        if (activeMapPopupCustomer) {
+                            mapInstanceCustomer.closePopup(activeMapPopupCustomer);
+                            activeMapPopupCustomer = null;
+                        }
+                        activeMapLayerCustomer = null;
+                        layer.setStyle({ weight: 1, color: '#cbd5e1' });
+                        return;
+                    }
+
+                    if (activeMapLayerCustomer) {
+                        activeMapLayerCustomer.setStyle({ weight: 1, color: '#cbd5e1' });
+                    }
+
+                    activeMapLayerCustomer = layer;
+                    layer.setStyle({ weight: 3.2, color: '#334155' });
+
+                    const popupContent = `<div class="map-tooltip"><span class="map-name">${name}</span><span class="map-count">${value} adet</span></div>`;
+                    if (activeMapPopupCustomer) {
+                        mapInstanceCustomer.closePopup(activeMapPopupCustomer);
+                    }
+                    activeMapPopupCustomer = L.popup({
+                        closeButton: true,
+                        autoClose: true,
+                        closeOnClick: true,
+                        className: 'map-popup'
+                    })
+                        .setLatLng(event.latlng)
+                        .setContent(popupContent)
+                        .openOn(mapInstanceCustomer);
                 });
             });
         };
 
         function setActiveMapPillCustomer(range) {
             document.querySelectorAll('.map-range-pill').forEach((pill) => {
+                if (pill.dataset.range === range) {
+                    pill.classList.add('is-active');
+                    pill.classList.add('text-white');
+                    pill.style.backgroundColor = '#fca5a5';
+                    pill.style.borderColor = '#f87171';
+                    pill.style.color = '#111827';
+                    pill.style.boxShadow = '0 2px 8px rgba(248,113,113,0.35)';
+                } else {
+                    pill.classList.remove('is-active');
+                    pill.classList.remove('text-white');
+                    pill.style.backgroundColor = '';
+                    pill.style.borderColor = '';
+                    pill.style.color = '';
+                    pill.style.boxShadow = '';
+                }
+            });
+        }
+
+        function setActiveMapTablePillCustomer(range) {
+            document.querySelectorAll('.map-table-range-pill').forEach((pill) => {
                 if (pill.dataset.range === range) {
                     pill.classList.add('is-active');
                     pill.classList.add('text-white');
@@ -764,8 +912,27 @@ scales: {
                 const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
                 if (!res.ok) return;
                 const data = await res.json();
-                updateMapCustomer(data.map || {});
+                mapDataCustomer = data.map || {};
+                updateMapCustomer(mapDataCustomer);
                 setActiveMapPillCustomer(range);
+                if (!tableDataCustomer) {
+                    tableDataCustomer = mapDataCustomer;
+                    renderTableCustomer(tableDataCustomer);
+                }
+            } catch (error) {
+                // no-op
+            }
+        };
+
+        const fetchMapTableCustomer = async (range = mapTableRangeCustomer) => {
+            try {
+                const url = `${mapEndpointCustomer}?range=${encodeURIComponent(range)}`;
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                if (!res.ok) return;
+                const data = await res.json();
+                tableDataCustomer = data.map || {};
+                setActiveMapTablePillCustomer(range);
+                renderTableCustomer(tableDataCustomer);
             } catch (error) {
                 // no-op
             }
@@ -774,7 +941,9 @@ scales: {
         initMapCustomer();
         if (mapEndpointCustomer) {
             setActiveMapPillCustomer(mapRangeCustomer);
+            setActiveMapTablePillCustomer(mapTableRangeCustomer);
             fetchMapCustomer();
+            fetchMapTableCustomer(mapTableRangeCustomer);
             setInterval(fetchMapCustomer, 60000);
         }
 
@@ -810,6 +979,20 @@ scales: {
                 fetchMapCustomer(mapRangeCustomer);
             });
         });
+
+        document.querySelectorAll('.map-table-range-pill').forEach((pill) => {
+            pill.addEventListener('click', () => {
+                mapTableRangeCustomer = pill.dataset.range;
+                fetchMapTableCustomer(mapTableRangeCustomer);
+            });
+        });
+
+        const mapTableSearchCustomer = document.getElementById('map-table-search-customer');
+        if (mapTableSearchCustomer) {
+            mapTableSearchCustomer.addEventListener('input', () => {
+                renderTableCustomer(tableDataCustomer ?? mapDataCustomer);
+            });
+        }
 
         document.querySelectorAll('.net-kar-range-pill').forEach((pill) => {
             pill.addEventListener('click', () => {

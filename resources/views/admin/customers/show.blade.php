@@ -28,7 +28,7 @@
 
             <div class="text-sm text-slate-600">
 
-                Tür: {{ $customer->customer_type === 'corporate' ? 'Tüzel KiÅŸi' : 'Gerçek KiÅŸi' }}
+                Tür: {{ $customer->customer_type === 'corporate' ? 'Tüzel Kişi' : 'Gerçek Kişi' }}
 
             </div>
 
@@ -42,7 +42,7 @@
 
                 <div class="panel-card p-4">
 
-                    <p class="text-xs uppercase text-slate-400">Firma Ãœnvanı</p>
+                    <p class="text-xs uppercase text-slate-400">Firma Ünvanı</p>
 
                     <p class="text-sm font-semibold text-slate-800 mt-1">{{ $customer->company_title ?? '-' }}</p>
 
@@ -153,6 +153,7 @@
     </div>
 
 @endsection
+
 
 
 

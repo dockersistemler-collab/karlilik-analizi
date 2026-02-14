@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Services\Entitlements\EntitlementService;
+use App\Services\Modules\ModuleGate;
 use App\Support\SupportUser;
 use Closure;
 use Illuminate\Http\Request;
@@ -11,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureModuleEnabled
 {
-    public function handle(Request $request, Closure $next, string $code): Response
+    public function handle(Request $request, Closure $next, string $code, string $onFail = 'redirect'): Response
     {
         $user = SupportUser::currentUser();
         $supportView = SupportUser::isEnabled();
@@ -19,43 +20,61 @@ class EnsureModuleEnabled
         if (!$user) {
             abort(401);
         }
-$code = $this->resolveDynamicCode($request, $code);
+
+        $code = $this->resolveDynamicCode($request, $code);
+        $failWith404 = strtolower(trim($onFail)) === '404';
 
         if ($user->isSuperAdmin() && !$supportView) {
             return $next($request);
         }
 
+        $moduleGate = app(ModuleGate::class);
+        $isModuleActive = $moduleGate->isActive($code);
+        if (!$isModuleActive && $failWith404) {
+            abort(404);
+        }
+
         if (!$user->getActivePlan()) {
             if ($request->expectsJson()) {
                 return response()->json([
-                    'message' => 'Bu iÅŸlemi yapmak için aktif bir paketiniz olmalı.',
+                    'message' => 'Bu islemi yapmak icin aktif bir paketiniz olmali.',
                     'error' => 'PLAN_REQUIRED',
                 ], 403);
             }
-$target = Route::has('portal.billing.plans')
+
+            if ($failWith404) {
+                abort(404);
+            }
+
+            $target = Route::has('portal.billing.plans')
                 ? route('portal.billing.plans')
                 : route('pricing');
 
             return redirect()
                 ->to($target)
-                ->with('warning', 'Bu iÅŸlemi yapmak için aktif bir paketiniz olmalı.');
+                ->with('warning', 'Bu islemi yapmak icin aktif bir paketiniz olmali.');
         }
-$allowed = app(EntitlementService::class)->hasModule($user, $code);
+
+        $allowed = $isModuleActive && app(EntitlementService::class)->hasModule($user, $code);
         if ($allowed) {
             return $next($request);
         }
 
         if ($request->expectsJson()) {
             return response()->json([
-                'message' => 'Bu modül hesabınız için aktif deÄŸil.',
+                'message' => 'Bu modul hesabiniz icin aktif degil.',
                 'error' => 'MODULE_NOT_ENABLED',
                 'module' => $code,
             ], 403);
         }
 
+        if ($failWith404) {
+            abort(404);
+        }
+
         return redirect()
             ->route('portal.modules.upsell', ['code' => $code])
-            ->with('info', 'Bu modül hesabınız için aktif deÄŸil.');
+            ->with('info', 'Bu modul hesabiniz icin aktif degil.');
     }
 
     private function resolveDynamicCode(Request $request, string $code): string
@@ -67,7 +86,8 @@ $allowed = app(EntitlementService::class)->hasModule($user, $code);
         if (!preg_match_all('/\{([^}]+)\}/', $code, $matches)) {
             return $code;
         }
-$allowed = [
+
+        $allowed = [
             'marketplace',
             'provider',
         ];
@@ -77,7 +97,8 @@ $allowed = [
                 abort(400, 'Invalid module placeholder.');
             }
         }
-$resolved = $code;
+
+        $resolved = $code;
         foreach ($matches[1] as $key) {
             $raw = $request->route($key);
             $value = data_get($raw, 'code');
@@ -87,19 +108,15 @@ $resolved = $code;
             if (!is_scalar($value)) {
                 abort(400, 'Invalid module placeholder value.');
             }
-$value = (string) $value;
+
+            $value = (string) $value;
             if (!preg_match('/^[a-z0-9_-]+$/i', $value)) {
                 abort(400, 'Invalid module placeholder value.');
             }
-$resolved = str_replace('{' . $key . '}', $value, $resolved);
+
+            $resolved = str_replace('{' . $key . '}', $value, $resolved);
         }
 
         return trim($resolved);
     }
 }
-
-
-
-
-
-

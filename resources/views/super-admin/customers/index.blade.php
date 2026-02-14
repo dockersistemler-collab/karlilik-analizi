@@ -60,7 +60,7 @@
 
                     <option value="">Tümü</option>
 
-                    <option value="none" @selected(($filters['user_id'] ?? '') === 'none')>BaÄŸlı deÄŸil</option>
+                    <option value="none" @selected(($filters['user_id'] ?? '') === 'none')>Bağlı değil</option>
 
                     @foreach($clients as $client)
 
@@ -175,6 +175,7 @@
     </div>
 
 @endsection
+
 
 
 

@@ -94,6 +94,8 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
         Route::resource('banners', SuperAdminBannerController::class)->except(['show']);
 
         Route::resource('modules', SuperAdminModuleController::class)->except(['show']);
+        Route::post('modules/{module}/toggle', [SuperAdminModuleController::class, 'toggle'])
+            ->name('modules.toggle');
         Route::post('modules/{module}/assign', [SuperAdminModuleController::class, 'assignToUser'])
             ->name('modules.assign');
         Route::post('user-modules/{userModule}/toggle', [SuperAdminModuleController::class, 'toggleUserModule'])

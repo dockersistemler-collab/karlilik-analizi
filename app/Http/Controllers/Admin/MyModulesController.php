@@ -106,13 +106,13 @@ $amount = (float) $amount;
 
             return redirect()
                 ->route($redirectRoute)
-                ->with('success', 'Ã–deme baÅŸarıyla tamamlandı (Fake Payments Mode).');
+                ->with('success', 'Ödeme başarıyla tamamlandı (Fake Payments Mode).');
         }
 
         if (!config('payments.iyzico_enabled')) {
             return redirect()
                 ->back()
-                ->with('error', 'Ã–deme altyapısı yapılandırılmamıÅŸ (Iyzico API bilgileri eksik).');
+                ->with('error', 'Ödeme altyapısı yapılandırılmamış (Iyzico API bilgileri eksik).');
         }
 $purchase = DB::transaction(function () use ($user, $module, $amount, $currency, $period) {
             return ModulePurchase::create([
@@ -217,7 +217,7 @@ $purchase = DB::transaction(function () use ($user, $module, $amount, $currency,
 
             return redirect()
                 ->route($redirectRoute)
-                ->with('error', 'Ã–deme baÅŸlatılamadı: '.$e->getMessage());
+                ->with('error', 'Ödeme başlatılamadı: '.$e->getMessage());
         }
 
         Log::info('iyzico.initialize.result', [
@@ -249,7 +249,7 @@ $purchase = DB::transaction(function () use ($user, $module, $amount, $currency,
 
             return redirect()
                 ->route($redirectRoute)
-                ->with('error', 'Ã–deme baÅŸlatılamadı: '.((string) ($result['errorMessage'] ?? 'Bilinmeyen hata')));
+                ->with('error', 'Ödeme başlatılamadı: '.((string) ($result['errorMessage'] ?? 'Bilinmeyen hata')));
         }
 
         return response()->view('admin.payments.iyzico-checkout', [
@@ -266,7 +266,7 @@ $purchase = DB::transaction(function () use ($user, $module, $amount, $currency,
     {
         $fullName = trim($fullName);
         if ($fullName === '') {
-            return ['MüÅŸteri', ''];
+            return ['Müşteri', ''];
         }
 $parts = preg_split('/\s+/', $fullName) ?: [];
         $first = (string) array_shift($parts);
@@ -274,5 +274,6 @@ $parts = preg_split('/\s+/', $fullName) ?: [];
         return [$first, $last !== '' ? $last : $first];
     }
 }
+
 
 

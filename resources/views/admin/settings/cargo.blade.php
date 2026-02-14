@@ -82,7 +82,7 @@
 
                         @else
 
-                            <div class="text-sm text-rose-600">Modül kataloÄŸu kaydı bulunamadı (feature.cargo_tracking).</div>
+                            <div class="text-sm text-rose-600">Modül kataloğu kaydı bulunamadı (feature.cargo_tracking).</div>
 
                         @endif
 
@@ -128,11 +128,11 @@
 
                             @if($canUse)
 
-                                <span class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">EriÅŸim Var</span>
+                                <span class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">Erişim Var</span>
 
                             @else
 
-                                <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-700">EriÅŸim Yok</span>
+                                <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-700">Erişim Yok</span>
 
                             @endif
 
@@ -146,7 +146,7 @@
 
                                 <div class="text-sm text-slate-700">
 
-                                    Bu saÄŸlayıcıyı kullanmak için ilgili modülü satın almanız gerekir.
+                                    Bu sağlayıcıyı kullanmak için ilgili modülü satın almanız gerekir.
 
                                 </div>
 
@@ -166,7 +166,7 @@
 
                                     @else
 
-                                        <div class="text-xs text-rose-600">Modül kataloÄŸu kaydı bulunamadı.</div>
+                                        <div class="text-xs text-rose-600">Modül kataloğu kaydı bulunamadı.</div>
 
                                     @endif
 
@@ -257,6 +257,7 @@
     </div>
 
 @endsection
+
 
 
 

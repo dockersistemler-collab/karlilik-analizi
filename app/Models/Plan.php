@@ -39,7 +39,7 @@ protected $fillable = [
         'yearly_price' => 'decimal:2',
     ];
 
-    // İliÅŸkiler
+    // İlişkiler
     public function subscriptions()
     {
         return $this->hasMany(Subscription::class);
@@ -136,5 +136,6 @@ $modules = array_values(array_unique(array_map('trim', $modules)));
     }
 
 }
+
 
 

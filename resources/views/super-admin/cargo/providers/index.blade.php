@@ -4,7 +4,7 @@
 
 @section('header')
 
-    Kargo SaÄŸlayıcıları
+    Kargo Sağlayıcıları
 
 @endsection
 
@@ -18,7 +18,7 @@
 
             <div class="text-sm text-slate-600">
 
-                SaÄŸlayıcı modül durumlarını buradan aktif/pasif edebilirsiniz.
+                Sağlayıcı modül durumlarını buradan aktif/pasif edebilirsiniz.
 
             </div>
 
@@ -32,7 +32,7 @@
 
                         <tr>
 
-                            <th class="py-2 pr-4">SaÄŸlayıcı</th>
+                            <th class="py-2 pr-4">Sağlayıcı</th>
 
                             <th class="py-2 pr-4">Module Code</th>
 
@@ -98,7 +98,7 @@
 
                             <tr>
 
-                                <td colspan="4" class="py-6 text-center text-slate-500">SaÄŸlayıcı bulunamadı.</td>
+                                <td colspan="4" class="py-6 text-center text-slate-500">Sağlayıcı bulunamadı.</td>
 
                             </tr>
 
@@ -115,6 +115,7 @@
     </div>
 
 @endsection
+
 
 
 
