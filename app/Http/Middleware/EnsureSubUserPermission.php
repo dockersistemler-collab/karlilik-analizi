@@ -24,6 +24,8 @@ class EnsureSubUserPermission
         'portal.reports.brand-sales' => 'reports.brand_sales',
         'portal.reports.vat' => 'reports.vat',
         'portal.reports.commission' => 'reports.commission',
+        'portal.commission-tariffs.' => 'reports.commission_tariffs',
+        'portal.campaigns.' => 'reports',
         'portal.reports.stock-value' => 'reports.stock_value',
         'portal.reports.order-profitability' => 'reports.profitability',
         'portal.profitability.' => 'reports.profitability',

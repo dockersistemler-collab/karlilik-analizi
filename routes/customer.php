@@ -39,6 +39,12 @@ use App\Http\Controllers\Admin\InventoryMappingController;
 use App\Http\Controllers\Admin\InventoryMovementController;
 use App\Http\Controllers\Admin\InventoryProductController;
 use App\Http\Controllers\Admin\InventoryUserController;
+use App\Http\Controllers\Admin\CommissionTariffController;
+use App\Http\Controllers\Admin\CommissionTariffApiController;
+use App\Http\Controllers\Admin\TrendyolOfferController;
+use App\Http\Controllers\Admin\TrendyolOfferApiController;
+use App\Http\Controllers\Admin\HepsiburadaOfferController;
+use App\Http\Controllers\Admin\HepsiburadaOfferApiController;
 use App\Http\Controllers\Customer\TicketController as CustomerTicketController;
 use App\Http\Controllers\SubUser\PasswordController as SubUserPasswordController;
 use App\Http\Controllers\Admin\System\MailLogController as AdminMailLogController;
@@ -239,6 +245,79 @@ Route::middleware(['client_or_subuser', 'verified', 'subscription', 'subuser.per
                 Route::delete('accounts/{account}', [AdminProfitabilityAccountController::class, 'destroy'])->name('accounts.destroy');
                 Route::post('accounts/{account}/test', [AdminProfitabilityAccountController::class, 'test'])->name('accounts.test');
             });
+
+        Route::middleware('module:feature.reports.commission_tariffs')->group(function () {
+            Route::get('commission-tariffs', [CommissionTariffController::class, 'index'])
+                ->name('commission-tariffs.index');
+
+            Route::prefix('api/commission-tariffs')
+                ->name('commission-tariffs.api.')
+                ->group(function () {
+                    Route::post('upload', [CommissionTariffApiController::class, 'upload'])->name('upload');
+                    Route::post('column-map', [CommissionTariffApiController::class, 'columnMap'])->name('column-map');
+                    Route::get('list', [CommissionTariffApiController::class, 'list'])->name('list');
+                    Route::get('errors/{uploadId}', [CommissionTariffApiController::class, 'errors'])->name('errors');
+                    Route::post('assign', [CommissionTariffApiController::class, 'assign'])->name('assign');
+                    Route::post('recalc', [CommissionTariffApiController::class, 'recalc'])->name('recalc');
+                    Route::post('export', [CommissionTariffApiController::class, 'export'])->name('export');
+                });
+        });
+
+        Route::prefix('campaigns')
+            ->name('campaigns.')
+            ->middleware('module:feature.reports')
+            ->group(function () {
+                Route::get('trendyol-offers', [TrendyolOfferController::class, 'index'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('trendyol-offers');
+                Route::post('trendyol-offers/upload', [TrendyolOfferApiController::class, 'upload'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('trendyol-offers.api.upload');
+                Route::post('trendyol-offers/column-map', [TrendyolOfferApiController::class, 'columnMap'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('trendyol-offers.api.column-map');
+                Route::get('trendyol-offers/list', [TrendyolOfferApiController::class, 'list'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('trendyol-offers.api.list');
+                Route::get('trendyol-offers/errors/{uploadId}', [TrendyolOfferApiController::class, 'errors'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('trendyol-offers.api.errors');
+                Route::post('trendyol-offers/assign', [TrendyolOfferApiController::class, 'assign'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('trendyol-offers.api.assign');
+                Route::post('trendyol-offers/recalc', [TrendyolOfferApiController::class, 'recalc'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('trendyol-offers.api.recalc');
+                Route::post('trendyol-offers/export', [TrendyolOfferApiController::class, 'export'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('trendyol-offers.api.export');
+
+                Route::get('hepsiburada-offers', [HepsiburadaOfferController::class, 'index'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('hepsiburada-offers');
+                Route::post('hepsiburada-offers/upload', [HepsiburadaOfferApiController::class, 'upload'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('hepsiburada-offers.api.upload');
+                Route::post('hepsiburada-offers/column-map', [HepsiburadaOfferApiController::class, 'columnMap'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('hepsiburada-offers.api.column-map');
+                Route::get('hepsiburada-offers/list', [HepsiburadaOfferApiController::class, 'list'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('hepsiburada-offers.api.list');
+                Route::get('hepsiburada-offers/errors/{uploadId}', [HepsiburadaOfferApiController::class, 'errors'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('hepsiburada-offers.api.errors');
+                Route::post('hepsiburada-offers/assign', [HepsiburadaOfferApiController::class, 'assign'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('hepsiburada-offers.api.assign');
+                Route::post('hepsiburada-offers/recalc', [HepsiburadaOfferApiController::class, 'recalc'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('hepsiburada-offers.api.recalc');
+                Route::post('hepsiburada-offers/export', [HepsiburadaOfferApiController::class, 'export'])
+                    ->middleware('module:feature.reports.commission_tariffs')
+                    ->name('hepsiburada-offers.api.export');
+            });
+
         Route::middleware('module:feature.integrations')->group(function () {
             Route::get('integrations', [IntegrationController::class, 'index'])->name('integrations.index');
             Route::get('integrations/health', [AdminIntegrationHealthController::class, 'index'])

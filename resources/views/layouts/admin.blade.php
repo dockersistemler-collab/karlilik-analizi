@@ -1483,11 +1483,140 @@
         main .text-slate-300 {
             color: #c0c0c0 !important;
         }
+
+        body.menu-modern-shell {
+            --menu-modern-primary: #0f172a;
+            --menu-modern-accent: #f97316;
+            --menu-modern-muted: #64748b;
+            --menu-modern-soft: #fdf2e9;
+        }
+
+        body.menu-modern-shell .menu-modern-hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+            gap: 16px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(250, 250, 252, 0.7));
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 10px;
+            border: 1px solid #f3e8ff;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+        }
+
+        body.menu-modern-shell .menu-modern-hero-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        body.menu-modern-shell .menu-modern-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #fb923c, #f97316);
+            color: #fff;
+        }
+
+        body.menu-modern-shell .menu-modern-status-pill {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        body.menu-modern-shell .menu-modern-title {
+            margin-top: 8px;
+            margin-bottom: 0;
+            font-size: 32px;
+            line-height: 1.2;
+            font-weight: 600;
+            color: var(--menu-modern-primary);
+            max-width: 760px;
+        }
+
+        body.menu-modern-shell .menu-modern-subtitle {
+            margin-top: 6px;
+            margin-bottom: 0;
+            color: var(--menu-modern-muted);
+            font-size: 15px;
+            max-width: 760px;
+        }
+
+        body.menu-modern-shell .menu-modern-hero-aside {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 14px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+        }
+
+        body.menu-modern-shell .menu-modern-hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+        }
+
+        body.menu-modern-shell .menu-modern-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            border-radius: 999px;
+            padding: 5px 10px;
+        }
+
+        body.menu-modern-shell main .panel-card {
+            border-radius: 18px;
+            border-color: #e8eef5;
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+        }
+
+        @media (max-width: 900px) {
+            body.menu-modern-shell .menu-modern-hero {
+                grid-template-columns: 1fr;
+                border-radius: 16px;
+                padding: 14px;
+            }
+
+            body.menu-modern-shell .menu-modern-title {
+                font-size: 26px;
+            }
+        }
     </style>
 
+    @stack('styles')
 </head>
 
-<body class="antialiased">
+@php
+    $isDashboardRoute = request()->routeIs('portal.dashboard');
+    $isCommissionTariffsRoute = request()->routeIs('portal.commission-tariffs.*');
+    $useModernMenuShell = !$isDashboardRoute && !$isCommissionTariffsRoute;
+
+    $resolvedHeader = trim((string) $__env->yieldContent('header'));
+    if ($resolvedHeader === '') {
+        $resolvedHeader = trim((string) $__env->yieldContent('page-title'));
+    }
+    if ($resolvedHeader === '') {
+        $resolvedHeader = 'Yönetim Paneli';
+    }
+@endphp
+
+<body class="antialiased {{ $useModernMenuShell ? 'menu-modern-shell' : '' }}">
 
 
 
@@ -1551,6 +1680,8 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                 $canReportsAny = $hasModule('feature.reports') && $canReportsAnyPermission;
                 $canProfitability = $hasModule('feature.reports.profitability')
                     && (!$subUser || $subPermissions->has('reports') || $subPermissions->has('reports.profitability'));
+                $canCommissionTariffs = $hasModule('feature.reports.commission_tariffs')
+                    && (!$subUser || $subPermissions->has('reports') || $subPermissions->has('reports.commission_tariffs'));
 
                 $canReports = function (string $key) use ($subPermissions, $subUser) {
 
@@ -1876,6 +2007,18 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                         @endif
 
+                        @if($canReports('reports.commission_tariffs'))
+
+                            @if($canCommissionTariffs)
+                            <a href="{{ route('portal.commission-tariffs.index') }}" class="sidebar-link {{ request()->routeIs('portal.commission-tariffs.*') ? 'is-active' : '' }}">
+
+                                <span class="sidebar-label">Ürün Komisyon Tarifeleri</span>
+
+                            </a>
+                            @endif
+
+                        @endif
+
                         @if($canReports('reports.stock_value'))
 
                             <a href="{{ route('portal.reports.stock-value') }}" class="sidebar-link {{ request()->routeIs('portal.reports.stock-value') ? 'is-active' : '' }}">
@@ -1888,6 +2031,22 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                     </div>
 
+                @endif
+
+                @if($canReportsAny)
+                    <button id="campaigns-menu-toggle" type="button" class="sidebar-link w-full text-left {{ request()->routeIs('portal.campaigns.*') ? 'is-active' : '' }}">
+                        <i class="fa-solid fa-bullhorn w-6"></i>
+                        <span class="sidebar-label flex-1">Kampanyalar</span>
+                        <i class="fa-solid fa-chevron-down text-xs sidebar-label"></i>
+                    </button>
+                    <div id="campaigns-submenu" class="sidebar-submenu">
+                        <a href="{{ route('portal.campaigns.trendyol-offers') }}" class="sidebar-link {{ request()->routeIs('portal.campaigns.trendyol-offers') ? 'is-active' : '' }}">
+                            <span class="sidebar-label">Trendyol Teklifler</span>
+                        </a>
+                        <a href="{{ route('portal.campaigns.hepsiburada-offers') }}" class="sidebar-link {{ request()->routeIs('portal.campaigns.hepsiburada-offers') ? 'is-active' : '' }}">
+                            <span class="sidebar-label">Hepsiburada Teklifler</span>
+                        </a>
+                    </div>
                 @endif
 
                 @if($canProfitability)
@@ -2277,16 +2436,31 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
             @endforeach
 
             <div class="px-6 pb-6 pt-6">
-
-                <div class="mb-6">
-
-                    <h2 class="text-2xl font-semibold text-slate-900">
-
-                        @yield('header')
-
-                    </h2>
-
-                </div>
+                @if($useModernMenuShell)
+                    <div class="menu-modern-hero">
+                        <div class="menu-modern-hero-content">
+                            <div class="menu-modern-hero-title">
+                                <span class="menu-modern-badge">Menü Alanı</span>
+                                <span class="menu-modern-status-pill">Canli</span>
+                            </div>
+                            <h1 class="menu-modern-title">{{ $resolvedHeader }}</h1>
+                            <p class="menu-modern-subtitle">İşlemleri komisyon tarifeleri ekranıyla aynı modern yapıda yönetin.</p>
+                        </div>
+                        <div class="menu-modern-hero-aside">
+                            <div class="menu-modern-hero-actions">
+                                <span class="menu-modern-chip"><i class="fa-solid fa-layer-group"></i> Modern Düzen</span>
+                                <span class="menu-modern-chip"><i class="fa-solid fa-bolt"></i> Hizli Erisim</span>
+                                <span class="menu-modern-chip"><i class="fa-solid fa-chart-line"></i> Akilli Akis</span>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <div class="mb-6 overflow-visible">
+                        <div class="text-2xl font-semibold text-slate-900 leading-normal -mt-1 pt-0 pb-1 overflow-visible">
+                            @yield('header')
+                        </div>
+                    </div>
+                @endif
 
                 @php
 
@@ -2625,6 +2799,26 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 	        });
 
 	    </script>
+
+    <script>
+        const campaignsMenuToggle = document.getElementById('campaigns-menu-toggle');
+        const campaignsSubmenu = document.getElementById('campaigns-submenu');
+
+        function setCampaignsMenu(open) {
+            campaignsSubmenu?.classList.toggle('is-open', open);
+        }
+
+        if (campaignsSubmenu) {
+            const hasActive = campaignsSubmenu.querySelector('.is-active');
+            const parentActive = campaignsMenuToggle?.classList.contains('is-active');
+            setCampaignsMenu(Boolean(hasActive || parentActive));
+        }
+
+        campaignsMenuToggle?.addEventListener('click', () => {
+            const isOpen = campaignsSubmenu?.classList.contains('is-open');
+            setCampaignsMenu(!isOpen);
+        });
+    </script>
 
         <script>
             const profitabilityMenuToggle = document.getElementById('profitability-menu-toggle');
@@ -2998,14 +3192,6 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 </body>
 
 </html>
-
-
-
-
-
-
-
-
 
 
 
