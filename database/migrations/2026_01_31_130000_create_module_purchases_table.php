@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('module_id')->constrained('modules')->cascadeOnDelete();
-            $table->enum('provider', ['iyzico', 'manual']);
+            $table->enum('provider', ['iyzico', 'manual', 'fake']);
             $table->string('provider_payment_id')->nullable();
             $table->decimal('amount', 10, 2)->nullable();
             $table->string('currency', 3)->default('TRY');

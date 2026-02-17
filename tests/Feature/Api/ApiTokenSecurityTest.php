@@ -3,6 +3,7 @@
 namespace Tests\Feature\Api;
 
 use App\Models\EInvoice;
+use App\Models\Module;
 use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\User;
@@ -17,6 +18,20 @@ class ApiTokenSecurityTest extends TestCase
     private function makeSubscribedUserWithModule(array $modules): User
     {
         $user = User::factory()->create(['role' => 'client']);
+
+        foreach ($modules as $index => $moduleCode) {
+            Module::query()->firstOrCreate(
+                ['code' => $moduleCode],
+                [
+                    'name' => $moduleCode,
+                    'description' => null,
+                    'type' => str_starts_with($moduleCode, 'integration.') ? 'integration' : 'feature',
+                    'billing_type' => 'recurring',
+                    'is_active' => true,
+                    'sort_order' => $index,
+                ]
+            );
+        }
 
         $plan = Plan::create([
             'name' => 'Test',

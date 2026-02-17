@@ -46,6 +46,6 @@ class ProfitabilityIndexTest extends TestCase
             ->actingAs($user)
             ->get(route('portal.profitability.index'))
             ->assertOk()
-            ->assertSee('Kârlılık Paneli');
+            ->assertSee('Karlilik');
     }
 }

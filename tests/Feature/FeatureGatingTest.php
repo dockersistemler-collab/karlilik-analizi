@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Marketplace;
 use App\Models\MarketplaceCredential;
+use App\Models\Module;
 use App\Models\Notification;
 use App\Models\Plan;
 use App\Models\Subscription;
@@ -25,6 +26,18 @@ class FeatureGatingTest extends TestCase
             'is_active' => true,
             'email_verified_at' => now(),
         ]);
+
+        Module::query()->firstOrCreate(
+            ['code' => 'feature.integrations'],
+            [
+                'name' => 'Integrations',
+                'description' => null,
+                'type' => 'feature',
+                'billing_type' => 'recurring',
+                'is_active' => true,
+                'sort_order' => 0,
+            ]
+        );
 
         $plan = Plan::create([
             'name' => 'Test',

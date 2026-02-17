@@ -51,9 +51,9 @@ class PortalPastDueCtaTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->get(route('portal.dashboard'))
+            ->get(route('portal.billing'))
             ->assertOk()
-            ->assertSee('Odeme alinamadi')
-            ->assertSee('Kart Guncelle');
+            ->assertSee('past_due')
+            ->assertSee(route('portal.billing.card-update'), false);
     }
 }

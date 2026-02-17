@@ -11,7 +11,8 @@ return new class extends Migration {
         if (!Schema::hasTable('support_access_logs')) {
             Schema::create('support_access_logs', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('super_admin_id')->constrained('users');
+                // support_agent actors do not have a super_admin_id.
+                $table->foreignId('super_admin_id')->nullable()->constrained('users')->nullOnDelete();
                 $table->foreignId('target_user_id')->constrained('users');
                 $table->dateTime('started_at');
                 $table->dateTime('ended_at')->nullable();

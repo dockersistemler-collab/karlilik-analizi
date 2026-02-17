@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Marketplace;
 use App\Models\MarketplaceCredential;
 use App\Models\MarketplaceProduct;
+use App\Models\Module;
 use App\Models\Notification;
 use App\Models\Plan;
 use App\Models\Product;
@@ -27,6 +28,18 @@ class IntegrationHealthTest extends TestCase
             'is_active' => true,
             'email_verified_at' => now(),
         ], $overrides));
+
+        Module::query()->firstOrCreate(
+            ['code' => 'feature.integrations'],
+            [
+                'name' => 'Integrations',
+                'description' => null,
+                'type' => 'feature',
+                'billing_type' => 'recurring',
+                'is_active' => true,
+                'sort_order' => 0,
+            ]
+        );
 
         $plan = Plan::create([
             'name' => 'Test',
