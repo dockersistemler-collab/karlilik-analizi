@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 
 
@@ -69,6 +69,40 @@
     }
 </style>
 @endif
+<style>
+    .inline-update-popover {
+        margin-top: 2px;
+        width: 84px;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        padding: 0;
+        box-shadow: none;
+    }
+
+    .inline-update-btn {
+        width: 100%;
+        border: 1px solid #f5821f !important;
+        border-radius: 999px;
+        padding: 4px 6px;
+        min-height: 26px;
+        font-size: 12px;
+        line-height: 1;
+        font-weight: 700;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff !important;
+        background: #f5821f !important;
+        transition: opacity 0.15s ease-in-out;
+    }
+
+    .inline-update-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+</style>
 @if($isInventoryView ?? false)
 <div class="inventory-sticky-shell">
 <div class="panel-card p-3 mb-4 inventory-top-card">
@@ -126,7 +160,7 @@
 
                 <a href="{{ route('portal.products.template') }}" class="btn btn-outline-accent">
 
-                    Excel Şablonu
+                    Excel Sablonu
 
                 </a>
 
@@ -370,32 +404,38 @@
 
                 <td class="px-6 py-4 whitespace-nowrap">
 
-                    <div class="flex items-center gap-2">
-
-                        <input type="number" step="0.01" min="0" class="w-24 text-sm"
-
-                               value="{{ $product->price }}"
-
-                               data-product-price="{{ $product->id }}">
-
-                        <span class="text-xs text-slate-500">{{ $product->currency }}</span>
-
+                    <div class="flex items-start gap-2">
+                        <div class="inline-flex flex-col items-center gap-1" data-inline-update-wrap="{{ $product->id }}">
+                            <input type="number" step="0.01" min="0" class="w-24 text-sm"
+                                   value="{{ $product->price }}"
+                                   data-product-price="{{ $product->id }}"
+                                   data-inline-update-trigger="{{ $product->id }}">
+                            <div class="hidden inline-update-popover" data-inline-update-popover>
+                                <button type="button" class="btn inline-update-btn" data-inline-update-submit="{{ $product->id }}">
+                                    G&#252;ncelle
+                                </button>
+                            </div>
+                        </div>
+                        <span class="text-xs text-slate-500 pt-2">{{ $product->currency }}</span>
                     </div>
 
                 </td>
 
-                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-6 py-4 whitespace-nowrap">
 
-                    <div class="flex items-center gap-2">
-
-                        <input type="number" min="0" class="w-20 text-sm"
-
-                               value="{{ $product->stock_quantity }}"
-
-                               data-product-stock="{{ $product->id }}">
-
-                        <span class="text-xs text-slate-500">adet</span>
-
+                    <div class="flex items-start gap-2">
+                        <div class="inline-flex flex-col items-center gap-1" data-inline-update-wrap="{{ $product->id }}">
+                            <input type="number" min="0" class="w-20 text-sm"
+                                   value="{{ $product->stock_quantity }}"
+                                   data-product-stock="{{ $product->id }}"
+                                   data-inline-update-trigger="{{ $product->id }}">
+                            <div class="hidden inline-update-popover" data-inline-update-popover>
+                                <button type="button" class="btn inline-update-btn" data-inline-update-submit="{{ $product->id }}">
+                                    G&#252;ncelle
+                                </button>
+                            </div>
+                        </div>
+                        <span class="text-xs text-slate-500 pt-2">adet</span>
                     </div>
 
                 </td>
@@ -589,21 +629,52 @@
     const inventoryFlashMessage = @json(session('error') ?? (session('success') ?? ($errors->any() ? $errors->first() : null)));
     const inventoryFlashType = @json(session('error') || $errors->any() ? 'error' : (session('success') ? 'success' : null));
 
-    const inlineSaveTimers = {};
     const inlineLastSavedState = {};
+    let inlinePopoverOutsideBound = false;
+    let inlineToastEl = null;
+
+    function showInlineToast(message, type = 'success') {
+        if (inlineToastEl) {
+            inlineToastEl.remove();
+            inlineToastEl = null;
+        }
+
+        const toast = document.createElement('div');
+        toast.className = 'fixed right-4 bottom-4 z-[120] px-4 py-3 rounded-xl shadow-lg border text-sm max-w-sm';
+        if (type === 'error') {
+            toast.classList.add('bg-red-50', 'border-red-200', 'text-red-700');
+        } else {
+            toast.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-700');
+        }
+
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        inlineToastEl = toast;
+
+        window.setTimeout(() => {
+            if (inlineToastEl === toast) {
+                toast.remove();
+                inlineToastEl = null;
+            }
+        }, 4500);
+    }
 
     async function submitInlineUpdate(productId, triggerButton = null) {
         const priceInput = document.querySelector(`[data-product-price="${productId}"]`);
         const stockInput = document.querySelector(`[data-product-stock="${productId}"]`);
 
         if (!priceInput || !stockInput) {
-            return;
+            return false;
         }
 
         const stateKey = `${priceInput.value}|${stockInput.value}`;
         if (inlineLastSavedState[productId] === stateKey) {
-            return;
+            return true;
         }
+        const previousStateKey = inlineLastSavedState[productId] ?? '';
+        const [previousPrice = '', previousStock = ''] = previousStateKey.split('|');
+        const changedPrice = previousPrice !== priceInput.value;
+        const changedStock = previousStock !== stockInput.value;
 
         if (triggerButton) {
             triggerButton.disabled = true;
@@ -629,10 +700,79 @@
 
         if (!response.ok) {
             alert('Kaydedilemedi. Lutfen degerleri kontrol edin.');
-            return;
+            return false;
         }
 
         inlineLastSavedState[productId] = stateKey;
+        let updatedField = 'Fiyat + Stok';
+        if (changedPrice && !changedStock) {
+            updatedField = 'Fiyat';
+        } else if (!changedPrice && changedStock) {
+            updatedField = 'Stok';
+        }
+        showInlineToast(`${updatedField}: Basari ile guncellendi.`, 'success');
+        return true;
+    }
+
+    function hideInlineUpdatePopovers(excludedPopover = null) {
+        document.querySelectorAll('[data-inline-update-popover]').forEach((popover) => {
+            if (excludedPopover && popover === excludedPopover) {
+                return;
+            }
+            popover.classList.add('hidden');
+        });
+    }
+
+    function bindInlineUpdatePopovers() {
+        const wrappers = Array.from(document.querySelectorAll('[data-inline-update-wrap]'));
+
+        wrappers.forEach((wrapper) => {
+            const triggerInput = wrapper.querySelector('[data-inline-update-trigger]');
+            const popover = wrapper.querySelector('[data-inline-update-popover]');
+            const submitButton = wrapper.querySelector('[data-inline-update-submit]');
+            const productId = wrapper.getAttribute('data-inline-update-wrap');
+
+            if (!triggerInput || !popover || !submitButton || !productId) {
+                return;
+            }
+
+            const showPopover = () => {
+                
+                hideInlineUpdatePopovers(popover);
+                popover.classList.remove('hidden');
+            };
+
+            triggerInput.addEventListener('focus', showPopover);
+            triggerInput.addEventListener('click', showPopover);
+            triggerInput.addEventListener('keydown', async (event) => {
+                if (event.key !== 'Enter') {
+                    return;
+                }
+
+                event.preventDefault();
+                const success = await submitInlineUpdate(productId, submitButton);
+                if (success) {
+                    popover.classList.add('hidden');
+                }
+            });
+
+            submitButton.addEventListener('click', async () => {
+                const success = await submitInlineUpdate(productId, submitButton);
+                if (success) {
+                    popover.classList.add('hidden');
+                }
+            });
+        });
+
+        if (!inlinePopoverOutsideBound) {
+            document.addEventListener('click', (event) => {
+                if (event.target.closest('[data-inline-update-wrap]')) {
+                    return;
+                }
+                hideInlineUpdatePopovers();
+            });
+            inlinePopoverOutsideBound = true;
+        }
     }
 
 
@@ -652,27 +792,6 @@
             });
 
         });
-
-        const registerAutoSave = (inputEl) => {
-            const productId = inputEl.getAttribute('data-product-price') || inputEl.getAttribute('data-product-stock');
-            if (!productId) {
-                return;
-            }
-
-            const scheduleSave = () => {
-                window.clearTimeout(inlineSaveTimers[productId]);
-                inlineSaveTimers[productId] = window.setTimeout(() => {
-                    submitInlineUpdate(productId);
-                }, 500);
-            };
-
-            inputEl.addEventListener('input', scheduleSave);
-            inputEl.addEventListener('change', scheduleSave);
-            inputEl.addEventListener('blur', scheduleSave);
-        };
-
-        priceInputs.forEach(registerAutoSave);
-        stockInputs.forEach(registerAutoSave);
 
         const seenProductIds = new Set();
         [...priceInputs, ...stockInputs].forEach((inputEl) => {
@@ -916,6 +1035,7 @@
                 resultsWrap.innerHTML = nextResults.innerHTML;
 
                 bindQuickSave();
+                bindInlineUpdatePopovers();
 
                 bindInventoryMarketplaceActions();
                 bindInventorySelection();
@@ -973,22 +1093,12 @@
 
 
     bindQuickSave();
+    bindInlineUpdatePopovers();
 
     bindInventoryMarketplaceActions();
     bindInventorySelection();
     if (inventoryFlashMessage) {
-        const toast = document.createElement('div');
-        toast.className = 'fixed right-4 bottom-4 z-[120] px-4 py-3 rounded-xl shadow-lg border text-sm max-w-sm';
-        if (inventoryFlashType === 'error') {
-            toast.classList.add('bg-red-50', 'border-red-200', 'text-red-700');
-        } else {
-            toast.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-700');
-        }
-        toast.textContent = inventoryFlashMessage;
-        document.body.appendChild(toast);
-        window.setTimeout(() => {
-            toast.remove();
-        }, 4500);
+        showInlineToast(inventoryFlashMessage, inventoryFlashType === 'error' ? 'error' : 'success');
     }
 
 
@@ -1064,6 +1174,7 @@
 </script>
 
 @endpush
+
 
 
 
