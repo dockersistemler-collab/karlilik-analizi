@@ -1,10 +1,10 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 
 
 @section('header')
 
-    Marka BazlÃ½ SatÃ½Ã¾ Raporu
+    Marka Bazlý Satýþ Raporu
 
 @endsection
 
@@ -18,11 +18,11 @@
 
             <div class="min-w-[180px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">SatÃ½Ã¾ KanalÃ½</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Satýþ Kanalý</label>
 
                 <select name="marketplace_id" class="report-filter-control">
 
-                    <option value="">TÃ¼mÃ¼</option>
+                    <option value="">Tümü</option>
 
                     @foreach($marketplaces as $marketplace)
 
@@ -40,7 +40,7 @@
 
             <div class="min-w-[260px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">BaÃ¾langÃ½Ã§</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Baþlangýç</label>
 
                 <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="report-filter-control">
 
@@ -48,7 +48,7 @@
 
             <div class="min-w-[150px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">BitiÃ¾</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Bitiþ</label>
 
                 <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="report-filter-control">
 
@@ -56,9 +56,9 @@
 
             <div class="min-w-[150px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">HÃ½zlÃ½ SeÃ§im</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Hýzlý Seçim</label>
 
-                <div class="flex flex-wrap gap-2">
+                <div class="report-filter-quick">
                     @foreach($quickRanges as $key => $label)
                         <button type="submit"
                                 name="quick_range"
@@ -81,7 +81,7 @@
 
                     <option value="horizontal" @selected($chartType === 'horizontal')>Yatay Grafik</option>
 
-                    <option value="bar" @selected($chartType === 'bar')>Ã‡ubuk Grafik</option>
+                    <option value="bar" @selected($chartType === 'bar')>Çubuk Grafik</option>
 
                 </select>
 
@@ -147,7 +147,7 @@
 
                         <tr>
 
-                            <td colspan="{{ $marketplaces->count() + 2 }}" class="py-4 text-center text-slate-500">KayÃ½t bulunamadÃ½.</td>
+                            <td colspan="{{ $marketplaces->count() + 2 }}" class="py-4 text-center text-slate-500">Kayýt bulunamadý.</td>
 
                         </tr>
 
@@ -167,7 +167,7 @@
 
         <div class="panel-card p-6">
 
-            <h3 class="text-sm font-semibold text-slate-700 mb-4">Marka BazlÃ½ Toplam Ciro</h3>
+            <h3 class="text-sm font-semibold text-slate-700 mb-4">Marka Bazlý Toplam Ciro</h3>
 
             <div class="h-64">
 
@@ -179,7 +179,7 @@
 
         <div class="panel-card p-6">
 
-            <h3 class="text-sm font-semibold text-slate-700 mb-4">Marka BazlÃ½ Toplam SipariÃ¾</h3>
+            <h3 class="text-sm font-semibold text-slate-700 mb-4">Marka Bazlý Toplam Sipariþ</h3>
 
             <div class="h-64">
 
@@ -253,11 +253,13 @@
 
         new Chart(document.getElementById('brand-revenue-chart'), createConfig(chartType, revenue, 'Ciro'));
 
-        new Chart(document.getElementById('brand-orders-chart'), createConfig(chartType, orders, 'SipariÃ¾'));
+        new Chart(document.getElementById('brand-orders-chart'), createConfig(chartType, orders, 'Sipariþ'));
 
     </script>
 
 @endpush
+
+
 
 
 

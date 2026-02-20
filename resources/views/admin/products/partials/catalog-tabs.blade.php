@@ -2,29 +2,6 @@
     $isInventoryView = $isInventoryView ?? false;
     $inventoryMarketplaces = $inventoryMarketplaces ?? collect();
     $selectedMarketplaceId = (int) ($selectedMarketplaceId ?? 0);
-    $marketplaceColorClass = static function ($marketplace): string {
-        $name = strtolower((string) ($marketplace->name ?? ''));
-        $code = strtolower((string) ($marketplace->code ?? ''));
-        $key = $code !== '' ? $code : $name;
-
-        if (str_contains($key, 'trendyol')) {
-            return 'bg-amber-400 text-slate-900';
-        }
-        if (str_contains($key, 'hepsiburada')) {
-            return 'bg-orange-400 text-slate-900';
-        }
-        if (str_contains($key, 'n11')) {
-            return 'bg-violet-300 text-slate-900';
-        }
-        if (str_contains($key, 'cicek') || str_contains($key, 'ciceksepeti')) {
-            return 'bg-emerald-200 text-slate-900';
-        }
-        if (str_contains($key, 'amazon')) {
-            return 'bg-slate-900 text-white';
-        }
-
-        return 'bg-slate-200 text-slate-800';
-    };
 @endphp
 
 @if($isInventoryView)
@@ -38,19 +15,23 @@
     }
     .inventory-market-chip {
         border-radius: 14px;
-        border: 1px solid rgba(148, 163, 184, 0.25);
+        border: 1px solid #dbe3ee;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        color: #334155;
         padding: 11px 18px;
         font-size: 14px;
         font-weight: 700;
         letter-spacing: 0.01em;
-        transition: transform .18s ease, box-shadow .2s ease, opacity .2s ease, border-color .2s ease;
+        transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease, background-color .2s ease, color .2s ease;
     }
     .inventory-market-chip:hover {
         transform: translateY(-1px);
     }
     .inventory-market-chip.is-active {
-        border-color: rgba(15, 23, 42, 0.08);
-        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.14);
+        border-color: #0f172a;
+        background: #0f172a;
+        color: #ffffff;
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.2);
         transform: translateY(-1px);
     }
     .inventory-action-btn {
@@ -87,16 +68,15 @@
         <div class="w-full pb-3 flex items-center justify-between gap-4 flex-wrap">
             <div class="inventory-market-tabs flex items-center gap-2 flex-wrap">
                 <a href="{{ request()->fullUrlWithQuery(['marketplace_id' => 0, 'page' => null]) }}"
-                   class="inventory-market-chip inline-flex items-center {{ $selectedMarketplaceId === 0 ? 'is-active bg-slate-900 text-white' : 'bg-white text-slate-700 hover:text-slate-900' }}">
+                   class="inventory-market-chip inline-flex items-center {{ $selectedMarketplaceId === 0 ? 'is-active' : 'hover:text-slate-900' }}">
                     T&uuml;m&uuml;
                 </a>
                 @foreach($inventoryMarketplaces as $marketplace)
                     @php
-                        $pillColor = $marketplaceColorClass($marketplace);
                         $isActivePill = $selectedMarketplaceId === (int) $marketplace->id;
                     @endphp
                     <a href="{{ request()->fullUrlWithQuery(['marketplace_id' => $marketplace->id, 'page' => null]) }}"
-                       class="inventory-market-chip inline-flex items-center {{ $pillColor }} {{ $isActivePill ? 'is-active bg-opacity-95' : 'bg-opacity-60 hover:bg-opacity-80' }}">
+                       class="inventory-market-chip inline-flex items-center {{ $isActivePill ? 'is-active' : 'hover:text-slate-900' }}">
                         {{ $marketplace->name }}
                     </a>
                 @endforeach

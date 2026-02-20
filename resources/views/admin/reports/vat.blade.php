@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 
 
@@ -18,11 +18,11 @@
 
             <div class="min-w-[180px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">SatÃ½Ã¾ KanalÃ½</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Satýþ Kanalý</label>
 
                 <select name="marketplace_id" class="report-filter-control">
 
-                    <option value="">TÃ¼mÃ¼</option>
+                    <option value="">Tümü</option>
 
                     @foreach($marketplaces as $marketplace)
 
@@ -40,7 +40,7 @@
 
             <div class="min-w-[260px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">BaÃ¾langÃ½Ã§</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Baþlangýç</label>
 
                 <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="report-filter-control">
 
@@ -48,7 +48,7 @@
 
             <div class="min-w-[150px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">BitiÃ¾</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Bitiþ</label>
 
                 <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="report-filter-control">
 
@@ -56,9 +56,9 @@
 
             <div class="min-w-[150px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">HÃ½zlÃ½ SeÃ§im</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Hýzlý Seçim</label>
 
-                <div class="flex flex-wrap gap-2">
+                <div class="report-filter-quick">
                     @foreach($quickRanges as $key => $label)
                         <button type="submit"
                                 name="quick_range"
@@ -122,6 +122,8 @@
     </div>
 
 @endsection
+
+
 
 
 

@@ -1,10 +1,10 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 
 
 @section('header')
 
-    SipariÅŸler
+    SipariÃ…Å¸ler
 
 @endsection
 
@@ -16,7 +16,7 @@
 
     $tabs = [
 
-        'all' => 'Tüm SipariÅŸler',
+        'all' => 'TÃ¼m SipariÃ…Å¸ler',
 
         'pending' => 'Onay Bekleyen',
 
@@ -26,9 +26,9 @@
 
         'delivered' => 'Teslim',
 
-        'cancelled' => 'İptal',
+        'cancelled' => 'Ä°ptal',
 
-        'returned' => 'İade',
+        'returned' => 'Ä°ade',
 
     ];
 
@@ -41,6 +41,59 @@
     $supportViewEnabled = \App\Support\SupportUser::isEnabled();
 
 @endphp
+
+<style>
+    .orders-thumb-wrap {
+        width: 48px;
+        height: 48px;
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: zoom-in;
+        overflow: hidden;
+    }
+    .orders-thumb {
+        width: 48px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 0.75rem;
+    }
+    .orders-thumb-placeholder {
+        width: 48px;
+        height: 48px;
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background: #f1f5f9;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .orders-image-popover {
+        position: fixed;
+        z-index: 1400;
+        pointer-events: none;
+        width: 150px;
+        height: 150px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.28);
+        overflow: hidden;
+        display: none;
+    }
+    .orders-image-popover.is-open {
+        display: block;
+    }
+    .orders-image-popover img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background: #f8fafc;
+    }
+</style>
 
 
 
@@ -72,7 +125,7 @@
 
             <select name="marketplace_id" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
 
-                <option value="">Tümü</option>
+                <option value="">TÃ¼mÃ¼</option>
 
                 @foreach($marketplaces as $marketplace)
 
@@ -96,19 +149,19 @@
 
             <select name="status" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
 
-                <option value="">Tümü</option>
+                <option value="">TÃ¼mÃ¼</option>
 
                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Beklemede</option>
 
-                <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Onaylandı</option>
+                <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>OnaylandÄ±</option>
 
                 <option value="shipped" {{ request('status') == 'shipped' ? 'selected' : '' }}>Kargoda</option>
 
                 <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>Teslim</option>
 
-                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>İptal</option>
+                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Ä°ptal</option>
 
-                <option value="returned" {{ request('status') == 'returned' ? 'selected' : '' }}>İade</option>
+                <option value="returned" {{ request('status') == 'returned' ? 'selected' : '' }}>Ä°ade</option>
 
             </select>
 
@@ -118,7 +171,7 @@
 
         <div>
 
-            <label class="block text-xs font-medium text-slate-500 mb-1">BaÅŸlangıç</label>
+            <label class="block text-xs font-medium text-slate-500 mb-1">BaÃ…Å¸langÄ±Ã§</label>
 
             <input type="date" name="date_from" value="{{ request('date_from') }}"
 
@@ -130,7 +183,7 @@
 
         <div>
 
-            <label class="block text-xs font-medium text-slate-500 mb-1">BitiÅŸ</label>
+            <label class="block text-xs font-medium text-slate-500 mb-1">BitiÃ…Å¸</label>
 
             <input type="date" name="date_to" value="{{ request('date_to') }}"
 
@@ -174,19 +227,19 @@
 
             <select name="status" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white" required>
 
-                <option value="">Seçiniz</option>
+                <option value="">SeÃ§iniz</option>
 
                 <option value="pending">Beklemede</option>
 
-                <option value="approved">Onaylandı</option>
+                <option value="approved">OnaylandÄ±</option>
 
                 <option value="shipped">Kargoda</option>
 
                 <option value="delivered">Teslim</option>
 
-                <option value="cancelled">İptal</option>
+                <option value="cancelled">Ä°ptal</option>
 
-                <option value="returned">İade</option>
+                <option value="returned">Ä°ade</option>
 
             </select>
 
@@ -196,13 +249,13 @@
 
             <label class="block text-xs font-medium text-slate-500 mb-1">Not (opsiyonel)</label>
 
-            <input type="text" name="note" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white" placeholder="Toplu güncelleme notu">
+            <input type="text" name="note" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white" placeholder="Toplu gÃ¼ncelleme notu">
 
         </div>
 
         <button type="submit" class="btn btn-solid-accent">
 
-            Seçili SipariÅŸleri Güncelle
+            SeÃ§ili SipariÃ…Å¸leri GÃ¼ncelle
 
         </button>
 
@@ -230,23 +283,25 @@
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">
 
-                    <input type="checkbox" onclick="document.querySelectorAll('input[name=&quot;order_ids[]&quot;]').forEach(cb=>cb.checked=this.checked); document.querySelectorAll('input[name=&quot;bulk_ship_ids[]&quot;]').forEach(cb=>cb.checked=this.checked);">
+                    <input type="checkbox" id="orders-select-all" class="rounded border-slate-300 text-[#ff4439] focus:ring-[#ff4439]">
 
                 </th>
 
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">SipariÅŸ No</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Görsel</th>
+
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Sipariş No</th>
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Pazaryeri</th>
 
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Müşteri</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">MÃ¼ÅŸteri</th>
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Tutar</th>
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Durum</th>
 
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">SipariÅŸ Tarihi</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">SipariÃ…Å¸ Tarihi</th>
 
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">İÅŸlem</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Ä°Ã…Å¸lem</th>
 
             </tr>
 
@@ -256,14 +311,36 @@
 
             @forelse($orders as $order)
 
+            @php
+                $firstItem = is_array($order->items) ? ($order->items[0] ?? null) : null;
+                $orderImageUrl = data_get($firstItem, 'image_url')
+                    ?: data_get($firstItem, 'image')
+                    ?: data_get($firstItem, 'product_image')
+                    ?: data_get($firstItem, 'productImage');
+            @endphp
+
             <tr>
 
                 <td class="px-6 py-4 whitespace-nowrap">
 
-                    <input type="checkbox" name="order_ids[]" value="{{ $order->id }}">
+                    <input type="checkbox" name="order_ids[]" value="{{ $order->id }}" class="orders-row-check rounded border-slate-300 text-[#ff4439] focus:ring-[#ff4439]">
 
-                    <input type="checkbox" class="hidden" name="bulk_ship_ids[]" value="{{ $order->id }}">
+                    <input type="checkbox" class="hidden orders-bulk-ship-check" name="bulk_ship_ids[]" value="{{ $order->id }}">
 
+                </td>
+
+                <td class="px-6 py-4 whitespace-nowrap">
+                    @if($orderImageUrl)
+                        <span class="orders-thumb-wrap"
+                              data-order-preview-src="{{ $orderImageUrl }}"
+                              data-order-preview-alt="{{ $order->marketplace_order_id }}">
+                            <img src="{{ $orderImageUrl }}" alt="{{ $order->marketplace_order_id }}" class="orders-thumb">
+                        </span>
+                    @else
+                        <span class="orders-thumb-placeholder">
+                            <i class="fas fa-image text-slate-400"></i>
+                        </span>
+                    @endif
                 </td>
 
                 <td class="px-6 py-4 whitespace-nowrap">
@@ -338,7 +415,7 @@
 
             <tr>
 
-                <td colspan="8" class="px-6 py-4 text-center text-slate-500">Henüz sipariÅŸ bulunmuyor</td>
+                <td colspan="9" class="px-6 py-4 text-center text-slate-500">HenÃ¼z sipariÃ…Å¸ bulunmuyor</td>
 
             </tr>
 
@@ -362,7 +439,7 @@
 
         <div class="md:col-span-2">
 
-            <label class="block text-xs font-medium text-slate-500 mb-1">Kargo Firması</label>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Kargo FirmasÄ±</label>
 
             <input type="text" name="cargo_company" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white" required>
 
@@ -388,7 +465,7 @@
 
             <button type="submit" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">
 
-                Seçili SipariÅŸleri Kargoya Al
+                SeÃ§ili SipariÃ…Å¸leri Kargoya Al
 
             </button>
 
@@ -406,27 +483,94 @@
 
 </div>
 
+<div id="orders-image-popover" class="orders-image-popover" aria-hidden="true">
+    <img id="orders-image-popover-img" src="" alt="">
+</div>
+
 <script>
 
-    document.querySelectorAll('input[name="order_ids[]"]').forEach(function (cb) {
+    const ordersSelectAll = document.getElementById('orders-select-all');
+    const orderRowChecks = Array.from(document.querySelectorAll('.orders-row-check'));
 
-        cb.addEventListener('change', function () {
+    const syncOrdersSelectAllState = () => {
+        if (!ordersSelectAll) return;
+        const checkedCount = orderRowChecks.filter((cb) => cb.checked).length;
+        ordersSelectAll.checked = checkedCount > 0 && checkedCount === orderRowChecks.length;
+        ordersSelectAll.indeterminate = checkedCount > 0 && checkedCount < orderRowChecks.length;
+    };
 
-            var hidden = cb.parentElement.querySelector('input[name="bulk_ship_ids[]"]');
-
+    ordersSelectAll?.addEventListener('change', () => {
+        orderRowChecks.forEach((cb) => {
+            cb.checked = ordersSelectAll.checked;
+            const hidden = cb.closest('td')?.querySelector('.orders-bulk-ship-check');
             if (hidden) {
-
                 hidden.checked = cb.checked;
-
             }
+        });
+        syncOrdersSelectAllState();
+    });
 
+    document.querySelectorAll('input[name="order_ids[]"]').forEach(function (cb) {
+        cb.addEventListener('change', function () {
+            var hidden = cb.parentElement.querySelector('input[name="bulk_ship_ids[]"]');
+            if (hidden) {
+                hidden.checked = cb.checked;
+            }
+            syncOrdersSelectAllState();
+        });
+    });
+
+    syncOrdersSelectAllState();
+
+    const ordersImagePopover = document.getElementById('orders-image-popover');
+    const ordersImagePopoverImg = document.getElementById('orders-image-popover-img');
+    const ordersImageTriggers = Array.from(document.querySelectorAll('[data-order-preview-src]'));
+
+    const placeOrdersPopover = (event) => {
+        if (!ordersImagePopover || !ordersImagePopoverImg) return;
+        const offset = 16;
+        const width = 150;
+        const height = 150;
+        let left = event.clientX + offset;
+        let top = event.clientY + offset;
+
+        if (left + width > window.innerWidth - 8) {
+            left = event.clientX - width - offset;
+        }
+        if (top + height > window.innerHeight - 8) {
+            top = event.clientY - height - offset;
+        }
+
+        ordersImagePopover.style.left = `${Math.max(8, left)}px`;
+        ordersImagePopover.style.top = `${Math.max(8, top)}px`;
+    };
+
+    ordersImageTriggers.forEach((trigger) => {
+        trigger.addEventListener('mouseenter', (event) => {
+            const src = trigger.getAttribute('data-order-preview-src');
+            if (!src || !ordersImagePopover || !ordersImagePopoverImg) return;
+            ordersImagePopoverImg.src = src;
+            ordersImagePopoverImg.alt = trigger.getAttribute('data-order-preview-alt') || 'Siparis gorseli';
+            ordersImagePopover.classList.add('is-open');
+            placeOrdersPopover(event);
         });
 
+        trigger.addEventListener('mousemove', placeOrdersPopover);
+
+        trigger.addEventListener('mouseleave', () => {
+            ordersImagePopover?.classList.remove('is-open');
+            if (ordersImagePopoverImg) {
+                ordersImagePopoverImg.removeAttribute('src');
+            }
+        });
     });
 
 </script>
 
 @endsection
+
+
+
 
 
 

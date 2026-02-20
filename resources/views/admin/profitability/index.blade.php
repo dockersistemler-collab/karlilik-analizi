@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('header')
     Karlilik
@@ -6,50 +6,68 @@
 
 @section('content')
     <div class="panel-card p-6 mb-6 report-filter-panel">
-        <form method="GET" action="{{ route('portal.profitability.index') }}" class="flex flex-wrap lg:flex-nowrap items-end gap-3 report-filter-form">
-            <div class="min-w-[220px] report-filter-field">
-                <label class="block text-xs font-medium text-slate-500 mb-1">Satis Kanali</label>
-                <select name="marketplaces[]" multiple class="report-filter-control">
-                    @foreach($marketplaces as $marketplace)
-                        <option value="{{ $marketplace->code }}" @selected(in_array($marketplace->code, $filters['marketplaces'], true))>
-                            {{ $marketplace->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+        <form method="GET" action="{{ route('portal.profitability.index') }}" class="report-filter-form">
+            <div class="w-full report-filter-field" style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:10px;flex-wrap:wrap;">
+                <div class="min-w-[320px]" style="text-align:left;flex:1 1 auto;">
+                    <label class="block text-xs font-medium text-slate-500 mb-1">Satis Kanali</label>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($marketplaces as $marketplace)
+                            @php
+                                $checked = in_array($marketplace->code, $filters['marketplaces'], true);
+                            @endphp
+                            <label class="report-filter-chip text-xs cursor-pointer {{ $checked ? 'is-active' : '' }}" data-mp-card>
+                                <input type="checkbox"
+                                       name="marketplaces[]"
+                                       value="{{ $marketplace->code }}"
+                                       class="sr-only"
+                                       @checked($checked)
+                                       data-mp-checkbox>
+                                <span>{{ $marketplace->name }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
 
-            <div class="min-w-[150px] report-filter-field">
-                <label class="block text-xs font-medium text-slate-500 mb-1">Baslangic</label>
-                <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="report-filter-control">
-            </div>
-
-            <div class="min-w-[150px] report-filter-field">
-                <label class="block text-xs font-medium text-slate-500 mb-1">Bitis</label>
-                <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="report-filter-control">
-            </div>
-
-            <div class="min-w-[200px] report-filter-field">
-                <label class="block text-xs font-medium text-slate-500 mb-1">SKU</label>
-                <input type="text" name="sku" value="{{ $filters['sku'] ?? '' }}" placeholder="SKU ara" class="report-filter-control">
-            </div>
-
-            <div class="min-w-[260px] report-filter-field">
-                <label class="block text-xs font-medium text-slate-500 mb-1">Hizli Secim</label>
-                <div class="flex flex-wrap gap-2">
-                    @foreach($quickRanges as $key => $label)
-                        <button type="submit"
-                                name="quick_range"
-                                value="{{ $key }}"
-                                class="report-filter-chip text-xs {{ ($filters['quick_range'] ?? '') === $key ? 'is-active' : '' }}">
-                            {{ $label }}
-                        </button>
-                    @endforeach
+                <div class="min-w-[260px]" style="text-align:right;flex:0 0 auto;">
+                    <label class="block text-xs font-medium text-slate-500 mb-1">Hizli Secim</label>
+                    <div class="flex flex-wrap gap-2" style="justify-content:flex-end;">
+                        @php
+                            $quickRangeOrder = ['today', 'last_7_days', 'last_30_days', 'this_week', 'this_month', 'last_month', 'last_3_months', 'last_1_year'];
+                        @endphp
+                        @foreach($quickRangeOrder as $key)
+                            @if(isset($quickRanges[$key]))
+                                <button type="submit"
+                                        name="quick_range"
+                                        value="{{ $key }}"
+                                        class="report-filter-chip text-xs {{ ($filters['quick_range'] ?? '') === $key ? 'is-active' : '' }}">
+                                    {{ $quickRanges[$key] }}
+                                </button>
+                            @endif
+                        @endforeach
+                    </div>
                 </div>
             </div>
 
-            <div class="report-filter-actions">
-                <button type="submit" class="report-filter-btn report-filter-btn-primary">Filtrele</button>
-                <a href="{{ route('portal.profitability.index') }}" class="report-filter-btn report-filter-btn-secondary">Temizle</a>
+            <div class="w-full" style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px;">
+                <div class="min-w-[150px] report-filter-field">
+                    <label class="block text-xs font-medium text-slate-500 mb-1">Baslangic</label>
+                    <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="report-filter-control">
+                </div>
+
+                <div class="min-w-[150px] report-filter-field">
+                    <label class="block text-xs font-medium text-slate-500 mb-1">Bitis</label>
+                    <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="report-filter-control">
+                </div>
+
+                <div class="min-w-[200px] report-filter-field">
+                    <label class="block text-xs font-medium text-slate-500 mb-1">SKU</label>
+                    <input type="text" name="sku" value="{{ $filters['sku'] ?? '' }}" placeholder="SKU ara" class="report-filter-control">
+                </div>
+
+                <div class="report-filter-actions">
+                    <button type="submit" class="report-filter-btn report-filter-btn-primary">Filtrele</button>
+                    <a href="{{ route('portal.profitability.index') }}" class="report-filter-btn report-filter-btn-secondary">Temizle</a>
+                </div>
             </div>
         </form>
     </div>
@@ -160,6 +178,16 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        document.querySelectorAll('[data-mp-card]').forEach((card) => {
+            const checkbox = card.querySelector('[data-mp-checkbox]');
+            if (!checkbox) return;
+            card.addEventListener('click', () => {
+                window.setTimeout(() => {
+                    card.classList.toggle('is-active', checkbox.checked);
+                }, 0);
+            });
+        });
+
         const trendLabels = @json($trend['labels']);
         const trendNetSales = @json($trend['net_sales']);
         const trendContribution = @json($trend['contribution_margin']);
@@ -221,4 +249,6 @@
         });
     </script>
 @endpush
+
+
 

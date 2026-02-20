@@ -1,10 +1,10 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 
 
 @section('header')
 
-    SipariÅŸ ve Ciro Raporu
+    Sipariş ve Ciro Raporu
 
 @endsection
 
@@ -27,11 +27,11 @@ $ownerUser = auth()->user();
 
             <div class="min-w-[180px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">SatÄ±ÅŸ KanalÄ±</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Satış Kanalı</label>
 
                 <select name="marketplace_id" class="report-filter-control">
 
-                    <option value="">TÃ¼mÃ¼</option>
+                    <option value="">Tümü</option>
 
                     @foreach($marketplaces as $marketplace)
 
@@ -49,7 +49,7 @@ $ownerUser = auth()->user();
 
             <div class="min-w-[150px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">BaÅŸlangÄ±Ã§</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Başlangıç</label>
 
                 <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="report-filter-control">
 
@@ -57,7 +57,7 @@ $ownerUser = auth()->user();
 
             <div class="min-w-[150px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">BitiÅŸ</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Bitiş</label>
 
                 <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="report-filter-control">
 
@@ -65,9 +65,9 @@ $ownerUser = auth()->user();
 
             <div class="min-w-[260px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">HÄ±zlÄ± SeÃ§im</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Hızlı Seçim</label>
 
-                <div class="flex flex-wrap gap-2">
+                <div class="report-filter-quick">
                     @foreach($quickRanges as $key => $label)
                         <button type="submit"
                                 name="quick_range"
@@ -96,9 +96,9 @@ $ownerUser = auth()->user();
 
                     <div class="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-lg shadow-lg p-2 z-10">
 
-                        <a href="{{ route('portal.reports.orders-revenue.export', request()->query()) }}" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md">SipariÅŸleri Excel'e Aktar</a>
+                        <a href="{{ route('portal.reports.orders-revenue.export', request()->query()) }}" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md">Siparişleri Excel'e Aktar</a>
 
-                        <a href="{{ route('portal.reports.orders-revenue.invoiced-export', request()->query()) }}" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md">FaturalandÄ±rÄ±lmÄ±ÅŸ SipariÅŸleri Excel'e Aktar</a>
+                        <a href="{{ route('portal.reports.orders-revenue.invoiced-export', request()->query()) }}" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md">Faturalandırılmış Siparişleri Excel'e Aktar</a>
 
                     </div>
 
@@ -116,9 +116,9 @@ $ownerUser = auth()->user();
 
         <div class="flex items-center justify-between mb-4">
 
-            <h3 class="text-sm font-semibold text-slate-700">SayÄ±sal Ciro Ä°statistiÄŸi</h3>
+            <h3 class="text-sm font-semibold text-slate-700">Sayısal Ciro İstatistiği</h3>
 
-            <span class="text-xs text-slate-400">{{ $report['granularity'] === 'monthly' ? 'AylÄ±k' : 'GÃ¼nlÃ¼k' }} gÃ¶rÃ¼nÃ¼m</span>
+            <span class="text-xs text-slate-400">{{ $report['granularity'] === 'monthly' ? 'Aylık' : 'Günlük' }} görünüm</span>
 
         </div>
 
@@ -166,7 +166,7 @@ $ownerUser = auth()->user();
 
                         <tr>
 
-                            <td colspan="{{ $report['marketplaces']->count() + 2 }}" class="py-4 text-center text-slate-500">KayÄ±t bulunamadÄ±.</td>
+                            <td colspan="{{ $report['marketplaces']->count() + 2 }}" class="py-4 text-center text-slate-500">Kayıt bulunamadı.</td>
 
                         </tr>
 
@@ -188,13 +188,13 @@ $ownerUser = auth()->user();
 
             <div class="flex items-center justify-between mb-4">
 
-                <h3 class="text-sm font-semibold text-slate-700">Grafiksel SipariÅŸ / Ciro Ä°statistiÄŸi</h3>
+                <h3 class="text-sm font-semibold text-slate-700">Grafiksel Sipariş / Ciro İstatistiği</h3>
 
                 <select id="orders-revenue-chart-mode" class="text-xs px-2 py-1 border border-slate-200 rounded-lg">
 
                     <option value="revenue">Ciro</option>
 
-                    <option value="orders">SipariÅŸ SayÄ±sÄ±</option>
+                    <option value="orders">Sipariş Sayısı</option>
 
                 </select>
 
@@ -210,7 +210,7 @@ $ownerUser = auth()->user();
 
         <div class="panel-card p-6">
 
-            <h3 class="text-sm font-semibold text-slate-700 mb-4">Pazaryeri Ciro DaÄŸÄ±lÄ±mÄ±</h3>
+            <h3 class="text-sm font-semibold text-slate-700 mb-4">Pazaryeri Ciro Dağılımı</h3>
 
             <div class="h-56">
 
@@ -222,7 +222,7 @@ $ownerUser = auth()->user();
 
         <div class="panel-card p-6">
 
-            <h3 class="text-sm font-semibold text-slate-700 mb-4">Pazaryeri SipariÅŸ DaÄŸÄ±lÄ±mÄ±</h3>
+            <h3 class="text-sm font-semibold text-slate-700 mb-4">Pazaryeri Sipariş Dağılımı</h3>
 
             <div class="h-56">
 
@@ -300,7 +300,7 @@ $ownerUser = auth()->user();
 
             const mode = modeSelect.value;
 
-            lineChart.data.datasets[0].label = mode === 'orders' ? 'SipariÅŸ SayÄ±sÄ±' : 'Ciro';
+            lineChart.data.datasets[0].label = mode === 'orders' ? 'Sipariş Sayısı' : 'Ciro';
 
             lineChart.data.datasets[0].data = mode === 'orders' ? ordersData : revenueData;
 
@@ -367,6 +367,8 @@ $ownerUser = auth()->user();
     </script>
 
 @endpush
+
+
 
 
 

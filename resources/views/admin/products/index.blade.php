@@ -50,16 +50,10 @@
         padding-top: 8px;
     }
     .inventory-sticky-shell .inventory-top-card {
-        margin-bottom: 0;
-        border-bottom: 0;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
+        margin-bottom: 12px;
     }
     .inventory-sticky-shell .inventory-search-card {
         margin-bottom: 0;
-        border-top: 0;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
     }
 
     @media (max-width: 1024px) {
@@ -97,8 +91,8 @@
         transition: border-color .18s ease, box-shadow .2s ease;
     }
     .inventory-search-form:focus-within {
-        border-color: #fda4af;
-        box-shadow: 0 0 0 4px rgba(251, 113, 133, 0.14), 0 12px 24px rgba(15, 23, 42, 0.08);
+        border-color: #9ca3af;
+        box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.22), 0 12px 24px rgba(15, 23, 42, 0.08);
     }
     .inventory-search-icon {
         width: 34px;
@@ -175,6 +169,56 @@
     }
     .inventory-file-input {
         max-width: 290px;
+    }
+    .list-thumb-wrap {
+        width: 48px;
+        height: 48px;
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: zoom-in;
+        overflow: hidden;
+    }
+    .list-thumb {
+        width: 48px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 0.75rem;
+    }
+    .list-thumb-placeholder {
+        width: 48px;
+        height: 48px;
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background: #f1f5f9;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .list-image-popover {
+        position: fixed;
+        z-index: 1400;
+        pointer-events: none;
+        width: 150px;
+        height: 150px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.28);
+        overflow: hidden;
+        display: none;
+    }
+    .list-image-popover.is-open {
+        display: block;
+    }
+    .list-image-popover img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background: #f8fafc;
     }
     @media (max-width: 1024px) {
         .inventory-toolbar-actions {
@@ -332,11 +376,9 @@
 
             <tr>
 
-                @if($isInventoryView ?? false)
                 <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
                     <input type="checkbox" id="inventory-select-all" class="rounded border-slate-300 text-[#ff4439] focus:ring-[#ff4439]">
                 </th>
-                @endif
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">GÃ¶rsel</th>
 
@@ -378,11 +420,11 @@
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">
 
-                    <a href="{{ $sortLink('price') }}" class="inline-flex items-center gap-2">
+                    <a href="{{ $sortLink('cost') }}" class="inline-flex items-center gap-2">
 
-                        Fiyat
+                        Maliyet
 
-                        <i class="fa-solid {{ $sortIcon('price') }}"></i>
+                        <i class="fa-solid {{ $sortIcon('cost') }}"></i>
 
                     </a>
 
@@ -390,11 +432,11 @@
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">
 
-                    <a href="{{ $sortLink('cost') }}" class="inline-flex items-center gap-2">
+                    <a href="{{ $sortLink('price') }}" class="inline-flex items-center gap-2">
 
-                        Maliyet
+                        Fiyat
 
-                        <i class="fa-solid {{ $sortIcon('cost') }}"></i>
+                        <i class="fa-solid {{ $sortIcon('price') }}"></i>
 
                     </a>
 
@@ -447,21 +489,23 @@
             @forelse($products as $product)
 
             <tr class="bg-white shadow-sm">
-                @if($isInventoryView ?? false)
                 <td class="px-4 py-4 whitespace-nowrap">
                     <input type="checkbox" class="inventory-row-select rounded border-slate-300 text-[#ff4439] focus:ring-[#ff4439]" value="{{ $product->id }}" data-product-id="{{ $product->id }}">
                 </td>
-                @endif
 
                 <td class="px-6 py-4 whitespace-nowrap">
 
                     @if($product->display_image_url)
 
-                        <img src="{{ $product->display_image_url }}" alt="{{ $product->name }}" class="w-12 h-12 object-cover rounded-xl">
+                        <span class="list-thumb-wrap"
+                              data-list-preview-src="{{ $product->display_image_url }}"
+                              data-list-preview-alt="{{ $product->name }}">
+                            <img src="{{ $product->display_image_url }}" alt="{{ $product->name }}" class="list-thumb">
+                        </span>
 
                     @else
 
-                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
+                        <div class="list-thumb-placeholder">
 
                             <i class="fas fa-image text-slate-400"></i>
 
@@ -497,9 +541,9 @@
 
                         <input type="number" step="0.01" min="0" class="w-24 text-sm"
 
-                               value="{{ $product->price }}"
+                               value="{{ $product->cost_price }}"
 
-                               data-product-price="{{ $product->id }}">
+                               data-product-cost="{{ $product->id }}">
 
                         <span class="text-xs text-slate-500">{{ $product->currency }}</span>
 
@@ -513,9 +557,9 @@
 
                         <input type="number" step="0.01" min="0" class="w-24 text-sm"
 
-                               value="{{ $product->cost_price }}"
+                               value="{{ $product->price }}"
 
-                               data-product-cost="{{ $product->id }}">
+                               data-product-price="{{ $product->id }}">
 
                         <span class="text-xs text-slate-500">{{ $product->currency }}</span>
 
@@ -663,7 +707,7 @@
 
             <tr>
 
-                <td colspan="{{ ($isInventoryView ?? false) ? 11 : 10 }}" class="px-6 py-4 text-center text-slate-500">HenÃ¼z Ã¼rÃ¼n bulunmuyor</td>
+                <td colspan="11" class="px-6 py-4 text-center text-slate-500">HenÃ¼z Ã¼rÃ¼n bulunmuyor</td>
 
             </tr>
 
@@ -709,6 +753,10 @@
 
     </div>
 
+</div>
+
+<div id="list-image-popover" class="list-image-popover" aria-hidden="true">
+    <img id="list-image-popover-img" src="" alt="">
 </div>
 
 <div id="product-edit-modal" class="fixed inset-0 z-[150] hidden" aria-hidden="true">
@@ -1045,6 +1093,54 @@
         syncSelectAllState();
     }
 
+    function bindListImagePreview() {
+        const popover = document.getElementById('list-image-popover');
+        const popoverImg = document.getElementById('list-image-popover-img');
+        const triggers = Array.from(document.querySelectorAll('[data-list-preview-src]'));
+
+        if (!popover || !popoverImg) {
+            return;
+        }
+
+        const placePopover = (event) => {
+            const offset = 16;
+            const width = 150;
+            const height = 150;
+            let left = event.clientX + offset;
+            let top = event.clientY + offset;
+
+            if (left + width > window.innerWidth - 8) {
+                left = event.clientX - width - offset;
+            }
+            if (top + height > window.innerHeight - 8) {
+                top = event.clientY - height - offset;
+            }
+
+            popover.style.left = `${Math.max(8, left)}px`;
+            popover.style.top = `${Math.max(8, top)}px`;
+        };
+
+        triggers.forEach((trigger) => {
+            trigger.addEventListener('mouseenter', (event) => {
+                const src = trigger.getAttribute('data-list-preview-src');
+                if (!src) {
+                    return;
+                }
+                popoverImg.src = src;
+                popoverImg.alt = trigger.getAttribute('data-list-preview-alt') || 'Urun gorseli';
+                popover.classList.add('is-open');
+                placePopover(event);
+            });
+
+            trigger.addEventListener('mousemove', placePopover);
+
+            trigger.addEventListener('mouseleave', () => {
+                popover.classList.remove('is-open');
+                popoverImg.removeAttribute('src');
+            });
+        });
+    }
+
 
     async function fetchResults(url) {
 
@@ -1102,6 +1198,7 @@
 
                 bindInventoryMarketplaceActions();
                 bindInventorySelection();
+                bindListImagePreview();
 
                 if (searchInput) {
 
@@ -1159,6 +1256,7 @@
 
     bindInventoryMarketplaceActions();
     bindInventorySelection();
+    bindListImagePreview();
     if (inventoryFlashMessage) {
         const toast = document.createElement('div');
         toast.className = 'fixed right-4 bottom-4 z-[120] px-4 py-3 rounded-xl shadow-lg border text-sm max-w-sm';

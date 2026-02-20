@@ -458,6 +458,20 @@
 
         }
 
+        .report-filter-quick {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 2px;
+            scrollbar-width: thin;
+        }
+
+        .report-filter-quick > * {
+            flex: 0 0 auto;
+        }
+
         .sidebar {
 
             width: 76px;
@@ -2104,6 +2118,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                         @if($canReports('reports.top_products'))
 
                             <a href="{{ route('portal.reports.top-products') }}" class="sidebar-link {{ request()->routeIs('portal.reports.top-products') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-fire w-6"></i>
 
                                 <span class="sidebar-label">Çok Satan Ürünler</span>
 
@@ -2114,6 +2129,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                         @if($canReports('reports.sold_products'))
 
                             <a href="{{ route('portal.reports.sold-products') }}" class="sidebar-link {{ request()->routeIs('portal.reports.sold-products') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-receipt w-6"></i>
 
                                 <span class="sidebar-label">Satılan Ürün Listesi</span>
 
@@ -2124,6 +2140,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                         @if($canReports('reports.orders'))
 
                             <a href="{{ route('portal.reports.index') }}" class="sidebar-link {{ request()->routeIs('portal.reports.index') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-chart-column w-6"></i>
 
                                 <span class="sidebar-label">Sipariş ve Ciro</span>
 
@@ -2134,6 +2151,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                         @if($canReports('reports.profitability'))
 
                             <a href="{{ route('portal.reports.order-profitability') }}" class="sidebar-link {{ request()->routeIs('portal.reports.order-profitability') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-sack-dollar w-6"></i>
 
                                 <span class="sidebar-label">Sipariş Karlılık</span>
 
@@ -2144,6 +2162,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                         @if($canReports('reports.category_sales'))
 
                             <a href="{{ route('portal.reports.category-sales') }}" class="sidebar-link {{ request()->routeIs('portal.reports.category-sales') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-layer-group w-6"></i>
 
                                 <span class="sidebar-label">Kategori Bazlı Satış</span>
 
@@ -2154,6 +2173,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                         @if($canReports('reports.brand_sales'))
 
                             <a href="{{ route('portal.reports.brand-sales') }}" class="sidebar-link {{ request()->routeIs('portal.reports.brand-sales') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-tag w-6"></i>
 
                                 <span class="sidebar-label">Marka Bazlı Satış</span>
 
@@ -2164,6 +2184,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                         @if($canReports('reports.vat'))
 
                             <a href="{{ route('portal.reports.vat') }}" class="sidebar-link {{ request()->routeIs('portal.reports.vat') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-percent w-6"></i>
 
                                 <span class="sidebar-label">KDV Raporu</span>
 
@@ -2174,6 +2195,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                         @if($canReports('reports.commission'))
 
                             <a href="{{ route('portal.reports.commission') }}" class="sidebar-link {{ request()->routeIs('portal.reports.commission') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-hand-holding-dollar w-6"></i>
 
                                 <span class="sidebar-label">Komisyon Raporu</span>
 
@@ -2185,6 +2207,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                             @if($canCommissionTariffs)
                             <a href="{{ route('portal.commission-tariffs.index') }}" class="sidebar-link {{ request()->routeIs('portal.commission-tariffs.*') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-sliders w-6"></i>
 
                                 <span class="sidebar-label">Ürün Komisyon Tarifeleri</span>
 
@@ -2196,6 +2219,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                         @if($canReports('reports.stock_value'))
 
                             <a href="{{ route('portal.reports.stock-value') }}" class="sidebar-link {{ request()->routeIs('portal.reports.stock-value') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-boxes-stacked w-6"></i>
 
                                 <span class="sidebar-label">Stoktaki Ürün Tutarları Raporu</span>
 
@@ -2215,9 +2239,11 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                     </button>
                     <div id="campaigns-submenu" class="sidebar-submenu">
                         <a href="{{ route('portal.campaigns.trendyol-offers') }}" class="sidebar-link {{ request()->routeIs('portal.campaigns.trendyol-offers', 'portal.campaigns.trendyol-offers.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-bolt w-6"></i>
                             <span class="sidebar-label">Trendyol Teklifler</span>
                         </a>
                         <a href="{{ route('portal.campaigns.hepsiburada-offers') }}" class="sidebar-link {{ request()->routeIs('portal.campaigns.hepsiburada-offers', 'portal.campaigns.hepsiburada-offers.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-bullseye w-6"></i>
                             <span class="sidebar-label">Hepsiburada Teklifler</span>
                         </a>
                     </div>
@@ -2231,9 +2257,11 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                     </button>
                     <div id="profitability-submenu" class="sidebar-submenu">
                         <a href="{{ route('portal.profitability.index') }}" class="sidebar-link {{ request()->routeIs('portal.profitability.index') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-chart-line w-6"></i>
                             <span class="sidebar-label">Genel Bakis</span>
                         </a>
                         <a href="{{ route('portal.profitability.accounts.index') }}" class="sidebar-link {{ request()->routeIs('portal.profitability.accounts.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-wallet w-6"></i>
                             <span class="sidebar-label">Hesaplar</span>
                         </a>
                         </div>
@@ -2283,9 +2311,11 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                 
                         @if($can('addons'))
                             <a href="{{ route('portal.addons.index') }}" class="sidebar-link {{ request()->routeIs('portal.addons.*') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-puzzle-piece w-6"></i>
                                 <span class="sidebar-label">Ek Modüller</span>
                             </a>
                             <a href="{{ route('portal.modules.mine') }}" class="sidebar-link {{ request()->routeIs('portal.modules.mine') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-cubes w-6"></i>
                                 <span class="sidebar-label">Modüllerim</span>
                             </a>
                         @endif
@@ -2300,21 +2330,26 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                     </button>
                     <div id="general-settings-submenu" class="sidebar-submenu">
                         <a href="{{ route('portal.settings.cargo.index') }}" class="sidebar-link {{ request()->routeIs('portal.settings.cargo.*') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-truck w-6"></i>
                             <span class="sidebar-label">Kargo Entegrasyonları</span>
                         </a>
                         <a href="{{ route('portal.settings.api') }}" class="sidebar-link {{ request()->routeIs('portal.settings.api') ? 'is-active' : '' }}">
+                            <i class="fa-solid fa-plug w-6"></i>
                             <span class="sidebar-label">API Ayarları</span>
                         </a>
                         @if($hasModule('feature.integrations') && $can('integrations'))
                             <a href="{{ route('portal.integrations.index') }}" class="sidebar-link {{ request()->routeIs('portal.integrations.*') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-link w-6"></i>
                                 <span class="sidebar-label">Mağaza Bağla</span>
                             </a>
                         @endif
                         @if($can('addons'))
                             <a href="{{ route('portal.addons.index') }}" class="sidebar-link {{ request()->routeIs('portal.addons.*') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-puzzle-piece w-6"></i>
                                 <span class="sidebar-label">Ek Modüller</span>
                             </a>
                             <a href="{{ route('portal.modules.mine') }}" class="sidebar-link {{ request()->routeIs('portal.modules.mine') ? 'is-active' : '' }}">
+                                <i class="fa-solid fa-cubes w-6"></i>
                                 <span class="sidebar-label">Modüllerim</span>
                             </a>
                         @endif
@@ -2623,7 +2658,6 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                                 <span class="menu-modern-status-pill">Canlı</span>
                             </div>
                             <h1 class="menu-modern-title">{{ $resolvedHeader }}</h1>
-                            <p class="menu-modern-subtitle">İşlemleri komisyon tarifeleri ekranıyla aynı modern yapıda yönetin.</p>
                         </div>
                         <div class="menu-modern-hero-aside">
                             <div class="menu-modern-hero-actions">

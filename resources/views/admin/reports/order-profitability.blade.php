@@ -1,27 +1,27 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('header')
-    SipariÅŸ KÃ¢rlÄ±lÄ±k Analizi
+    Sipariş Kârlılık Analizi
 @endsection
 
 @section('content')
     @php
         $statusOptions = [
             'pending' => 'Beklemede',
-            'approved' => 'OnaylandÄ±',
+            'approved' => 'Onaylandı',
             'shipped' => 'Kargoda',
             'delivered' => 'Teslim',
-            'cancelled' => 'Ä°ptal',
-            'returned' => 'Ä°ade',
+            'cancelled' => 'İptal',
+            'returned' => 'İade',
         ];
     @endphp
 
     <div class="panel-card p-6 mb-6 report-filter-panel">
         <form id="profitability-filters" method="GET" action="{{ route('portal.reports.order-profitability') }}" class="flex flex-wrap lg:flex-nowrap items-end gap-3 report-filter-form">
             <div class="min-w-[180px] report-filter-field">
-                <label class="block text-xs font-medium text-slate-500 mb-1">SatÄ±ÅŸ KanalÄ±</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Satış Kanalı</label>
                 <select name="marketplace_id" class="report-filter-control">
-                    <option value="">TÃ¼mÃ¼</option>
+                    <option value="">Tümü</option>
                     @foreach($marketplaces as $marketplace)
                         <option value="{{ $marketplace->id }}" @selected(($filters['marketplace_id'] ?? null) == $marketplace->id)>
                             {{ $marketplace->name }}
@@ -33,7 +33,7 @@
             <div class="min-w-[150px] report-filter-field">
                 <label class="block text-xs font-medium text-slate-500 mb-1">Durum</label>
                 <select name="status" class="report-filter-control">
-                    <option value="">TÃ¼mÃ¼</option>
+                    <option value="">Tümü</option>
                     @foreach($statusOptions as $key => $label)
                         <option value="{{ $key }}" @selected(($filters['status'] ?? null) === $key)>
                             {{ $label }}
@@ -43,18 +43,18 @@
             </div>
 
             <div class="min-w-[150px] report-filter-field">
-                <label class="block text-xs font-medium text-slate-500 mb-1">BaÅŸlangÄ±Ã§</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Başlangıç</label>
                 <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="report-filter-control">
             </div>
 
             <div class="min-w-[150px] report-filter-field">
-                <label class="block text-xs font-medium text-slate-500 mb-1">BitiÅŸ</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Bitiş</label>
                 <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="report-filter-control">
             </div>
 
             <div class="min-w-[220px] report-filter-field">
-                <label class="block text-xs font-medium text-slate-500 mb-1">HÄ±zlÄ± SeÃ§im</label>
-                <div class="flex flex-wrap gap-2">
+                <label class="block text-xs font-medium text-slate-500 mb-1">Hızlı Seçim</label>
+                <div class="report-filter-quick">
                     @foreach($quickRanges as $key => $label)
                         <button
                             type="button"
@@ -79,12 +79,12 @@
                 <thead class="text-xs uppercase text-slate-400">
                     <tr>
                         <th class="text-left py-2 pr-4 w-[140px]">Pazaryeri</th>
-                        <th class="text-left py-2 pr-4 w-[170px]">SipariÅŸ NumarasÄ±</th>
-                        <th class="text-left py-2 pr-4 w-[180px]">SipariÅŸ Tarihi</th>
-                        <th class="text-center py-2 pr-4 w-[150px] tabular-nums">SipariÅŸ TutarÄ± (â‚º)</th>
-                        <th class="text-center py-2 pr-4 w-[150px] tabular-nums">KÃ¢r TutarÄ± (â‚º)</th>
-                        <th class="text-center py-2 pr-4 w-[120px] tabular-nums">KÃ¢r OranÄ± (%)</th>
-                        <th class="text-center py-2 pr-4 w-[120px] tabular-nums">KÃ¢r MarjÄ± (%)</th>
+                        <th class="text-left py-2 pr-4 w-[170px]">Sipariş Numarası</th>
+                        <th class="text-left py-2 pr-4 w-[180px]">Sipariş Tarihi</th>
+                        <th class="text-center py-2 pr-4 w-[150px] tabular-nums">Sipariş Tutarı (₺)</th>
+                        <th class="text-center py-2 pr-4 w-[150px] tabular-nums">Kâr Tutarı (₺)</th>
+                        <th class="text-center py-2 pr-4 w-[120px] tabular-nums">Kâr Oranı (%)</th>
+                        <th class="text-center py-2 pr-4 w-[120px] tabular-nums">Kâr Marjı (%)</th>
                         <th class="text-right py-2 w-[130px]">Detay Bilgiler</th>
                     </tr>
                 </thead>
@@ -98,14 +98,14 @@
                             <td class="py-3 pr-4 text-slate-600">
                                 {{ $row['order_date'] ? $row['order_date']->locale('tr')->translatedFormat('j M Y') : '-' }}
                             </td>
-                            <td class="py-3 pr-4 text-center text-slate-700 tabular-nums">{{ number_format((float) $row['sale_price'], 2, ',', '.') }} â‚º</td>
+                            <td class="py-3 pr-4 text-center text-slate-700 tabular-nums">{{ number_format((float) $row['sale_price'], 2, ',', '.') }} ₺</td>
                             @php
                                 $profitValue = (float) $row['profit_amount'];
                                 $profitRate = (float) $row['profit_markup_percent'];
                                 $profitMargin = (float) $row['profit_margin_percent'];
                             @endphp
                             <td class="py-3 pr-4 text-center tabular-nums {{ $profitValue < 0 ? 'text-red-500' : 'text-emerald-600' }}">
-                                {{ number_format($profitValue, 2, ',', '.') }} â‚º
+                                {{ number_format($profitValue, 2, ',', '.') }} ₺
                             </td>
                             <td class="py-3 pr-4 text-center tabular-nums {{ $profitRate < 0 ? 'text-red-500' : 'text-emerald-600' }}">
                                 {{ number_format($profitRate, 2, ',', '.') }}
@@ -122,22 +122,22 @@
                                     class="btn btn-solid-accent px-4 py-2 text-xs"
                                     data-profit-detail
                                     data-order-number="{{ $row['order_number'] }}"
-                                    data-sale-price="{{ number_format((float) $row['sale_price'], 2, ',', '.') }} â‚º"
-                                    data-profit-amount="{{ number_format((float) $row['profit_amount'], 2, ',', '.') }} â‚º"
-                                    data-product-cost="{{ number_format((float) ($detail['product_cost'] ?? 0), 2, ',', '.') }} â‚º"
-                                    data-commission="{{ number_format((float) ($detail['commission_amount'] ?? 0), 2, ',', '.') }} â‚º"
-                                    data-shipping-fee="{{ number_format((float) ($detail['shipping_fee'] ?? 0), 2, ',', '.') }} â‚º"
-                                    data-platform-fee="{{ number_format((float) ($detail['platform_service_fee'] ?? 0), 2, ',', '.') }} â‚º"
-                                    data-refund-adjustment="{{ number_format((float) ($detail['refunds_shipping_adjustment'] ?? 0), 2, ',', '.') }} â‚º"
-                                    data-withholding-tax="{{ number_format((float) ($detail['withholding_tax_amount'] ?? 0), 2, ',', '.') }} â‚º"
-                                    data-sales-vat="{{ number_format((float) ($detail['sales_vat_amount'] ?? 0), 2, ',', '.') }} â‚º"
+                                    data-sale-price="{{ number_format((float) $row['sale_price'], 2, ',', '.') }} ₺"
+                                    data-profit-amount="{{ number_format((float) $row['profit_amount'], 2, ',', '.') }} ₺"
+                                    data-product-cost="{{ number_format((float) ($detail['product_cost'] ?? 0), 2, ',', '.') }} ₺"
+                                    data-commission="{{ number_format((float) ($detail['commission_amount'] ?? 0), 2, ',', '.') }} ₺"
+                                    data-shipping-fee="{{ number_format((float) ($detail['shipping_fee'] ?? 0), 2, ',', '.') }} ₺"
+                                    data-platform-fee="{{ number_format((float) ($detail['platform_service_fee'] ?? 0), 2, ',', '.') }} ₺"
+                                    data-refund-adjustment="{{ number_format((float) ($detail['refunds_shipping_adjustment'] ?? 0), 2, ',', '.') }} ₺"
+                                    data-withholding-tax="{{ number_format((float) ($detail['withholding_tax_amount'] ?? 0), 2, ',', '.') }} ₺"
+                                    data-sales-vat="{{ number_format((float) ($detail['sales_vat_amount'] ?? 0), 2, ',', '.') }} ₺"
                                     data-vat-rate="{{ number_format((float) ($detail['vat_rate_percent'] ?? 0), 2, ',', '.') }} %"
-                                >DetayÄ± GÃ¶r</button>
+                                >Detayı Gör</button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="py-4 text-center text-slate-500">KayÄ±t bulunamadÄ±.</td>
+                            <td colspan="8" class="py-4 text-center text-slate-500">Kayıt bulunamadı.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -151,7 +151,7 @@
             <div class="panel-card p-6 shadow-2xl">
                 <div class="flex items-start justify-between gap-4 mb-4">
                     <div>
-                        <h3 class="text-sm font-semibold text-slate-800">SipariÅŸ KÃ¢rlÄ±lÄ±k DetayÄ±</h3>
+                        <h3 class="text-sm font-semibold text-slate-800">Sipariş Kârlılık Detayı</h3>
                         <p class="text-xs text-slate-500" id="modal-order-number">-</p>
                     </div>
                     <button type="button" id="profitability-modal-close" class="btn btn-outline-accent px-3 py-1 text-xs">Kapat</button>
@@ -159,24 +159,24 @@
 
                 <div class="grid grid-cols-2 gap-3 text-xs text-slate-600">
                     <div class="panel-card p-3 border-slate-100">
-                        <div class="text-[11px] text-slate-400">SipariÅŸ TutarÄ±</div>
+                        <div class="text-[11px] text-slate-400">Sipariş Tutarı</div>
                         <div class="text-sm font-semibold text-slate-800" id="modal-sale-price">-</div>
                     </div>
                     <div class="panel-card p-3 border-slate-100">
-                        <div class="text-[11px] text-slate-400">KÃ¢r TutarÄ±</div>
+                        <div class="text-[11px] text-slate-400">Kâr Tutarı</div>
                         <div class="text-sm font-semibold text-slate-800" id="modal-profit-amount">-</div>
                     </div>
                 </div>
 
                 <div class="mt-4 grid grid-cols-1 gap-2 text-xs text-slate-600">
-                    <div class="flex items-center justify-between"><span>ÃœrÃ¼n Maliyeti</span><span id="modal-product-cost" class="text-red-500">-</span></div>
+                    <div class="flex items-center justify-between"><span>Ürün Maliyeti</span><span id="modal-product-cost" class="text-red-500">-</span></div>
                     <div class="flex items-center justify-between"><span>Komisyon</span><span id="modal-commission" class="text-red-500">-</span></div>
                     <div class="flex items-center justify-between"><span>Kargo</span><span id="modal-shipping-fee" class="text-red-500">-</span></div>
                     <div class="flex items-center justify-between"><span>Platform Hizmeti</span><span id="modal-platform-fee" class="text-red-500">-</span></div>
-                    <div class="flex items-center justify-between"><span>Ä°ade Kargo DÃ¼zeltmesi</span><span id="modal-refund-adjustment" class="text-red-500">-</span></div>
+                    <div class="flex items-center justify-between"><span>İade Kargo Düzeltmesi</span><span id="modal-refund-adjustment" class="text-red-500">-</span></div>
                     <div class="flex items-center justify-between"><span>Stopaj (%1)</span><span id="modal-withholding-tax" class="text-red-500">-</span></div>
-                    <div class="flex items-center justify-between"><span>SatÄ±ÅŸ KDV</span><span id="modal-sales-vat" class="text-red-500">-</span></div>
-                    <div class="flex items-center justify-between"><span>KDV OranÄ±</span><span id="modal-vat-rate">-</span></div>
+                    <div class="flex items-center justify-between"><span>Satış KDV</span><span id="modal-sales-vat" class="text-red-500">-</span></div>
+                    <div class="flex items-center justify-between"><span>KDV Oranı</span><span id="modal-vat-rate">-</span></div>
                 </div>
             </div>
         </div>
@@ -197,7 +197,7 @@
             const setSignColor = (id, value) => {
                 const el = document.getElementById(id);
                 if (!el) return;
-                const normalized = (value || '').toString().replace(/\s/g, '').replace('â‚º', '').replace('%', '').replace('.', '').replace(',', '.');
+                const normalized = (value || '').toString().replace(/\s/g, '').replace('₺', '').replace('%', '').replace('.', '').replace(',', '.');
                 const num = parseFloat(normalized);
                 el.classList.remove('text-emerald-600', 'text-red-500', 'text-slate-800');
                 if (!Number.isNaN(num)) {
@@ -277,4 +277,6 @@
         })();
     </script>
 @endpush
+
+
 
