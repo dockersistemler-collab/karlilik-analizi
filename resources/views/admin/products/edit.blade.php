@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends(request()->boolean('embed') ? 'layouts.admin-embed' : 'layouts.admin')
 
 
 
@@ -12,7 +12,7 @@
 
 <div class="bg-white rounded-lg shadow p-6">
 
-    <form action="{{ route('portal.products.update', $product) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('portal.products.update', ['product' => $product, 'embed' => request()->query('embed')]) }}" method="POST" enctype="multipart/form-data">
 
         @csrf
 

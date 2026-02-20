@@ -1,6 +1,29 @@
 ﻿# Session Memory
 
-**Last updated:** 2026-02-18
+**Last updated:** 2026-02-20
+
+## Current Work (2026-02-20)
+- Goal: Continue from prior session by executing queued deliverability/integration tests and re-check UI text quality.
+- Status: Target tests passing; one public layout mojibake hotspot fixed; text quality scan clean.
+
+## Changes Made (2026-02-20)
+- Ran targeted tests from previous next-steps list:
+  - `php artisan test --filter=NotificationHubDeliverabilityTest` => PASS
+  - `php artisan test --filter=EmailSuppressionTest` => PASS
+  - `php artisan test --filter=IntegrationHealthTest` => PASS
+- Ran `scripts/check-ui-text-quality.ps1` and fixed reported text encoding issues in:
+  - `resources/views/layouts/public.blade.php`
+    - `Fiyatland?rma` -> `Fiyatlandırma`
+    - `Kay?t Ol` -> `Kayıt Ol`
+    - `Giri?` -> `Giriş` (all occurrences on this layout)
+    - Footer copy normalized with `&copy;` and proper Turkish characters.
+- Validation:
+  - `powershell -ExecutionPolicy Bypass -File scripts/check-ui-text-quality.ps1 -Root .` => PASS.
+
+## Next Steps (2026-02-20)
+1) Manual smoke check on `/portal/billing` past-due copy/CTA state.
+2) Functional QA pass for `/commission-tariffs` flow (upload -> map -> import -> recalc -> export).
+3) If needed, run targeted commission tariff tests (`TRNumberParser`, matcher, profitability calculator) after UI QA.
 
 ## Current Work (2026-02-18)
 - Goal: Continue from prior session by cleaning remaining UI mojibake text.

@@ -360,7 +360,10 @@
         }
 
         .nk-detail-col {
+            width: 118px;
+            min-width: 118px;
             text-align: right;
+            vertical-align: bottom;
         }
 
         .nk-table-wrap .nk-detail-col .nk-detail-btn,
@@ -1248,22 +1251,6 @@
 
                     <div class="nk-card">
                         <div class="nk-card-header">
-                            <span>Pazaryeri</span>
-                            <i class="fa-regular fa-circle-question nk-gear"></i>
-                        </div>
-                        <div class="card-body">
-                            <select class="form-control nk-soft-input" id="marketplace_platform" name="marketplace_platform">
-                                <option value="trendyol" selected>Trendyol</option>
-                                <option value="hepsiburada">Hepsiburada</option>
-                                <option value="n11">N11</option>
-                                <option value="amazon">Amazon</option>
-                                <option value="ciceksepeti">&Ccedil;i&ccedil;ek Sepeti</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="nk-card">
-                        <div class="nk-card-header">
                             <span>Kategori Oranlari</span>
                             <i class="fa-regular fa-circle-question nk-gear"></i>
                         </div>
@@ -1912,8 +1899,8 @@
                 const panels = Array.from(document.querySelectorAll('.nk-table-panel'));
                 const rightColumn = document.querySelector('.nk-right');
                 const leftCard = document.querySelector('.nk-left > .nk-card');
-                const leftHeader = leftCard?.querySelector('.nk-table-header');
-                const leftBody = leftCard?.querySelector('.nk-table-body');
+                const leftHeader = leftCard?.querySelector('.nk-card-header');
+                const leftBody = leftCard?.querySelector('.card-body');
 
                 if (!panels.length || !rightColumn || !leftCard || !leftBody) {
                     return;

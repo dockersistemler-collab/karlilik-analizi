@@ -650,7 +650,9 @@
         if (productEditModalTitle) {
             productEditModalTitle.textContent = titleText || '-';
         }
-        productEditModalFrame.src = url;
+        const iframeUrl = new URL(url, window.location.origin);
+        iframeUrl.searchParams.set('embed', '1');
+        productEditModalFrame.src = iframeUrl.toString();
         productEditModal.classList.remove('hidden');
         productEditModal.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';

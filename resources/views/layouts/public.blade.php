@@ -260,7 +260,7 @@
 
             <a href="{{ route('public.home') }}" class="hover:text-teal-700">Anasayfa</a>
 
-            <a href="{{ route('pricing') }}" class="hover:text-teal-700">Fiyatland?rma</a>
+            <a href="{{ route('pricing') }}" class="hover:text-teal-700">Fiyatlandırma</a>
 
             @auth
 
@@ -268,11 +268,11 @@
 
             @else
 
-                <a href="{{ route('login') }}" class="hover:text-teal-700">Giri?</a>
+                <a href="{{ route('login') }}" class="hover:text-teal-700">Giriş</a>
 
                 <a href="{{ route('register') }}" class="btn btn-solid-brand">
 
-                    Kay?t Ol
+                    Kayıt Ol
 
                 </a>
 
@@ -288,7 +288,7 @@
 
             @else
 
-                <a href="{{ route('login') }}" class="text-teal-700 font-semibold">Giri?</a>
+                <a href="{{ route('login') }}" class="text-teal-700 font-semibold">Giriş</a>
 
             @endauth
 
@@ -310,13 +310,13 @@
 
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-            <span>? {{ date('Y') }} Pazaryeri Entegrasyon. T?m haklar? sakl?d?r.</span>
+            <span>&copy; {{ date('Y') }} Pazaryeri Entegrasyon. Tüm hakları saklıdır.</span>
 
             <div class="flex items-center gap-4">
 
                 <a href="{{ route('pricing') }}" class="hover:text-teal-700">Paketler</a>
 
-                <a href="{{ route('login') }}" class="hover:text-teal-700">Giri?</a>
+                <a href="{{ route('login') }}" class="hover:text-teal-700">Giriş</a>
 
             </div>
 
