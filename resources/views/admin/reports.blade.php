@@ -1,10 +1,10 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 
 
 @section('header')
 
-    Sipariş ve Ciro Raporu
+    SipariÅŸ ve Ciro Raporu
 
 @endsection
 
@@ -21,17 +21,17 @@ $ownerUser = auth()->user();
 
     @endphp
 
-    <div class="panel-card p-6 mb-6">
+    <div class="panel-card p-6 mb-6 report-filter-panel">
 
-        <form method="GET" class="flex flex-wrap lg:flex-nowrap items-end gap-3">
+        <form method="GET" class="flex flex-wrap lg:flex-nowrap items-end gap-3 report-filter-form">
 
-            <div class="min-w-[180px]">
+            <div class="min-w-[180px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">Satış Kanalı</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">SatÄ±ÅŸ KanalÄ±</label>
 
-                <select name="marketplace_id" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+                <select name="marketplace_id" class="report-filter-control">
 
-                    <option value="">Tümü</option>
+                    <option value="">TÃ¼mÃ¼</option>
 
                     @foreach($marketplaces as $marketplace)
 
@@ -47,45 +47,44 @@ $ownerUser = auth()->user();
 
             </div>
 
-            <div class="min-w-[150px]">
+            <div class="min-w-[150px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">Başlangıç</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">BaÅŸlangÄ±Ã§</label>
 
-                <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
-
-            </div>
-
-            <div class="min-w-[150px]">
-
-                <label class="block text-xs font-medium text-slate-500 mb-1">Bitiş</label>
-
-                <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+                <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="report-filter-control">
 
             </div>
 
-            <div class="min-w-[150px]">
+            <div class="min-w-[150px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">Hızlı Seçim</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">BitiÅŸ</label>
 
-                <select name="quick_range" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+                <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="report-filter-control">
 
-                    <option value="">Seç</option>
+            </div>
 
+            <div class="min-w-[260px] report-filter-field">
+
+                <label class="block text-xs font-medium text-slate-500 mb-1">HÄ±zlÄ± SeÃ§im</label>
+
+                <div class="flex flex-wrap gap-2">
                     @foreach($quickRanges as $key => $label)
-
-                        <option value="{{ $key }}" @selected(($filters['quick_range'] ?? '') === $key)>{{ $label }}</option>
-
+                        <button type="submit"
+                                name="quick_range"
+                                value="{{ $key }}"
+                                class="report-filter-chip text-xs {{ ($filters['quick_range'] ?? '') === $key ? 'is-active' : '' }}">
+                            {{ $label }}
+                        </button>
                     @endforeach
-
-                </select>
+                </div>
 
             </div>
 
-            <div class="flex items-center gap-2 lg:ml-auto">
+            <div class="report-filter-actions">
 
-                <button type="submit" class="btn btn-solid-accent">Filtrele</button>
+                <button type="submit" class="report-filter-btn report-filter-btn-primary">Filtrele</button>
 
-                <a href="{{ route('portal.reports.index') }}" class="btn btn-outline">Temizle</a>
+                <a href="{{ route('portal.reports.index') }}" class="report-filter-btn report-filter-btn-secondary">Temizle</a>
 
             </div>
 
@@ -93,13 +92,13 @@ $ownerUser = auth()->user();
 
                 <details class="relative">
 
-                    <summary class="btn btn-outline list-none cursor-pointer">Excel Aktar</summary>
+                    <summary class="report-filter-btn report-filter-btn-secondary list-none cursor-pointer">Excel Aktar</summary>
 
                     <div class="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-lg shadow-lg p-2 z-10">
 
-                        <a href="{{ route('portal.reports.orders-revenue.export', request()->query()) }}" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md">Siparişleri Excel'e Aktar</a>
+                        <a href="{{ route('portal.reports.orders-revenue.export', request()->query()) }}" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md">SipariÅŸleri Excel'e Aktar</a>
 
-                        <a href="{{ route('portal.reports.orders-revenue.invoiced-export', request()->query()) }}" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md">Faturalandırılmış Siparişleri Excel'e Aktar</a>
+                        <a href="{{ route('portal.reports.orders-revenue.invoiced-export', request()->query()) }}" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md">FaturalandÄ±rÄ±lmÄ±ÅŸ SipariÅŸleri Excel'e Aktar</a>
 
                     </div>
 
@@ -117,9 +116,9 @@ $ownerUser = auth()->user();
 
         <div class="flex items-center justify-between mb-4">
 
-            <h3 class="text-sm font-semibold text-slate-700">Sayısal Ciro İstatistiği</h3>
+            <h3 class="text-sm font-semibold text-slate-700">SayÄ±sal Ciro Ä°statistiÄŸi</h3>
 
-            <span class="text-xs text-slate-400">{{ $report['granularity'] === 'monthly' ? 'Aylık' : 'Günlük' }} görünüm</span>
+            <span class="text-xs text-slate-400">{{ $report['granularity'] === 'monthly' ? 'AylÄ±k' : 'GÃ¼nlÃ¼k' }} gÃ¶rÃ¼nÃ¼m</span>
 
         </div>
 
@@ -167,7 +166,7 @@ $ownerUser = auth()->user();
 
                         <tr>
 
-                            <td colspan="{{ $report['marketplaces']->count() + 2 }}" class="py-4 text-center text-slate-500">Kayıt bulunamadı.</td>
+                            <td colspan="{{ $report['marketplaces']->count() + 2 }}" class="py-4 text-center text-slate-500">KayÄ±t bulunamadÄ±.</td>
 
                         </tr>
 
@@ -189,13 +188,13 @@ $ownerUser = auth()->user();
 
             <div class="flex items-center justify-between mb-4">
 
-                <h3 class="text-sm font-semibold text-slate-700">Grafiksel Sipariş / Ciro İstatistiği</h3>
+                <h3 class="text-sm font-semibold text-slate-700">Grafiksel SipariÅŸ / Ciro Ä°statistiÄŸi</h3>
 
                 <select id="orders-revenue-chart-mode" class="text-xs px-2 py-1 border border-slate-200 rounded-lg">
 
                     <option value="revenue">Ciro</option>
 
-                    <option value="orders">Sipariş Sayısı</option>
+                    <option value="orders">SipariÅŸ SayÄ±sÄ±</option>
 
                 </select>
 
@@ -211,7 +210,7 @@ $ownerUser = auth()->user();
 
         <div class="panel-card p-6">
 
-            <h3 class="text-sm font-semibold text-slate-700 mb-4">Pazaryeri Ciro Dağılımı</h3>
+            <h3 class="text-sm font-semibold text-slate-700 mb-4">Pazaryeri Ciro DaÄŸÄ±lÄ±mÄ±</h3>
 
             <div class="h-56">
 
@@ -223,7 +222,7 @@ $ownerUser = auth()->user();
 
         <div class="panel-card p-6">
 
-            <h3 class="text-sm font-semibold text-slate-700 mb-4">Pazaryeri Sipariş Dağılımı</h3>
+            <h3 class="text-sm font-semibold text-slate-700 mb-4">Pazaryeri SipariÅŸ DaÄŸÄ±lÄ±mÄ±</h3>
 
             <div class="h-56">
 
@@ -301,7 +300,7 @@ $ownerUser = auth()->user();
 
             const mode = modeSelect.value;
 
-            lineChart.data.datasets[0].label = mode === 'orders' ? 'Sipariş Sayısı' : 'Ciro';
+            lineChart.data.datasets[0].label = mode === 'orders' ? 'SipariÅŸ SayÄ±sÄ±' : 'Ciro';
 
             lineChart.data.datasets[0].data = mode === 'orders' ? ordersData : revenueData;
 
@@ -368,6 +367,7 @@ $ownerUser = auth()->user();
     </script>
 
 @endpush
+
 
 
 

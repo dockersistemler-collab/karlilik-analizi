@@ -6,13 +6,30 @@
 
 @section('content')
     <style>
-    .period-tab.is-active {
-        background: #fda4af;
-        border-color: #fb7185;
-        color: #7f1d1d; font-weight: 600;
-        box-shadow: 0 6px 16px rgba(251, 113, 133, 0.35);
-    }
-</style>
+        .range-pill,
+        .period-tab {
+            border: 1px solid #dbe3ee;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            color: #334155;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease;
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
+        }
+        .range-pill:hover,
+        .period-tab:hover {
+            border-color: #c7d7ec;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.09);
+        }
+        .range-pill.is-active,
+        .period-tab.is-active {
+            background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+            border-color: #fecdd3;
+            color: #9f1239;
+            box-shadow: 0 12px 24px rgba(244, 63, 94, 0.2);
+        }
+    </style>
 <div class="space-y-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
             <div class="rounded-2xl border border-slate-100 bg-emerald-50/80 p-6 shadow-sm">
@@ -334,10 +351,33 @@
             .mini-metric-card {
                 min-height: 380px;
             }
+            .range-pill,
+            .period-tab {
+                border: 1px solid #dbe3ee;
+                background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+                color: #334155;
+                font-weight: 600;
+                border-radius: 12px;
+                transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease;
+                box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
+            }
+            .range-pill:hover,
+            .period-tab:hover {
+                border-color: #c7d7ec;
+                transform: translateY(-1px);
+                box-shadow: 0 10px 20px rgba(15, 23, 42, 0.09);
+            }
             .range-pill.is-active {
-                background: #111827;
-                color: #ffffff;
-                border-color: #111827;
+                background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+                border-color: #fecdd3;
+                color: #9f1239;
+                box-shadow: 0 12px 24px rgba(244, 63, 94, 0.2);
+            }
+            .period-tab.is-active {
+                background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+                border-color: #fecdd3;
+                color: #9f1239;
+                box-shadow: 0 12px 24px rgba(244, 63, 94, 0.2);
             }
             #turkey-map-admin .leaflet-zoom-box {
                 display: none !important;
@@ -705,18 +745,8 @@ scales: {
             document.querySelectorAll('.map-range-pill').forEach((pill) => {
                 if (pill.dataset.range === range) {
                     pill.classList.add('is-active');
-                    pill.classList.add('text-white');
-                    pill.style.backgroundColor = '#fca5a5';
-                    pill.style.borderColor = '#f87171';
-                    pill.style.color = '#111827';
-                    pill.style.boxShadow = '0 2px 8px rgba(248,113,113,0.35)';
                 } else {
                     pill.classList.remove('is-active');
-                    pill.classList.remove('text-white');
-                    pill.style.backgroundColor = '';
-                    pill.style.borderColor = '';
-                    pill.style.color = '';
-                    pill.style.boxShadow = '';
                 }
             });
         }
@@ -725,18 +755,8 @@ scales: {
             document.querySelectorAll('.net-kar-range-pill').forEach((pill) => {
                 if (pill.dataset.range === range) {
                     pill.classList.add('is-active');
-                    pill.classList.add('text-white');
-                    pill.style.backgroundColor = '#fca5a5';
-                    pill.style.borderColor = '#f87171';
-                    pill.style.color = '#111827';
-                    pill.style.boxShadow = '0 2px 8px rgba(248,113,113,0.35)';
                 } else {
                     pill.classList.remove('is-active');
-                    pill.classList.remove('text-white');
-                    pill.style.backgroundColor = '';
-                    pill.style.borderColor = '';
-                    pill.style.color = '';
-                    pill.style.boxShadow = '';
                 }
             });
         }

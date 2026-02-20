@@ -1,10 +1,10 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 
 
 @section('header')
 
-    {{ ($isInventoryView ?? false) ? 'Stok Takip' : 'Ürünler' }}
+    {{ ($isInventoryView ?? false) ? 'Stok Takip' : 'ÃœrÃ¼nler' }}
 
 @endsection
 
@@ -29,7 +29,7 @@
         if (str_contains($name, 'n11')) {
             return 'bg-violet-300 text-slate-900';
         }
-        if (str_contains($name, 'cicek') || str_contains($name, 'çiçek')) {
+        if (str_contains($name, 'cicek') || str_contains($name, 'Ã§iÃ§ek')) {
             return 'bg-emerald-200 text-slate-900';
         }
         if (str_contains($name, 'amazon')) {
@@ -69,6 +69,119 @@
     }
 </style>
 @endif
+<style>
+    .inventory-toolbar {
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+        padding: 12px;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+    }
+    .inventory-search-wrap {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        flex: 1 1 auto;
+        min-width: 300px;
+    }
+    .inventory-search-form {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border: 1px solid #dbe3ee;
+        border-radius: 16px;
+        background: #fff;
+        padding: 6px 8px 6px 14px;
+        width: min(640px, 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 8px 18px rgba(15, 23, 42, 0.05);
+        transition: border-color .18s ease, box-shadow .2s ease;
+    }
+    .inventory-search-form:focus-within {
+        border-color: #fda4af;
+        box-shadow: 0 0 0 4px rgba(251, 113, 133, 0.14), 0 12px 24px rgba(15, 23, 42, 0.08);
+    }
+    .inventory-search-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        color: #64748b;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+    }
+    .inventory-search-form input[type='text'] {
+        border: 0;
+        box-shadow: none;
+        background: transparent;
+        font-size: 15px;
+    }
+    .inventory-search-submit {
+        border: 1px solid #3f3f46;
+        border-radius: 12px;
+        background: #3f3f46;
+        color: #fff;
+        font-weight: 700;
+        min-height: 38px;
+        padding: 8px 18px;
+        transition: transform .18s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    .inventory-search-submit:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.03);
+        box-shadow: 0 10px 18px rgba(63, 63, 70, 0.25);
+    }
+    .inventory-toolbar-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+    .inventory-action-pill {
+        border: 1px solid #dbe3ee;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        color: #1f2937;
+        font-size: 15px;
+        font-weight: 700;
+        padding: 10px 18px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+    }
+    .inventory-action-pill:hover {
+        transform: translateY(-1px);
+        border-color: #c9d8ee;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
+    }
+    .inventory-action-pill.is-primary {
+        background: #3f3f46;
+        color: #fff;
+        border-color: #3f3f46;
+    }
+    .inventory-import-form {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid #dbe3ee;
+        border-radius: 12px;
+        background: #fff;
+        padding: 6px 10px;
+        min-height: 44px;
+    }
+    .inventory-file-input {
+        max-width: 290px;
+    }
+    @media (max-width: 1024px) {
+        .inventory-toolbar-actions {
+            justify-content: flex-start;
+        }
+    }
+</style>
 @if($isInventoryView ?? false)
 <div class="inventory-sticky-shell">
 <div class="panel-card p-3 mb-4 inventory-top-card">
@@ -90,19 +203,17 @@
 <div class="panel-card p-4 mb-4">
 @endif
 
-    <div class="flex flex-col gap-3">
+    <div class="inventory-toolbar">
 
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
 
-            <div class="flex items-center gap-3 w-full lg:w-auto">
+            <div class="inventory-search-wrap w-full lg:w-auto">
 
-                <span class="text-sm font-medium text-slate-700 whitespace-nowrap">Ürün Ara</span>
+                <form method="GET" id="product-search-form" class="inventory-search-form">
 
-                <form method="GET" id="product-search-form" class="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-2 w-full md:w-[520px]">
+                    <span class="inventory-search-icon"><i class="fa-solid fa-magnifying-glass text-sm"></i></span>
 
-                    <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm"></i>
-
-                    <input type="text" id="product-search-input" name="search" placeholder="Barkod, SKU, Ürün adı, Marka..."
+                    <input type="text" id="product-search-input" name="search" placeholder="Barkod, SKU, ÃœrÃ¼n adÄ±, Marka..."
 
                            class="border-0 focus:ring-0 text-sm w-full"
 
@@ -114,47 +225,47 @@
 
                     @endforeach
 
-                    <button type="submit" class="text-slate-500 hover:text-slate-700 text-sm">Ara</button>
+                    <button type="submit" class="inventory-search-submit">Ara</button>
 
                 </form>
 
             </div>
 
-            <div class="flex flex-wrap items-center gap-3 justify-start lg:justify-end">
+            <div class="inventory-toolbar-actions">
 
                 @if($canExport)
 
-                <a href="{{ route('portal.products.template') }}" class="btn btn-outline-accent">
+                <a href="{{ route('portal.products.template') }}" class="inventory-action-pill">
 
-                    Excel Şablonu
+                    Excel Åablonu
 
                 </a>
 
-                <a href="{{ route('portal.products.export') }}" class="btn btn-outline-accent">
+                <a href="{{ route('portal.products.export') }}" class="inventory-action-pill">
 
-                    Excel Dışa Aktar
+                    Excel DÄ±ÅŸa Aktar
 
                 </a>
 
                 @endif
 
-                <form method="POST" action="{{ route('portal.products.import') }}" enctype="multipart/form-data" class="flex items-center gap-2">
+                <form method="POST" action="{{ route('portal.products.import') }}" enctype="multipart/form-data" class="inventory-import-form">
 
                     @csrf
 
-                    <input type="file" name="file" accept=".xlsx" class="text-sm">
+                    <input type="file" name="file" accept=".xlsx" class="text-sm inventory-file-input">
 
-                    <button type="submit" class="btn btn-outline-accent">
+                    <button type="submit" class="inventory-action-pill">
 
-                        Excel İçeri Aktar
+                        Excel Ä°Ã§eri Aktar
 
                     </button>
 
                 </form>
 
-                <a href="{{ route('portal.products.create') }}" class="btn btn-solid-accent">
+                <a href="{{ route('portal.products.create') }}" class="inventory-action-pill is-primary">
 
-                    <i class="fas fa-plus mr-2"></i> Yeni Ürün
+                    <i class="fas fa-plus mr-2"></i> Yeni ÃœrÃ¼n
 
                 </a>
 
@@ -227,7 +338,7 @@
                 </th>
                 @endif
 
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Görsel</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">GÃ¶rsel</th>
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">
 
@@ -245,7 +356,7 @@
 
                     <a href="{{ $sortLink('name') }}" class="inline-flex items-center gap-2">
 
-                        Ürün
+                        ÃœrÃ¼n
 
                         <i class="fa-solid {{ $sortIcon('name') }}"></i>
 
@@ -325,7 +436,7 @@
 
                 </th>
 
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">İşlem</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Ä°ÅŸlem</th>
 
             </tr>
 
@@ -503,7 +614,7 @@
 
                         @method('DELETE')
 
-                        <button type="submit" class="text-rose-600 hover:text-rose-800" onclick="return confirm('Silmek istediğinize emin misiniz?')">
+                        <button type="submit" class="text-rose-600 hover:text-rose-800" onclick="return confirm('Silmek istediÄŸinize emin misiniz?')">
 
                             <i class="fas fa-trash"></i>
 
@@ -552,7 +663,7 @@
 
             <tr>
 
-                <td colspan="{{ ($isInventoryView ?? false) ? 11 : 10 }}" class="px-6 py-4 text-center text-slate-500">Henüz ürün bulunmuyor</td>
+                <td colspan="{{ ($isInventoryView ?? false) ? 11 : 10 }}" class="px-6 py-4 text-center text-slate-500">HenÃ¼z Ã¼rÃ¼n bulunmuyor</td>
 
             </tr>
 
@@ -570,7 +681,7 @@
 
         <form method="GET" class="flex items-center gap-2 text-sm">
 
-            <label for="per-page" class="text-slate-500">Sayfa başına</label>
+            <label for="per-page" class="text-slate-500">Sayfa baÅŸÄ±na</label>
 
             <select id="per-page" name="per_page" class="w-24" onchange="this.form.submit()">
 
@@ -604,7 +715,7 @@
     <div class="absolute inset-0 bg-slate-900/55" data-product-edit-close></div>
     <div class="relative mx-auto mt-6 w-[96%] max-w-6xl h-[90vh] rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
         <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-            <h3 class="text-sm font-semibold text-slate-800">Ürün Düzenle: <span id="product-edit-modal-title" class="text-slate-600">-</span></h3>
+            <h3 class="text-sm font-semibold text-slate-800">ÃœrÃ¼n DÃ¼zenle: <span id="product-edit-modal-title" class="text-slate-600">-</span></h3>
             <button type="button" class="btn btn-outline text-xs" data-product-edit-close>Kapat</button>
         </div>
         <iframe id="product-edit-modal-frame" class="w-full h-[calc(90vh-56px)] border-0" src="about:blank" loading="lazy"></iframe>
@@ -1155,6 +1266,7 @@
 </script>
 
 @endpush
+
 
 
 

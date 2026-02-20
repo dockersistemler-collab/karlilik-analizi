@@ -1,15 +1,15 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('header')
     Karlilik
 @endsection
 
 @section('content')
-    <div class="panel-card p-6 mb-6">
-        <form method="GET" action="{{ route('portal.profitability.index') }}" class="flex flex-wrap lg:flex-nowrap items-end gap-3">
-            <div class="min-w-[220px]">
+    <div class="panel-card p-6 mb-6 report-filter-panel">
+        <form method="GET" action="{{ route('portal.profitability.index') }}" class="flex flex-wrap lg:flex-nowrap items-end gap-3 report-filter-form">
+            <div class="min-w-[220px] report-filter-field">
                 <label class="block text-xs font-medium text-slate-500 mb-1">Satis Kanali</label>
-                <select name="marketplaces[]" multiple class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+                <select name="marketplaces[]" multiple class="report-filter-control">
                     @foreach($marketplaces as $marketplace)
                         <option value="{{ $marketplace->code }}" @selected(in_array($marketplace->code, $filters['marketplaces'], true))>
                             {{ $marketplace->name }}
@@ -18,34 +18,38 @@
                 </select>
             </div>
 
-            <div class="min-w-[150px]">
+            <div class="min-w-[150px] report-filter-field">
                 <label class="block text-xs font-medium text-slate-500 mb-1">Baslangic</label>
-                <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+                <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="report-filter-control">
             </div>
 
-            <div class="min-w-[150px]">
+            <div class="min-w-[150px] report-filter-field">
                 <label class="block text-xs font-medium text-slate-500 mb-1">Bitis</label>
-                <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+                <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="report-filter-control">
             </div>
 
-            <div class="min-w-[200px]">
+            <div class="min-w-[200px] report-filter-field">
                 <label class="block text-xs font-medium text-slate-500 mb-1">SKU</label>
-                <input type="text" name="sku" value="{{ $filters['sku'] ?? '' }}" placeholder="SKU ara" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+                <input type="text" name="sku" value="{{ $filters['sku'] ?? '' }}" placeholder="SKU ara" class="report-filter-control">
             </div>
 
-            <div class="min-w-[200px]">
+            <div class="min-w-[260px] report-filter-field">
                 <label class="block text-xs font-medium text-slate-500 mb-1">Hizli Secim</label>
-                <select name="quick_range" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
-                    <option value="">Sec</option>
+                <div class="flex flex-wrap gap-2">
                     @foreach($quickRanges as $key => $label)
-                        <option value="{{ $key }}" @selected(($filters['quick_range'] ?? '') === $key)>{{ $label }}</option>
+                        <button type="submit"
+                                name="quick_range"
+                                value="{{ $key }}"
+                                class="report-filter-chip text-xs {{ ($filters['quick_range'] ?? '') === $key ? 'is-active' : '' }}">
+                            {{ $label }}
+                        </button>
                     @endforeach
-                </select>
+                </div>
             </div>
 
-            <div class="flex items-center gap-2 lg:ml-auto">
-                <button type="submit" class="btn btn-solid-accent">Filtrele</button>
-                <a href="{{ route('portal.profitability.index') }}" class="btn btn-outline">Temizle</a>
+            <div class="report-filter-actions">
+                <button type="submit" class="report-filter-btn report-filter-btn-primary">Filtrele</button>
+                <a href="{{ route('portal.profitability.index') }}" class="report-filter-btn report-filter-btn-secondary">Temizle</a>
             </div>
         </form>
     </div>
@@ -217,3 +221,4 @@
         });
     </script>
 @endpush
+

@@ -1,10 +1,10 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 
 
 @section('header')
 
-    Kategori Bazlý Satýþ Raporu
+    Kategori BazlÃ½ SatÃ½Ã¾ Raporu
 
 @endsection
 
@@ -12,17 +12,17 @@
 
 @section('content')
 
-    <div class="panel-card p-6 mb-6">
+    <div class="panel-card p-6 mb-6 report-filter-panel">
 
-        <form method="GET" class="flex flex-wrap lg:flex-nowrap items-end gap-3">
+        <form method="GET" class="flex flex-wrap lg:flex-nowrap items-end gap-3 report-filter-form">
 
-            <div class="min-w-[180px]">
+            <div class="min-w-[180px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">Satýþ Kanalý</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">SatÃ½Ã¾ KanalÃ½</label>
 
-                <select name="marketplace_id" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+                <select name="marketplace_id" class="report-filter-control">
 
-                    <option value="">Tümü</option>
+                    <option value="">TÃ¼mÃ¼</option>
 
                     @foreach($marketplaces as $marketplace)
 
@@ -38,61 +38,60 @@
 
             </div>
 
-            <div class="min-w-[150px]">
+            <div class="min-w-[260px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">Baþlangýç</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">BaÃ¾langÃ½Ã§</label>
 
-                <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
-
-            </div>
-
-            <div class="min-w-[150px]">
-
-                <label class="block text-xs font-medium text-slate-500 mb-1">Bitiþ</label>
-
-                <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+                <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="report-filter-control">
 
             </div>
 
-            <div class="min-w-[150px]">
+            <div class="min-w-[150px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">Hýzlý Seçim</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">BitiÃ¾</label>
 
-                <select name="quick_range" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+                <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="report-filter-control">
 
-                    <option value="">Seç</option>
+            </div>
 
+            <div class="min-w-[150px] report-filter-field">
+
+                <label class="block text-xs font-medium text-slate-500 mb-1">HÃ½zlÃ½ SeÃ§im</label>
+
+                <div class="flex flex-wrap gap-2">
                     @foreach($quickRanges as $key => $label)
-
-                        <option value="{{ $key }}" @selected(($filters['quick_range'] ?? '') === $key)>{{ $label }}</option>
-
+                        <button type="submit"
+                                name="quick_range"
+                                value="{{ $key }}"
+                                class="report-filter-chip text-xs {{ ($filters['quick_range'] ?? '') === $key ? 'is-active' : '' }}">
+                            {{ $label }}
+                        </button>
                     @endforeach
-
-                </select>
+                </div>
 
             </div>
 
-            <div class="min-w-[150px]">
+            <div class="min-w-[150px] report-filter-field">
 
                 <label class="block text-xs font-medium text-slate-500 mb-1">Grafik Tipi</label>
 
-                <select name="chart_type" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+                <select name="chart_type" class="report-filter-control">
 
                     <option value="pie" @selected($chartType === 'pie')>Pasta Grafik</option>
 
                     <option value="horizontal" @selected($chartType === 'horizontal')>Yatay Grafik</option>
 
-                    <option value="bar" @selected($chartType === 'bar')>Çubuk Grafik</option>
+                    <option value="bar" @selected($chartType === 'bar')>Ã‡ubuk Grafik</option>
 
                 </select>
 
             </div>
 
-            <div class="flex items-center gap-2 lg:ml-auto">
+            <div class="report-filter-actions">
 
-                <button type="submit" class="btn btn-solid-accent">Filtrele</button>
+                <button type="submit" class="report-filter-btn report-filter-btn-primary">Filtrele</button>
 
-                <a href="{{ route('portal.reports.category-sales') }}" class="btn btn-outline">Temizle</a>
+                <a href="{{ route('portal.reports.category-sales') }}" class="report-filter-btn report-filter-btn-secondary">Temizle</a>
 
             </div>
 
@@ -106,7 +105,7 @@
 
         <div class="panel-card p-6">
 
-            <h3 class="text-sm font-semibold text-slate-700 mb-4">Kategori Bazlý Ciro</h3>
+            <h3 class="text-sm font-semibold text-slate-700 mb-4">Kategori BazlÃ½ Ciro</h3>
 
             <div class="h-64">
 
@@ -118,7 +117,7 @@
 
         <div class="panel-card p-6">
 
-            <h3 class="text-sm font-semibold text-slate-700 mb-4">Kategori Bazlý Toplam Sipariþ</h3>
+            <h3 class="text-sm font-semibold text-slate-700 mb-4">Kategori BazlÃ½ Toplam SipariÃ¾</h3>
 
             <div class="h-64">
 
@@ -192,11 +191,12 @@
 
         new Chart(document.getElementById('category-revenue-chart'), createConfig(chartType, revenue, 'Ciro'));
 
-        new Chart(document.getElementById('category-orders-chart'), createConfig(chartType, orders, 'Sipariþ'));
+        new Chart(document.getElementById('category-orders-chart'), createConfig(chartType, orders, 'SipariÃ¾'));
 
     </script>
 
 @endpush
+
 
 
 
