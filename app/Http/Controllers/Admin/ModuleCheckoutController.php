@@ -27,14 +27,17 @@ class ModuleCheckoutController extends Controller
         $user = Auth::user();
         abort_unless($user, 403);
 
-        $validated = $request->validate(['amount' => 'required|numeric|min:0.01',
+        $isSubUsersModule = $module->code === 'feature.sub_users';
+
+        $validated = $request->validate([
+            'amount' => $isSubUsersModule ? 'nullable|numeric|min:0.01' : 'required|numeric|min:0.01',
             'currency' => 'nullable|string|size:3',
-            'period' => 'required|in:monthly,yearly,one_time',
+            'period' => $isSubUsersModule ? 'nullable|in:yearly' : 'required|in:monthly,yearly,one_time',
         ]);
 
-        $amount = (float) $validated['amount'];
-        $currency = strtoupper((string) ($validated['currency'] ?? 'TRY'));
-        $period = (string) $validated['period'];
+        $amount = $isSubUsersModule ? 2499.0 : (float) $validated['amount'];
+        $currency = 'TRY';
+        $period = $isSubUsersModule ? 'yearly' : (string) $validated['period'];
 
         $purchase = DB::transaction(function () use ($user, $module, $amount, $currency, $period) {
             return ModulePurchase::create([

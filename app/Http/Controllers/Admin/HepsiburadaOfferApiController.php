@@ -86,7 +86,7 @@ class HepsiburadaOfferApiController extends Controller
             $platformFee = (float) config('commission_tariffs.platform_service_fee', 0);
 
             $ranges = [];
-            for ($i = 1; $i <= 4; $i++) {
+            for ($i = 1; $i <= 3; $i++) {
                 $min = $assignment?->{"range{$i}_min"};
                 $max = $assignment?->{"range{$i}_max"};
                 $percent = $assignment?->{"c{$i}_percent"};
@@ -210,7 +210,7 @@ class HepsiburadaOfferApiController extends Controller
 
         $ranges = [];
         $chosenRange = null;
-        for ($i = 1; $i <= 4; $i++) {
+        for ($i = 1; $i <= 3; $i++) {
             $min = $assignment?->{"range{$i}_min"};
             $max = $assignment?->{"range{$i}_max"};
             $percent = $assignment?->{"c{$i}_percent"};
@@ -252,7 +252,8 @@ class HepsiburadaOfferApiController extends Controller
             $this->tenantUserId($request),
             $request->input('search'),
             $request->input('category_id'),
-            $request->input('selected', [])
+            $request->input('selected', []),
+            3
         );
 
         return Excel::download($export, 'hepsiburada-teklifler.xlsx');

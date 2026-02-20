@@ -55,6 +55,7 @@ $sortKey = $request->query('sort');
             'sku' => 'sku',
             'name' => 'name',
             'brand' => 'brand',
+            'cost' => 'cost_price',
             'price' => 'price',
             'stock' => 'stock_quantity',
             'marketplace' => 'marketplace_products_count',
@@ -459,17 +460,10 @@ $limit = (int) ($plan?->max_products ?? 0);
         $this->ensureOwner($product);
         $product->load('marketplaceProducts.marketplace', 'categoryRelation');
 
-        $user = auth()->user();
-        if ($user && $user->isSuperAdmin()) {
-            $availableMarketplaces = \App\Models\Marketplace::where('is_active', true)->get();
-        } else {
-            $availableMarketplaces = \App\Models\Marketplace::whereIn('id', function ($query) use ($user) {
-                $query->select('marketplace_id')
-                    ->from('marketplace_credentials')
-                    ->where('user_id', $user->id)
-                    ->where('is_active', true);
-            })->where('is_active', true)->get();
-        }
+        // Show marketplace names even before API credentials are connected.
+        $availableMarketplaces = \App\Models\Marketplace::query()
+            ->orderBy('name')
+            ->get();
 
         return view('admin.products.show', compact('product', 'availableMarketplaces'));
     }
@@ -563,17 +557,20 @@ $product->update($validated);
     {
         $this->ensureOwner($product);
 
-        $validated = $request->validate(['price' => 'required|numeric|min:0',
+        $validated = $request->validate(['cost_price' => 'nullable|numeric|min:0',
+            'price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
         ]);
 
-        $product->update(['price' => $validated['price'],
+        $product->update(['cost_price' => ($validated['cost_price'] ?? '') !== '' ? $validated['cost_price'] : null,
+            'price' => $validated['price'],
             'stock_quantity' => $validated['stock_quantity'],
         ]);
 
         if ($request->ajax() || $request->expectsJson()) {
             return response()->json([
                 'id' => $product->id,
+                'cost_price' => $product->cost_price,
                 'price' => $product->price,
                 'stock_quantity' => $product->stock_quantity,
             ]);

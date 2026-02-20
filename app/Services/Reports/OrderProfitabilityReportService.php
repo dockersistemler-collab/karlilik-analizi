@@ -43,13 +43,17 @@ class OrderProfitabilityReportService
         $collection = $orders instanceof Collection ? $orders : collect($orders);
 
         return $collection->map(function (Order $order) {
+            $items = is_array($order->items)
+                ? $order->items
+                : (is_string($order->items) ? (json_decode($order->items, true) ?: []) : []);
+
             $input = new ProfitabilityInput(
                 $order->id,
                 $order->order_number ?? $order->marketplace_order_id,
                 optional($order->order_date)->toDateTimeString() ?? now()->toDateTimeString(),
                 (string) ($order->total_amount ?? '0'),
                 (string) ($order->commission_amount ?? '0'),
-                is_array($order->items) ? $order->items : [],
+                $items,
                 is_array($order->marketplace_data) ? $order->marketplace_data : [],
                 $order->user_id
             );
@@ -60,6 +64,7 @@ class OrderProfitabilityReportService
                 'order_number' => $order->order_number ?? $order->marketplace_order_id,
                 'marketplace_name' => $order->marketplace?->name,
                 'order_date' => $order->order_date,
+                'image_url' => $this->resolveImageUrlFromItems($items),
                 'sale_price' => $breakdown->sale_price,
                 'profit_amount' => $breakdown->profit_amount,
                 'profit_margin_percent' => $breakdown->profit_margin_percent,
@@ -69,5 +74,26 @@ class OrderProfitabilityReportService
                 'breakdown' => json_encode($breakdown, JSON_UNESCAPED_UNICODE),
             ];
         });
+    }
+
+    /**
+     * @param array<int, mixed> $items
+     */
+    private function resolveImageUrlFromItems(array $items): ?string
+    {
+        $firstItem = $items;
+        if (array_is_list($items)) {
+            $firstItem = $items[0] ?? [];
+        }
+
+        if (!is_array($firstItem)) {
+            return null;
+        }
+
+        return $firstItem['image_url']
+            ?? $firstItem['image']
+            ?? $firstItem['product_image']
+            ?? $firstItem['thumbnail']
+            ?? null;
     }
 }

@@ -125,7 +125,7 @@ class ProfitabilityAccountController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->with('info', 'Bağlantı testi başarısız. Lütfen daha sonra tekrar deneyin.');
+            return back()->with('info', 'BaÄŸlantÄ± testi baÅŸarÄ±sÄ±z. LÃ¼tfen daha sonra tekrar deneyin.');
         }
     }
 

@@ -148,4 +148,84 @@ class EntitlementServiceTest extends TestCase
         $service = app(EntitlementService::class);
         $this->assertTrue($service->hasModule($user, 'integration.marketplace.trendyol'));
     }
+
+    public function test_sub_users_module_is_not_granted_by_plan_only(): void
+    {
+        $user = User::factory()->create(['role' => 'client']);
+        $plan = Plan::create([
+            'name' => 'Pro Sub Users',
+            'slug' => 'pro-sub-users',
+            'price' => 100,
+            'billing_period' => 'monthly',
+            'features' => [
+                'modules' => ['feature.sub_users'],
+            ],
+        ]);
+        Subscription::create([
+            'user_id' => $user->id,
+            'plan_id' => $plan->id,
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addMonth(),
+            'amount' => 100,
+            'billing_period' => 'monthly',
+        ]);
+
+        Module::create([
+            'code' => 'feature.sub_users',
+            'name' => 'Alt Kullanicilar',
+            'type' => 'feature',
+            'billing_type' => 'recurring',
+            'is_active' => true,
+            'sort_order' => 0,
+        ]);
+
+        $service = app(EntitlementService::class);
+
+        $this->assertFalse($service->hasModule($user, 'feature.sub_users'));
+    }
+
+    public function test_sub_users_module_is_granted_only_when_user_module_active(): void
+    {
+        $user = User::factory()->create(['role' => 'client']);
+        $plan = Plan::create([
+            'name' => 'Pro Sub Users Active',
+            'slug' => 'pro-sub-users-active',
+            'price' => 100,
+            'billing_period' => 'monthly',
+            'features' => [
+                'modules' => ['feature.sub_users'],
+            ],
+        ]);
+        Subscription::create([
+            'user_id' => $user->id,
+            'plan_id' => $plan->id,
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addMonth(),
+            'amount' => 100,
+            'billing_period' => 'monthly',
+        ]);
+
+        $module = Module::create([
+            'code' => 'feature.sub_users',
+            'name' => 'Alt Kullanicilar',
+            'type' => 'feature',
+            'billing_type' => 'recurring',
+            'is_active' => true,
+            'sort_order' => 0,
+        ]);
+
+        UserModule::create([
+            'user_id' => $user->id,
+            'module_id' => $module->id,
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        $service = app(EntitlementService::class);
+
+        $this->assertTrue($service->hasModule($user, 'feature.sub_users'));
+    }
 }

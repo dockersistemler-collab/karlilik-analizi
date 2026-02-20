@@ -32,6 +32,8 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
     ->group(function () {
         Route::get('/', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
         Route::resource('users', SuperAdminUserController::class)->only(['index', 'edit', 'update']);
+        Route::post('users/{user}/toggle-sub-users-module', [SuperAdminUserController::class, 'toggleSubUsersModule'])
+            ->name('users.toggle-sub-users-module');
         Route::resource('plans', SuperAdminPlanController::class)->only([
             'index',
             'create',
@@ -69,6 +71,8 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
             ->name('settings.features.update');
         Route::post('settings/billing', [SuperAdminSettingsController::class, 'updateBillingPlansCatalog'])
             ->name('settings.billing.update');
+        Route::post('settings/ne-kazanirim', [SuperAdminSettingsController::class, 'updateNeKazanirimSettings'])
+            ->name('settings.ne-kazanirim.update');
         Route::post('system-settings/billing/iyzico/product-create', [SuperAdminSettingsController::class, 'createIyzicoProduct'])
             ->name('system-settings.billing.iyzico.product-create');
         Route::post('system-settings/billing/iyzico/pricing-plan-create', [SuperAdminSettingsController::class, 'createIyzicoPricingPlan'])

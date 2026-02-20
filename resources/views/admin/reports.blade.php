@@ -4,7 +4,7 @@
 
 @section('header')
 
-    Sipariþ ve Ciro Raporu
+    Sipariş ve Ciro Raporu
 
 @endsection
 
@@ -27,7 +27,7 @@ $ownerUser = auth()->user();
 
             <div class="min-w-[180px]">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">Satýþ Kanalý</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Satış Kanalı</label>
 
                 <select name="marketplace_id" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
 
@@ -49,7 +49,7 @@ $ownerUser = auth()->user();
 
             <div class="min-w-[150px]">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">Baþlangýç</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Başlangıç</label>
 
                 <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
 
@@ -57,7 +57,7 @@ $ownerUser = auth()->user();
 
             <div class="min-w-[150px]">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">Bitiþ</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Bitiş</label>
 
                 <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
 
@@ -65,7 +65,7 @@ $ownerUser = auth()->user();
 
             <div class="min-w-[150px]">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">Hýzlý Seçim</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Hızlı Seçim</label>
 
                 <select name="quick_range" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
 
@@ -97,9 +97,9 @@ $ownerUser = auth()->user();
 
                     <div class="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-lg shadow-lg p-2 z-10">
 
-                        <a href="{{ route('portal.reports.orders-revenue.export', request()->query()) }}" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md">Sipariþleri Excel'e Aktar</a>
+                        <a href="{{ route('portal.reports.orders-revenue.export', request()->query()) }}" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md">Siparişleri Excel'e Aktar</a>
 
-                        <a href="{{ route('portal.reports.orders-revenue.invoiced-export', request()->query()) }}" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md">Faturalandýrýlmýþ Sipariþleri Excel'e Aktar</a>
+                        <a href="{{ route('portal.reports.orders-revenue.invoiced-export', request()->query()) }}" class="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md">Faturalandırılmış Siparişleri Excel'e Aktar</a>
 
                     </div>
 
@@ -117,9 +117,9 @@ $ownerUser = auth()->user();
 
         <div class="flex items-center justify-between mb-4">
 
-            <h3 class="text-sm font-semibold text-slate-700">Sayýsal Ciro Ýstatistiði</h3>
+            <h3 class="text-sm font-semibold text-slate-700">Sayısal Ciro İstatistiği</h3>
 
-            <span class="text-xs text-slate-400">{{ $report['granularity'] === 'monthly' ? 'Aylýk' : 'Günlük' }} görünüm</span>
+            <span class="text-xs text-slate-400">{{ $report['granularity'] === 'monthly' ? 'Aylık' : 'Günlük' }} görünüm</span>
 
         </div>
 
@@ -167,7 +167,7 @@ $ownerUser = auth()->user();
 
                         <tr>
 
-                            <td colspan="{{ $report['marketplaces']->count() + 2 }}" class="py-4 text-center text-slate-500">Kayýt bulunamadý.</td>
+                            <td colspan="{{ $report['marketplaces']->count() + 2 }}" class="py-4 text-center text-slate-500">Kayıt bulunamadı.</td>
 
                         </tr>
 
@@ -189,13 +189,13 @@ $ownerUser = auth()->user();
 
             <div class="flex items-center justify-between mb-4">
 
-                <h3 class="text-sm font-semibold text-slate-700">Grafiksel Sipariþ / Ciro Ýstatistiði</h3>
+                <h3 class="text-sm font-semibold text-slate-700">Grafiksel Sipariş / Ciro İstatistiği</h3>
 
                 <select id="orders-revenue-chart-mode" class="text-xs px-2 py-1 border border-slate-200 rounded-lg">
 
                     <option value="revenue">Ciro</option>
 
-                    <option value="orders">Sipariþ Sayýsý</option>
+                    <option value="orders">Sipariş Sayısı</option>
 
                 </select>
 
@@ -211,7 +211,7 @@ $ownerUser = auth()->user();
 
         <div class="panel-card p-6">
 
-            <h3 class="text-sm font-semibold text-slate-700 mb-4">Pazaryeri Ciro Daðýlýmý</h3>
+            <h3 class="text-sm font-semibold text-slate-700 mb-4">Pazaryeri Ciro Dağılımı</h3>
 
             <div class="h-56">
 
@@ -223,7 +223,7 @@ $ownerUser = auth()->user();
 
         <div class="panel-card p-6">
 
-            <h3 class="text-sm font-semibold text-slate-700 mb-4">Pazaryeri Sipariþ Daðýlýmý</h3>
+            <h3 class="text-sm font-semibold text-slate-700 mb-4">Pazaryeri Sipariş Dağılımı</h3>
 
             <div class="h-56">
 
@@ -301,7 +301,7 @@ $ownerUser = auth()->user();
 
             const mode = modeSelect.value;
 
-            lineChart.data.datasets[0].label = mode === 'orders' ? 'Sipariþ Sayýsý' : 'Ciro';
+            lineChart.data.datasets[0].label = mode === 'orders' ? 'Sipariş Sayısı' : 'Ciro';
 
             lineChart.data.datasets[0].data = mode === 'orders' ? ordersData : revenueData;
 

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\NeKazanirimController;
 use App\Http\Controllers\Webhooks\IyzicoPaymentWebhookController;
 use App\Http\Controllers\Payments\IyzicoCheckoutCallbackController;
 use App\Http\Controllers\Billing\IyzicoController as BillingIyzicoController;
@@ -78,6 +79,10 @@ if ($appDomain) {
         ->middleware('correlation')
         ->group(function () {
             require __DIR__.'/customer.php';
+
+            Route::middleware(['client_or_subuser', 'verified', 'subscription', 'subuser.permission', 'support.readonly'])
+                ->get('/ne-kazanirim', [NeKazanirimController::class, 'index'])
+                ->name('ne-kazanirim.index');
         });
 }
 

@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('header')
     Trendyol Teklifler
@@ -7,12 +7,6 @@
 @section('content')
     <div class="commission-page">
         <div class="commission-hero">
-            <div class="commission-hero-content">
-                <div class="commission-hero-title">
-                    <span class="commission-badge-hero">Komisyon Tarifeleri</span>
-                    <span class="commission-status-pill">Canlı</span>
-                </div>
-            </div>
             <div class="commission-hero-aside">
                 <div class="commission-hero-actions">
                     <button id="commission-upload-btn" class="btn btn-solid-accent">
@@ -68,7 +62,7 @@
                         <th class="w-10"></th>
                         <th>Ürün</th>
                         <th>Stok</th>
-                        <th>Güncel Fiyat (?)</th>
+                        <th>Güncel Fiyat (₺)</th>
                         <th>1. Fiyat Aralığı</th>
                         <th>2. Fiyat Aralığı</th>
                         <th>3. Fiyat Aralığı</th>
@@ -709,7 +703,7 @@
 
     let currentPage = 1;
     let lastPage = 1;
-    let pageSize = Number(pageSizeSelect?.value || 20);
+    let pageSize = Number(pageSizeSelect?? ;
     let latestUploadId = null;
     let currentHeaders = [];
 
@@ -738,14 +732,14 @@
         modal.classList.toggle('flex', show);
     }
 
-    uploadBtn?.addEventListener('click', () => toggleModal(uploadModal, true));
-    uploadClose?.addEventListener('click', () => toggleModal(uploadModal, false));
-    uploadCancel?.addEventListener('click', () => toggleModal(uploadModal, false));
-    mapClose?.addEventListener('click', () => toggleModal(mapModal, false));
-    mapCancel?.addEventListener('click', () => toggleModal(mapModal, false));
-    errorsClose?.addEventListener('click', () => toggleModal(errorsModal, false));
+    uploadBtn?? ;
+    uploadClose?? ;
+    uploadCancel?? ;
+    mapClose?? ;
+    mapCancel?? ;
+    errorsClose?? ;
 
-    document.getElementById('commission-upload-form')?.addEventListener('submit', async (event) => {
+    document.getElementById('commission-upload-form')?? ) => {
         event.preventDefault();
         const form = event.target;
         const formData = new FormData(form);
@@ -789,7 +783,7 @@
         });
     }
 
-    mapSave?.addEventListener('click', async () => {
+    mapSave?? ) => {
         const mapping = {};
         mapFields.querySelectorAll('select').forEach(select => {
             if (select.value) {
@@ -812,7 +806,7 @@
         toggleModal(mapModal, false);
     });
 
-    errorsBtn?.addEventListener('click', async () => {
+    errorsBtn?? ) => {
         if (!latestUploadId) {
             toggleModal(errorsModal, true);
             return;
@@ -844,7 +838,7 @@
             search: searchInput.value || '',
             category_id: categorySelect.value || '',
         });
-        const response = await fetch(`{{ route('portal.campaigns.trendyol-offers.api.list') }}?${params.toString()}`);
+        const response = await fetch(`{{ route('portal.campaigns.trendyol-offers.api.list') }}?? ;
         const data = await response.json();
         currentPage = data.meta.current_page;
         lastPage = data.meta.last_page;
@@ -879,8 +873,8 @@
                         </div>
                     </div>
                 </td>
-                <td>${row.stock ?? 0}</td>
-                <td>${row.current_price ?? 0}</td>
+                <td>${row.stock ? 0}</td>
+                <td>${row.current_price ? 0}</td>
                 ${row.ranges.map((r, idx) => renderRangeCard(r, row.current_price, idx + 1)).join('')}
                 <td>
                     <div class="commission-manual-cell">
@@ -894,8 +888,8 @@
     }
 
     function renderRangeCard(range, currentPrice, index) {
-        const rangeText = `${formatMoney(range.min ?? 0)} - ${formatMoney(range.max ?? 0)}`;
-        const profitText = `${formatMoney(range.profit ?? 0)} Kâr (${formatNumber(range.profit_rate ?? 0)}%)`;
+        const rangeText = `${formatMoney(range.min ?? ;
+        const profitText = `${formatMoney(range.profit ?? ;
         const isActive = currentPrice !== null && currentPrice !== undefined
             && range.min !== null && range.max !== null
             && Number(currentPrice) >= Number(range.min) && Number(currentPrice) <= Number(range.max);
@@ -903,10 +897,10 @@
             <td>
                 <div class="commission-card ${isActive ? 'is-active' : ''}" data-range-index="${index}">
                     <div class="commission-range">
-                        ?${formatMoney(range.min ?? 0)} - <span class="max">?${formatMoney(range.max ?? 0)}</span>
+                        ₺${formatMoney(range.min ?? )} - <span class="max">₺${formatMoney(range.max ?? )}</span>
                     </div>
-                    <div class="commission-line">Komisyon ${formatNumber(range.commission_percent ?? 0)}</div>
-                    <div class="commission-pill">?${profitText}</div>
+                    <div class="commission-line">Komisyon ${formatNumber(range.commission_percent ?? )}</div>
+                    <div class="commission-pill">₺${profitText}</div>
                     <button type="button" class="commission-action" data-range="${index}">Varyantı Seç</button>
                 </div>
             </td>
@@ -943,7 +937,7 @@
                     row.querySelectorAll('.commission-card').forEach(card => card.classList.remove('is-active'));
                     if (data.chosenRange) {
                         const active = row.querySelector(`.commission-card[data-range-index="${data.chosenRange}"]`);
-                        active?.classList.add('is-active');
+                        active?? ;
                     }
                 }
             });
@@ -981,7 +975,7 @@
         });
     });
 
-    document.getElementById('commission-bulk-download')?.addEventListener('click', async () => {
+    document.getElementById('commission-bulk-download')?? ) => {
         const selected = Array.from(document.querySelectorAll('.commission-select:checked'))
             .map(el => Number(el.dataset.variant));
         const response = await fetch('{{ route('portal.campaigns.trendyol-offers.api.export') }}', {
@@ -1003,7 +997,7 @@
         link.remove();
     });
 
-    selectAllCheckbox?.addEventListener('change', (event) => {
+    selectAllCheckbox?? ) => {
         const checked = event.target.checked;
         document.querySelectorAll('.commission-select').forEach(el => {
             el.checked = checked;
@@ -1011,18 +1005,18 @@
     });
 
 
-    prevBtn?.addEventListener('click', () => {
+    prevBtn?? ) => {
         if (currentPage > 1) loadTable(currentPage - 1);
     });
-    nextBtn?.addEventListener('click', () => {
+    nextBtn?? ) => {
         if (currentPage < lastPage) loadTable(currentPage + 1);
     });
-    pageSizeSelect?.addEventListener('change', () => {
+    pageSizeSelect?? ) => {
         pageSize = Number(pageSizeSelect.value || 20);
         loadTable(1);
     });
-    searchInput?.addEventListener('change', () => loadTable(1));
-    categorySelect?.addEventListener('change', () => loadTable(1));
+    searchInput?? ;
+    categorySelect?? ;
 
     function formatMoney(value) {
         const number = Number(value) || 0;
@@ -1037,6 +1031,12 @@
     loadTable(1);
 </script>
 @endpush
+
+
+
+
+
+
 
 
 

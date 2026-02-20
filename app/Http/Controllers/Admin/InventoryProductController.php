@@ -58,6 +58,7 @@ class InventoryProductController extends Controller
             'sku' => 'sku',
             'name' => 'name',
             'brand' => 'brand',
+            'cost' => 'cost_price',
             'price' => 'price',
             'stock' => 'stock_quantity',
             'marketplace' => 'marketplace_products_count',

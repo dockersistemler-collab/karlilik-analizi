@@ -12,6 +12,8 @@
                     <span class="commission-badge-hero">Komisyon Tarifeleri</span>
                     <span class="commission-status-pill">Canlı</span>
                 </div>
+                <h2>Ürün komisyon tarifelerini yönet, aralık bazlı kârlılığı tek ekranda izle.</h2>
+                <p>Excel’den gelen komisyon aralıklarını eşleştir, varyantlara uygula, kâr simülasyonunu anında doğrula.</p>
             </div>
             <div class="commission-hero-aside">
                 <div class="commission-hero-actions">
@@ -84,16 +86,7 @@
             </table>
         </div>
         <div class="flex items-center justify-between text-xs text-slate-500 mt-4">
-            <div class="flex items-center gap-3">
-                <label for="commission-page-size" class="text-slate-500">Sayfa başına</label>
-                <select id="commission-page-size" class="px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 shadow-sm">
-                    <option value="10">10</option>
-                    <option value="20" selected>20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-                <div id="commission-pagination-info">Toplam kayıt: 0</div>
-            </div>
+            <div id="commission-pagination-info">Toplam kayıt: 0</div>
             <div class="flex items-center gap-2">
                 <button id="commission-prev" class="btn btn-outline btn-sm">Önceki</button>
                 <button id="commission-next" class="btn btn-outline btn-sm">Sonraki</button>
@@ -699,7 +692,6 @@
     const mapFields = document.getElementById('commission-map-fields');
     const tableBody = document.getElementById('commission-table-body');
     const paginationInfo = document.getElementById('commission-pagination-info');
-    const pageSizeSelect = document.getElementById('commission-page-size');
     const prevBtn = document.getElementById('commission-prev');
     const nextBtn = document.getElementById('commission-next');
     const searchInput = document.getElementById('commission-search');
@@ -709,7 +701,6 @@
 
     let currentPage = 1;
     let lastPage = 1;
-    let pageSize = Number(pageSizeSelect?.value || 20);
     let latestUploadId = null;
     let currentHeaders = [];
 
@@ -840,7 +831,6 @@
     async function loadTable(page = 1) {
         const params = new URLSearchParams({
             page,
-            per_page: String(pageSize),
             search: searchInput.value || '',
             category_id: categorySelect.value || '',
         });
@@ -1016,10 +1006,6 @@
     });
     nextBtn?.addEventListener('click', () => {
         if (currentPage < lastPage) loadTable(currentPage + 1);
-    });
-    pageSizeSelect?.addEventListener('change', () => {
-        pageSize = Number(pageSizeSelect.value || 20);
-        loadTable(1);
     });
     searchInput?.addEventListener('change', () => loadTable(1));
     categorySelect?.addEventListener('change', () => loadTable(1));

@@ -1961,7 +1961,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                             <a href="{{ route('portal.reports.order-profitability') }}" class="sidebar-link {{ request()->routeIs('portal.reports.order-profitability') ? 'is-active' : '' }}">
 
-                                <span class="sidebar-label">Sipariş Kârlılık</span>
+                                <span class="sidebar-label">Sipariş Karlılık</span>
 
                             </a>
 
@@ -2040,10 +2040,10 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                         <i class="fa-solid fa-chevron-down text-xs sidebar-label"></i>
                     </button>
                     <div id="campaigns-submenu" class="sidebar-submenu">
-                        <a href="{{ route('portal.campaigns.trendyol-offers') }}" class="sidebar-link {{ request()->routeIs('portal.campaigns.trendyol-offers') ? 'is-active' : '' }}">
+                        <a href="{{ route('portal.campaigns.trendyol-offers') }}" class="sidebar-link {{ request()->routeIs('portal.campaigns.trendyol-offers', 'portal.campaigns.trendyol-offers.*') ? 'is-active' : '' }}">
                             <span class="sidebar-label">Trendyol Teklifler</span>
                         </a>
-                        <a href="{{ route('portal.campaigns.hepsiburada-offers') }}" class="sidebar-link {{ request()->routeIs('portal.campaigns.hepsiburada-offers') ? 'is-active' : '' }}">
+                        <a href="{{ route('portal.campaigns.hepsiburada-offers') }}" class="sidebar-link {{ request()->routeIs('portal.campaigns.hepsiburada-offers', 'portal.campaigns.hepsiburada-offers.*') ? 'is-active' : '' }}">
                             <span class="sidebar-label">Hepsiburada Teklifler</span>
                         </a>
                     </div>
@@ -2052,18 +2052,23 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                 @if($canProfitability)
                     <button id="profitability-menu-toggle" type="button" class="sidebar-link w-full text-left {{ request()->routeIs('portal.profitability.*') ? 'is-active' : '' }}">
                         <i class="fa-solid fa-chart-pie w-6"></i>
-                        <span class="sidebar-label flex-1">Kârlılık</span>
+                        <span class="sidebar-label flex-1">Karlılık</span>
                         <i class="fa-solid fa-chevron-down text-xs sidebar-label"></i>
                     </button>
                     <div id="profitability-submenu" class="sidebar-submenu">
                         <a href="{{ route('portal.profitability.index') }}" class="sidebar-link {{ request()->routeIs('portal.profitability.index') ? 'is-active' : '' }}">
-                            <span class="sidebar-label">Genel Bakış</span>
+                            <span class="sidebar-label">Genel Bakis</span>
                         </a>
                         <a href="{{ route('portal.profitability.accounts.index') }}" class="sidebar-link {{ request()->routeIs('portal.profitability.accounts.*') ? 'is-active' : '' }}">
                             <span class="sidebar-label">Hesaplar</span>
                         </a>
-                    </div>
+                        </div>
                 @endif
+
+                <a href="{{ route('ne-kazanirim.index') }}" class="sidebar-link {{ request()->routeIs('ne-kazanirim.*') ? 'is-active' : '' }}">
+                    <i class="fa-solid fa-calculator w-6"></i>
+                    <span class="sidebar-label">Ne Kazanırım</span>
+                </a>
 
 
 
@@ -2193,7 +2198,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                             <i class="fa-solid fa-graduation-cap text-xs"></i>
 
-                            Eðitim Merkezi
+                            Eğitim Merkezi
 
                         </a>
 
@@ -2441,7 +2446,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                         <div class="menu-modern-hero-content">
                             <div class="menu-modern-hero-title">
                                 <span class="menu-modern-badge">Menü Alanı</span>
-                                <span class="menu-modern-status-pill">Canli</span>
+                                <span class="menu-modern-status-pill">Canlı</span>
                             </div>
                             <h1 class="menu-modern-title">{{ $resolvedHeader }}</h1>
                             <p class="menu-modern-subtitle">İşlemleri komisyon tarifeleri ekranıyla aynı modern yapıda yönetin.</p>
@@ -2449,8 +2454,8 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                         <div class="menu-modern-hero-aside">
                             <div class="menu-modern-hero-actions">
                                 <span class="menu-modern-chip"><i class="fa-solid fa-layer-group"></i> Modern Düzen</span>
-                                <span class="menu-modern-chip"><i class="fa-solid fa-bolt"></i> Hizli Erisim</span>
-                                <span class="menu-modern-chip"><i class="fa-solid fa-chart-line"></i> Akilli Akis</span>
+                                <span class="menu-modern-chip"><i class="fa-solid fa-bolt"></i> Hızlı Erişim</span>
+                                <span class="menu-modern-chip"><i class="fa-solid fa-chart-line"></i> Akıllı Akış</span>
                             </div>
                         </div>
                     </div>
@@ -2800,25 +2805,25 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
 	    </script>
 
-    <script>
-        const campaignsMenuToggle = document.getElementById('campaigns-menu-toggle');
-        const campaignsSubmenu = document.getElementById('campaigns-submenu');
+        <script>
+            const campaignsMenuToggle = document.getElementById('campaigns-menu-toggle');
+            const campaignsSubmenu = document.getElementById('campaigns-submenu');
 
-        function setCampaignsMenu(open) {
-            campaignsSubmenu?.classList.toggle('is-open', open);
-        }
+            function setCampaignsMenu(open) {
+                campaignsSubmenu?.classList.toggle('is-open', open);
+            }
 
-        if (campaignsSubmenu) {
-            const hasActive = campaignsSubmenu.querySelector('.is-active');
-            const parentActive = campaignsMenuToggle?.classList.contains('is-active');
-            setCampaignsMenu(Boolean(hasActive || parentActive));
-        }
+            if (campaignsSubmenu) {
+                const hasActive = campaignsSubmenu.querySelector('.is-active');
+                const parentActive = campaignsMenuToggle?.classList.contains('is-active');
+                setCampaignsMenu(Boolean(hasActive || parentActive));
+            }
 
-        campaignsMenuToggle?.addEventListener('click', () => {
-            const isOpen = campaignsSubmenu?.classList.contains('is-open');
-            setCampaignsMenu(!isOpen);
-        });
-    </script>
+            campaignsMenuToggle?.addEventListener('click', () => {
+                const isOpen = campaignsSubmenu?.classList.contains('is-open');
+                setCampaignsMenu(!isOpen);
+            });
+        </script>
 
         <script>
             const profitabilityMenuToggle = document.getElementById('profitability-menu-toggle');
@@ -3192,6 +3197,8 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 </body>
 
 </html>
+
+
 
 
 

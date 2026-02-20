@@ -15,6 +15,7 @@ use App\Services\Reports\SoldProductsReportService;
 use App\Services\Reports\StockValueReportService;
 use App\Services\Reports\TopProductsReportService;
 use App\Services\Reports\VatReportService;
+use App\Services\SystemSettings\SettingsRepository;
 use App\Support\SupportUser;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -198,12 +199,55 @@ $selectedMarketplaceId = $filters['marketplace_id'] ?? null;
             ->get();
 
         $rows = $service->rows($orders);
+        $settings = app(SettingsRepository::class);
+        $withholdingRatePercent = (float) $settings->get(
+            'ne_kazanirim',
+            'withholding_rate_percent',
+            config('ne_kazanirim.withholding_rate_percent', 1.0)
+        );
+        $platformServiceAmountTrendyol = (float) $settings->get(
+            'ne_kazanirim',
+            'platform_service_amount_trendyol',
+            $settings->get(
+                'ne_kazanirim',
+                'platform_service_amount',
+                config('ne_kazanirim.platform_service_amount_trendyol', 0.0)
+            )
+        );
+        $platformServiceAmountHepsiburada = (float) $settings->get(
+            'ne_kazanirim',
+            'platform_service_amount_hepsiburada',
+            config('ne_kazanirim.platform_service_amount_hepsiburada', 0.0)
+        );
+        $platformServiceAmountN11 = (float) $settings->get(
+            'ne_kazanirim',
+            'platform_service_amount_n11',
+            config('ne_kazanirim.platform_service_amount_n11', 0.0)
+        );
+        $platformServiceAmountAmazon = (float) $settings->get(
+            'ne_kazanirim',
+            'platform_service_amount_amazon',
+            config('ne_kazanirim.platform_service_amount_amazon', 0.0)
+        );
+        $platformServiceAmountCiceksepeti = (float) $settings->get(
+            'ne_kazanirim',
+            'platform_service_amount_ciceksepeti',
+            config('ne_kazanirim.platform_service_amount_ciceksepeti', 0.0)
+        );
 
         return view('admin.reports.order-profitability', [
             'filters' => $filters,
             'marketplaces' => $marketplaces,
             'quickRanges' => $this->quickRanges(),
             'rows' => $rows,
+            'neKazanirimSettings' => [
+                'withholding_rate_percent' => $withholdingRatePercent,
+                'platform_service_amount_trendyol' => $platformServiceAmountTrendyol,
+                'platform_service_amount_hepsiburada' => $platformServiceAmountHepsiburada,
+                'platform_service_amount_n11' => $platformServiceAmountN11,
+                'platform_service_amount_amazon' => $platformServiceAmountAmazon,
+                'platform_service_amount_ciceksepeti' => $platformServiceAmountCiceksepeti,
+            ],
         ]);
     }
 

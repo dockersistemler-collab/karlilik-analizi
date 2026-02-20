@@ -976,11 +976,19 @@
 
                 </a>
 
-                <a href="{{ route('super-admin.settings.index') }}" class="sidebar-link {{ request()->routeIs('super-admin.settings.*') ? 'is-active' : '' }}">
+                <a href="{{ route('super-admin.settings.index') }}" class="sidebar-link {{ request()->routeIs('super-admin.settings.*') && request()->query('tab') !== 'ne-kazanirim' ? 'is-active' : '' }}">
 
                     <i class="fa-solid fa-gear w-6"></i>
 
                     <span class="sidebar-label">Sistem Ayarları</span>
+
+                </a>
+
+                <a href="{{ route('super-admin.settings.index', ['tab' => 'ne-kazanirim']) }}" class="sidebar-link {{ request()->routeIs('super-admin.settings.*') && request()->query('tab') === 'ne-kazanirim' ? 'is-active' : '' }}">
+
+                    <i class="fa-solid fa-calculator w-6"></i>
+
+                    <span class="sidebar-label">Ne Kazanirim Ayarlari</span>
 
                 </a>
 

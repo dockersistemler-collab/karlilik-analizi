@@ -26,7 +26,7 @@ class VatReportService
 
         foreach ($orders as $order) {
             $period = Carbon::parse($order->order_date)->format('Y-m');
-            $items = is_array($order->items) ? $order->items : [];
+            $items = $this->normalizeItems($order->items);
             $vatTotal = 0.0;
 
             foreach ($items as $item) {
@@ -54,8 +54,49 @@ $labels = $grouped->keys()->values()->all();
         ];
     }
 
-    private function calculateItemVat(array $item): float
+    /**
+     * @param mixed $rawItems
+     * @return array<int, array<string, mixed>>
+     */
+    private function normalizeItems(mixed $rawItems): array
     {
+        if (is_string($rawItems)) {
+            $decoded = json_decode($rawItems, true);
+            $rawItems = is_array($decoded) ? $decoded : [];
+        }
+
+        if (!is_array($rawItems)) {
+            return [];
+        }
+
+        $items = [];
+        foreach ($rawItems as $rawItem) {
+            if (is_string($rawItem)) {
+                $decodedItem = json_decode($rawItem, true);
+                if (is_array($decodedItem)) {
+                    $items[] = $decodedItem;
+                }
+                continue;
+            }
+
+            if (is_array($rawItem)) {
+                $items[] = $rawItem;
+            }
+        }
+
+        return $items;
+    }
+
+    private function calculateItemVat(mixed $item): float
+    {
+        if (is_string($item)) {
+            $item = json_decode($item, true);
+        }
+
+        if (!is_array($item)) {
+            return 0.0;
+        }
+
         $qty = (int) ($item['quantity'] ?? $item['qty'] ?? $item['adet'] ?? 0);
 
         if (isset($item['vat_amount'])) {

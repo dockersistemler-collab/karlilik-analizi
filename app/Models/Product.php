@@ -45,6 +45,9 @@ class Product extends Model
             return null;
         }
 
+        // Normalize Windows-style paths for browser URLs.
+        $url = str_replace('\\', '/', (string) $url);
+
         if (Str::startsWith($url, ['http://', 'https://'])) {
             $path = parse_url($url, PHP_URL_PATH);
             if ($path && Str::startsWith($path, '/storage/')) {
@@ -108,6 +111,16 @@ class Product extends Model
     public function marketplaceListings()
     {
         return $this->hasMany(MarketplaceListing::class);
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    public function commissionTariffAssignments()
+    {
+        return $this->hasMany(CommissionTariffAssignment::class);
     }
 }
 

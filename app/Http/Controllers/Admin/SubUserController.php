@@ -26,6 +26,7 @@ class SubUserController extends Controller
         'reports.brand_sales' => 'Raporlar: Marka Bazlı Satış',
         'reports.vat' => 'Raporlar: KDV Raporu',
         'reports.commission' => 'Raporlar: Komisyon Raporu',
+        'reports.commission_tariffs' => 'Raporlar: Ürün Komisyon Tarifeleri',
         'reports.stock_value' => 'Raporlar: Stoktaki Ürün Tutarları',
         'reports.profitability' => 'Raporlar: Sipariş Kârlılık Analizi',
         'integrations' => 'Entegrasyonlar',

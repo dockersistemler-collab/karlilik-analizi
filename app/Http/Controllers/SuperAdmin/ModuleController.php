@@ -150,7 +150,7 @@ $meta = $decoded;
         $module->is_active = !$module->is_active;
         $module->save();
 
-        return back()->with('success', 'ModÃ¼l durumu gÃ¼ncellendi.');
+        return back()->with('success', 'Modül durumu güncellendi.');
     }
 }
 

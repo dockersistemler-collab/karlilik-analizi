@@ -120,6 +120,14 @@
 
             </button>
 
+            <button type="button" class="tab-button btn btn-outline justify-start" data-tab-button="ne-kazanirim">
+
+                <i class="fa-solid fa-calculator"></i>
+
+                Ne Kazanırım
+
+            </button>
+
         </div>
 
     </div>
@@ -837,6 +845,12 @@
             </form>
 
         </div>
+
+    </section>
+
+    <section class="tab-panel hidden" data-tab-panel="ne-kazanirim">
+
+        @include('super-admin.settings.partials.ne_kazanirim')
 
     </section>
 

@@ -54,6 +54,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        require_once app_path('Support/helpers.php');
+
         $this->app->bind(ProductCostResolver::class, EloquentProductCostResolver::class);
         $this->app->bind(ShippingFeeResolver::class, MarketplaceDataShippingFeeResolver::class);
         $this->app->bind(RefundShippingResolver::class, MarketplaceDataRefundShippingResolver::class);

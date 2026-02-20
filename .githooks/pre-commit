@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+set -e
+
+echo "[pre-commit] Auto-fixing UTF-8 mojibake..."
+
+before_unstaged="$(git diff --name-only)"
+
+if command -v composer >/dev/null 2>&1; then
+  composer run --quiet fix:utf8-tr
+else
+  echo "[pre-commit] composer not found. Commit blocked."
+  exit 1
+fi
+
+after_unstaged="$(git diff --name-only)"
+if [ "$before_unstaged" != "$after_unstaged" ]; then
+  echo "[pre-commit] UTF-8 fixes applied. Please review and stage changes, then commit again."
+  git status --short
+  exit 1
+fi
+
+echo "[pre-commit] Running quality checks..."
+composer run --quiet check:quality
+
+echo "[pre-commit] Quality checks passed."

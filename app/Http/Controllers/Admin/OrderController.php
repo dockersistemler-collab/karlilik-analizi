@@ -32,7 +32,12 @@ class OrderController extends Controller
         }
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $status = (string) $request->status;
+            if ($status === 'approval') {
+                $query->whereIn('status', ['pending', 'approved']);
+            } elseif ($status !== 'all') {
+                $query->where('status', $status);
+            }
         }
 
         if ($request->filled('date_from')) {

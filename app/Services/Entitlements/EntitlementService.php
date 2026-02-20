@@ -20,6 +20,13 @@ class EntitlementService
         if ($user->isSuperAdmin()) {
             return true;
         }
+
+        // Security rule: sub-users module must be explicitly assigned per client by super-admin.
+        // Plan-level grants are ignored for this module.
+        if ($code === 'feature.sub_users') {
+            return $this->hasActiveUserModule($user, $code);
+        }
+
 $plan = $user->getActivePlan();
         if (!$plan) {
             return false;

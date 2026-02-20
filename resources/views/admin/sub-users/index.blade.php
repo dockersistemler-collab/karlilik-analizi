@@ -222,6 +222,8 @@
 
                             'reports.commission' => 'Raporlar: Komisyon Raporu',
 
+                            'reports.commission_tariffs' => 'Raporlar: Ürün Komisyon Tarifeleri',
+
                             'reports.stock_value' => 'Raporlar: Stoktaki Ürün Tutarları',
                             'reports.profitability' => 'Raporlar: Sipariş Kârlılık Analizi',
 
@@ -318,6 +320,8 @@
         'reports.vat': 'Raporlar: KDV Raporu',
 
         'reports.commission': 'Raporlar: Komisyon Raporu',
+
+        'reports.commission_tariffs': 'Raporlar: Ürün Komisyon Tarifeleri',
 
         'reports.stock_value': 'Raporlar: Stoktaki Ürün Tutarları',
         'reports.profitability': 'Raporlar: Sipariş Kârlılık Analizi',

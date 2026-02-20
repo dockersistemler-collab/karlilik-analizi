@@ -1,0 +1,531 @@
+Ana Kategori	Alt Kategori	Alt?n Alt Kategori	Kategori Komisyon % (KDV Dahil)
+Aksesuar	Altın (İşlenmemiş)	Altın (İşlenmemiş)	9%
+Aksesuar	Atkı & Bere & Eldiven	Atkı, Atkı & Bere & Eldiven Set, Bere, Boyunluk, Eldiven, Şal & Fular & Eşarp	21.5%
+Aksesuar	Atkı & Bere & Eldiven	Atkı, Atkı & Bere & Eldiven Set, Bere, Boyunluk, Eldiven, Şal & Fular & Eşarp	21.5%
+Aksesuar	Atkı & Bere & Eldiven	Atkı, Atkı & Bere & Eldiven Set, Bere, Boyunluk, Eldiven, Şal & Fular & Eşarp	21.5%
+Aksesuar	Atkı & Bere & Eldiven	Atkı, Atkı & Bere & Eldiven Set, Bere, Boyunluk, Eldiven, Şal & Fular & Eşarp	21.5%
+Aksesuar	Diğer Aksesuar	Kemer, Saç Aksesuarı, Kravat & Pantolon Askısı, Kol Düğmesi, Şapka	22.5%
+Aksesuar	Diğer Aksesuar	Kemer, Saç Aksesuarı, Kravat & Pantolon Askısı, Kol Düğmesi, Şapka	22.5%
+Aksesuar	Diğer Aksesuar	Kemer, Saç Aksesuarı, Kravat & Pantolon Askısı, Kol Düğmesi, Şapka	22.5%
+Aksesuar	Diğer Aksesuar	Kemer, Saç Aksesuarı, Kravat & Pantolon Askısı, Kol Düğmesi, Şapka	22.5%
+Aksesuar	Gözlük	Güneş Gözlüğü, Mavi Işık Korumalı Gözlük , İmaj Gözlüğü	21.5%
+Aksesuar	Gözlük	Güneş Gözlüğü, Mavi Işık Korumalı Gözlük , İmaj Gözlüğü	21.5%
+Aksesuar	Gözlük	Güneş Gözlüğü, Mavi Işık Korumalı Gözlük , İmaj Gözlüğü	21.5%
+Aksesuar	Gözlük	Güneş Gözlüğü, Mavi Işık Korumalı Gözlük , İmaj Gözlüğü	21.5%
+Aksesuar	Mücevher	Altın, Gümüş, Pırlanta Takı ve Takı Setleri	21.5%
+Aksesuar	Mücevher	Altın, Gümüş, Pırlanta Takı ve Takı Setleri	21.5%
+Aksesuar	Mücevher	Altın, Gümüş, Pırlanta Takı ve Takı Setleri	21.5%
+Aksesuar	Mücevher	Altın, Gümüş, Pırlanta Takı ve Takı Setleri	21.5%
+Aksesuar	Saat	Saat, Saat Kordonu	21.5%
+Aksesuar	Saat	Saat, Saat Kordonu	21.5%
+Aksesuar	Saat	Saat, Saat Kordonu	21.5%
+Aksesuar	Saat	Saat, Saat Kordonu	21.5%
+Aksesuar	Takı	Halhal&Ayak Aksesuarları, Bijuteri Bileklik, Çelik Bileklik, Choker, Bijuteri Kolye, Çelik Kolye	22.5%
+Aksesuar	Takı	Halhal&Ayak Aksesuarları, Bijuteri Bileklik, Çelik Bileklik, Choker, Bijuteri Kolye, Çelik Kolye	22.5%
+Aksesuar	Takı	Halhal&Ayak Aksesuarları, Bijuteri Bileklik, Çelik Bileklik, Choker, Bijuteri Kolye, Çelik Kolye	22.5%
+Aksesuar	Takı	Halhal&Ayak Aksesuarları, Bijuteri Bileklik, Çelik Bileklik, Choker, Bijuteri Kolye, Çelik Kolye	22.5%
+Ayakkabı & Çanta	Ayakkabı	Ayakkabı , Terlik, Diğer Ayakkabı Ürünleri	21.5%
+Ayakkabı & Çanta	Ayakkabı	Ayakkabı , Terlik, Diğer Ayakkabı Ürünleri	21.5%
+Ayakkabı & Çanta	Ayakkabı	Ayakkabı , Terlik, Diğer Ayakkabı Ürünleri	21.5%
+Ayakkabı & Çanta	Ayakkabı	Ayakkabı , Terlik, Diğer Ayakkabı Ürünleri	21.5%
+Ayakkabı & Çanta	Ayakkabı	Ayakkabı , Terlik, Diğer Ayakkabı Ürünleri	21.5%
+Ayakkabı & Çanta	Ayakkabı	Ayakkabı , Terlik, Diğer Ayakkabı Ürünleri	21.5%
+Ayakkabı & Çanta	Çanta	Çanta, Cüzdan, Valiz & Bavul	21.5%
+Ayakkabı & Çanta	Çanta	Çanta, Cüzdan, Valiz & Bavul	21.5%
+Ayakkabı & Çanta	Çanta	Çanta, Cüzdan, Valiz & Bavul	21.5%
+Ayakkabı & Çanta	Çanta	Çanta, Cüzdan, Valiz & Bavul	21.5%
+Ayakkabı & Çanta	Çanta	Çanta, Cüzdan, Valiz & Bavul	21.5%
+Ayakkabı & Çanta	Çanta	Çanta, Cüzdan, Valiz & Bavul	21.5%
+Bahçe & Elektrikli El Aletleri	Bahçe	Bahçe & Balkon Isıtma - Şömine	20%
+Bahçe & Elektrikli El Aletleri	Bahçe	Bahçe Aydınlatması	20.5%
+Bahçe & Elektrikli El Aletleri	Bahçe	Bahçe Dekorasyonu, Çitler, Gübre, Saksı, Tohumlar, Torf ve Topraklar	20%
+Bahçe & Elektrikli El Aletleri	Bahçe	Bahçe Makine Yağları	17%
+Bahçe & Elektrikli El Aletleri	Bahçe	Bahçe Makine Yağları	17%
+Bahçe & Elektrikli El Aletleri	Bahçe	Bahçe Makineleri, Çapa Makineleri, Tırpanlar	16%
+Bahçe & Elektrikli El Aletleri	Bahçe	Bahçe Makineleri, Çapa Makineleri, Tırpanlar	16%
+Bahçe & Elektrikli El Aletleri	Bahçe	Bungalov ve Prefabrik Evler	12%
+Bahçe & Elektrikli El Aletleri	Bahçe	El Aletleri, Elektrikli El Aletleri ve Aksesuarları, Manuel El Aletleri, Akülü Vidalama, Matkaplar	16.5%
+Bahçe & Elektrikli El Aletleri	Bahçe	El Aletleri, Elektrikli El Aletleri ve Aksesuarları, Manuel El Aletleri, Akülü Vidalama, Matkaplar	16.5%
+Bahçe & Elektrikli El Aletleri	Bahçe	El Aletleri, Elektrikli El Aletleri ve Aksesuarları, Manuel El Aletleri, Akülü Vidalama, Matkaplar	16.5%
+Bahçe & Elektrikli El Aletleri	Bahçe	Havuz Ürünleri	21%
+Bahçe & Elektrikli El Aletleri	Bahçe	Hayvancılık Makineleri	15.5%
+Bahçe & Elektrikli El Aletleri	Bahçe	Hayvancılık Makineleri	15.5%
+Bahçe & Elektrikli El Aletleri	Bahçe	Küçük El Aletleri	17%
+Bahçe & Elektrikli El Aletleri	Bahçe	Küçük El Aletleri	17%
+Bahçe & Elektrikli El Aletleri	Bahçe	Mangallar ve Aksesuarları	18%
+Bahçe & Elektrikli El Aletleri	Bahçe	Zincirli Ağaç Kesme, Dal Budama Makinesi	16%
+Bahçe & Elektrikli El Aletleri	Bahçe	Zincirli Ağaç Kesme, Dal Budama Makinesi	16%
+Bahçe & Elektrikli El Aletleri	Bahçe	Çim Biçme Makineleri	16%
+Bahçe & Elektrikli El Aletleri	Bahçe	Çim Biçme Makineleri	16%
+Bahçe & Elektrikli El Aletleri	Elektrikli El Aletleri	El Aletleri, Elektrikli El Aletleri ve Aksesuarları, Manuel El Aletleri, Akülü Vidalama, Matkaplar	16.5%
+Bahçe & Elektrikli El Aletleri	Elektrikli El Aletleri	El Aletleri, Elektrikli El Aletleri ve Aksesuarları, Manuel El Aletleri, Akülü Vidalama, Matkaplar	16.5%
+Bahçe & Elektrikli El Aletleri	Elektrikli El Aletleri	El Aletleri, Elektrikli El Aletleri ve Aksesuarları, Manuel El Aletleri, Akülü Vidalama, Matkaplar	16.5%
+Bahçe & Elektrikli El Aletleri	Elektrikli El Aletleri	Tilki Kuyruğu, Kaldırma Ekipmanları	16.5%
+Bahçe & Elektrikli El Aletleri	Elektrikli El Aletleri	Tilki Kuyruğu, Kaldırma Ekipmanları	16.5%
+Bahçe & Elektrikli El Aletleri	Elektrikli El Aletleri	Tilki Kuyruğu, Kaldırma Ekipmanları	16.5%
+Bahçe & Elektrikli El Aletleri	Enerji Sistemleri	Güneş Paneli ve Sistemleri, Rüzgar Türbini	16.5%
+Bahçe & Elektrikli El Aletleri	Enerji Sistemleri	Güneş Paneli ve Sistemleri, Rüzgar Türbini	16.5%
+Bahçe & Elektrikli El Aletleri	Enerji Sistemleri	Jenaratör	16%
+Bahçe & Elektrikli El Aletleri	Enerji Sistemleri	Jenaratör	16%
+Bahçe ve Yapı Market	Yapı Market	Hırdavat ve İnşaat Malzemeleri, Kutu Ambalaj Malzemeleri, Sinek Perdeleri, Yapıştırıcı ve Bantlar	20%
+Banyo Yapı & Hırdavat	Banyo Yapı Malzemeleri	Banyo Bataryası, Banyo Yapı Malzemeleri, Duş Sistemleri, Eviye, Lavabo, Lavabo Bataryası	18%
+Banyo Yapı & Hırdavat	Banyo Yapı Malzemeleri	Banyo Bataryası, Banyo Yapı Malzemeleri, Duş Sistemleri, Eviye, Lavabo, Lavabo Bataryası	18%
+Banyo Yapı & Hırdavat	Banyo Yapı Malzemeleri	Klozet	18%
+Banyo Yapı & Hırdavat	Banyo Yapı Malzemeleri	Su Arıtma	16%
+Banyo Yapı & Hırdavat	Banyo Yapı Malzemeleri	Su Arıtma	16%
+Banyo Yapı & Hırdavat	Boya	Boya & Boya Malzemeleri	19.5%
+Banyo Yapı & Hırdavat	Elektrik & Tesisat Malzemeleri	Ampul	20%
+Banyo Yapı & Hırdavat	Elektrik & Tesisat Malzemeleri	Elektrik ve Aydınlatma	20%
+Banyo Yapı & Hırdavat	Elektrik & Tesisat Malzemeleri	Güvenlik Ürünleri	21%
+Banyo Yapı & Hırdavat	Elektrik & Tesisat Malzemeleri	Para Kasaları	20%
+Banyo Yapı & Hırdavat	Hırdavat	El Aletleri, Elektrikli El Aletleri ve Aksesuarları, Manuel El Aletleri, Akülü Vidalama, Matkaplar	16.5%
+Banyo Yapı & Hırdavat	Hırdavat	El Aletleri, Elektrikli El Aletleri ve Aksesuarları, Manuel El Aletleri, Akülü Vidalama, Matkaplar	16.5%
+Banyo Yapı & Hırdavat	Hırdavat	El Aletleri, Elektrikli El Aletleri ve Aksesuarları, Manuel El Aletleri, Akülü Vidalama, Matkaplar	16.5%
+Banyo Yapı & Hırdavat	Hırdavat	Ev Kapıları	21%
+Banyo Yapı & Hırdavat	Hırdavat	Hırdavat ve İnşaat Malzemeleri, Kutu Ambalaj Malzemeleri, Sinek Perdeleri, Yapıştırıcı ve Bantlar	20%
+Banyo Yapı & Hırdavat	Hırdavat	Isınma & Soğutma Sistemi, Oda Termostatı	14%
+Banyo Yapı & Hırdavat	Hırdavat	İş Ayakkabısı&Çizmesi , İş Güvenliği Elbisesi	20.5%
+Banyo Yapı & Hırdavat	Hırdavat	İş Kıyafetleri	20.5%
+Banyo Yapı & Hırdavat	Hırdavat	İş Kıyafetleri	20.5%
+Banyo Yapı & Hırdavat	Hırdavat	Tavan Vantilatörü, Tavan Vantilatörü Aksesuarları, Sanayi Tipi Fanlar	18%
+Dijital Kod & Ürünler	Dijital Kart & Kupon & Hizmetler	Dijital Kart & Kupon & Hizmetler	11%
+Dijital Kod & Ürünler	Dijital Kod & Ürünler	Dijital Abonelik, Kargo Hizmeti, Ön Ödemeli Kartlar, Online Eğitim	11%
+Dijital Kod & Ürünler	Dijital Kod & Ürünler	Dijital Yayın Paketleri (Exxen, S Sport Plus, Bein Connect, D-Smart ...)	18%
+Dijital Kod & Ürünler	Dijital Kod & Ürünler	E-pin ve Cüzdan Kodu	11%
+Dijital Kod & Ürünler	Dijital Kod & Ürünler	Hediye Kartı	11%
+E-Kitap Okuyucu	E-Kitap Okuyucu	E-Kitap Okuyucu	10%
+Elektronik	Beyaz Eşya & TV	Ankastre, Fırın, Ocak, Davlumbaz, Aspiratör, Mikrodalga Fırın, Mini & Midi Fırın, Su Sebili	15%
+Elektronik	Beyaz Eşya & TV	Beyaz Eşya Yedek Parça	19%
+Elektronik	Beyaz Eşya & TV	Buzdolabı, Bulaşık Makinesi, Çamaşır Makinesi, Kurutma Makinesi, Derin Dondurucu	12%
+Elektronik	Beyaz Eşya & TV	Televizyon	9%
+Elektronik	Bilgisayar Grubu	Anakart,Harddisk, İşlemci,Bellek (RAM),Ekran Kartı, SSD (Solid State Drive), Bilgisayar Kasası, Power Supply (PSU)	11%
+Elektronik	Bilgisayar Grubu	Bilgisayar Yedek Parça	16.5%
+Elektronik	Bilgisayar Grubu	Dizüstü Bilgisayar, Oyuncu Dizüstü Bilgisayarı	8%
+Elektronik	Bilgisayar Grubu	Lazer Yazıcı, Mürekkep Püskürtmeli Yazıcı, Tanklı Yazıcı, Tarayıcı,Barkod Okuyucu,3D Yazıcı	12%
+Elektronik	Bilgisayar Grubu	Masaüstü Bilgisayar,Oyuncu Masaüstü Bilgisayarı, Mini Masaüstü Bilgisayar, All-in- One Monitor PC	9%
+Elektronik	Bilgisayar Grubu	Monitör, Oyuncu Monitörü	8.5%
+Elektronik	Bilgisayar Grubu	Optik Sürücü,Ses Kartı,Soğutucu ve Overclock, TV Kartları, Bileşenler Paketi, Server Donanımı, Garanti ve Ek Hizmetler	15%
+Elektronik	Dijital Kod & Ürünler	Dijital Destek Kartları	0%
+Elektronik	Elektrikli Ev Aletleri	Akıllı Aydınlatma Ürünleri	19.5%
+Elektronik	Elektrikli Ev Aletleri	Akıllı Aydınlatma Ürünleri	19.5%
+Elektronik	Elektrikli Ev Aletleri	Dik Süpürge, Torbasız Süpürge, Robot Süpürge	13.25%
+Elektronik	Elektrikli Ev Aletleri	Dik Süpürge, Torbasız Süpürge, Robot Süpürge	13.25%
+Elektronik	Elektrikli Ev Aletleri	Elektrikli Ev Aletleri Yedek Parça ve Aksesuarları	23%
+Elektronik	Elektrikli Ev Aletleri	Espresso & Cappuccino Makinesi	16.25%
+Elektronik	Elektrikli Ev Aletleri	Espresso & Cappuccino Makinesi	16.25%
+Elektronik	Elektrikli Ev Aletleri	Hava Temizleme ve Nemlendirme Cihazları	16.5%
+Elektronik	Elektrikli Ev Aletleri	Hava Temizleme ve Nemlendirme Cihazları	16.5%
+Elektronik	Elektrikli Ev Aletleri	Yiyecek ve İçecek Hazırlama, Dikiş Makinesi ve Diğer Elektrikli Ev Aletleri	15.5%
+Elektronik	Elektrikli Ev Aletleri	Yiyecek ve İçecek Hazırlama, Dikiş Makinesi ve Diğer Elektrikli Ev Aletleri	15.5%
+Elektronik	Elektrikli Ev Aletleri	Ütü, Diğer Süpürgeler	15%
+Elektronik	Elektrikli Ev Aletleri	Ütü, Diğer Süpürgeler	15%
+Elektronik	Elektronik Aksesuarlar	Akıllı Bileklik Ekran Koruyucu,Akıllı Bileklik Kordon, Akıllı Saat Ekran Koruyucu,Akıllı Saat Kordon,Kablo Aksesuarları	23%
+Elektronik	Elektronik Aksesuarlar	Akıllı Priz,Akıllı Kamera,Akıllı Güvenlik Ürünleri	14%
+Elektronik	Elektronik Aksesuarlar	Akıllı Takip Cihazları	18%
+Elektronik	Elektronik Aksesuarlar	Araç İçi Telefon Tutucu, Kablo & Adaptör	19.5%
+Elektronik	Elektronik Aksesuarlar	Bluetooth Hoparlör	14%
+Elektronik	Elektronik Aksesuarlar	Kablolu Hoparlör	14%
+Elektronik	Elektronik Aksesuarlar	Kamera Lens Koruyucu,Kulaklık Aksesuarları, Kulaklık Kılıfı	28%
+Elektronik	Elektronik Aksesuarlar	Kapak & Kılıf,Ekran Koruyucu Film	29%
+Elektronik	Elektronik Aksesuarlar	Kartuş,Tonerler, Yazıcı Mürekkepleri, Filamentler,Kartuş Dolum Seti,Diğer Yazıcı Sarf Malzemeleri	16.5%
+Elektronik	Elektronik Aksesuarlar	Klavye Mouse Set, Oyuncu Klavye Mouse Set,Çoklu Depolama Ünitesi, Webcam,Güç Kaynağı & UPS, Yayıncı Aksesuarları, Bilgisayar Hoparlörü, Bilgisayar Mikrofonları, Notebook Soğutucu	12%
+Elektronik	Elektronik Aksesuarlar	Klavye,Mouse, Oyuncu Mouse, Oyuncu Klavyesi, Oyuncu Kulaklık	12%
+Elektronik	Elektronik Aksesuarlar	Konsol Gamepad & Joystick,PlayStation Aksesuarları, Nintendo Aksesuarları,Xbox Aksesuarları,Mobil Oyun Aksesuarları	14%
+Elektronik	Elektronik Aksesuarlar	Monitör Aparatı, Monitör Kabloları, Monitör Aksesuarları	23%
+Elektronik	Elektronik Aksesuarlar	Mousepad	14.5%
+Elektronik	Elektronik Aksesuarlar	MP Player & Ses Kayıt Cihazı,Alarm Saatli Radyolar, Nostaljik Radyolar, Mikrofon	14%
+Elektronik	Elektronik Aksesuarlar	Notebook Standı, Notebook Adaptörleri,Data Kablosu,Notebook Koruyucu	23%
+Elektronik	Elektronik Aksesuarlar	Notebook Çantası	21%
+Elektronik	Elektronik Aksesuarlar	Powerbank	16%
+Elektronik	Elektronik Aksesuarlar	Projeksiyon Perdesi,Projeksiyon Sunum Kumandaları, Projeksiyon Askı Aparatları,Kablosuz Ses&Görüntü Aktarıcı	16%
+Elektronik	Elektronik Aksesuarlar	Selfie Çubuğu,TV Ekran Temizleme Ürünleri,Telefon Bataryası,Telefon Ekranı,Telefon Kamerası,Telefon Kasası,Telefon Tuş Takımı	29%
+Elektronik	Elektronik Aksesuarlar	Ses Kabloları,Scart Kablolar,Güç Kablosu,Network Kablosu,Hoparlör Ayakları & Askıları	18%
+Elektronik	Elektronik Aksesuarlar	Stereo Amfiler, Receiver Amfiler, Sinema Sistemi,Ev Tipi Subwoofer, Portatif Sistemler	14%
+Elektronik	Elektronik Aksesuarlar	Tablet Kılıfı,Tablet Standı,Tablet Kalemi, Tablet Ekran Koruyucuları	23%
+Elektronik	Elektronik Aksesuarlar	Taşınabilir Hard Disk,Taşınabilir SSD	11.5%
+Elektronik	Elektronik Aksesuarlar	TV Ekran Koruyucular,TV Askı Aparatları	18%
+Elektronik	Elektronik Aksesuarlar	USB,Hafıza Kartı	12%
+Elektronik	Elektronik Aksesuarlar	Uydu Yön Bulucular,Uydu Santrali,Çanak Antenler,Uydu Konnektörleri, Lnbler,Switchler, Uydu Bölücüler, Uzaktan Kumandalar,HDMI Kablo, Dönüştürücüler, Uzatıcı & Çoklayıcılar,Çevirici Dönüştürücü,USB Hub Çoklayıcılar, Ses Kablosu Dönüştürücüleri	19%
+Elektronik	Elektronik Aksesuarlar	Veri Depolama Aksesuarları,Hard Disk Kutuları, Yazılabilir CD, Yazılabilir DVD	22%
+Elektronik	Elektronik Aksesuarlar	Wireless Adaptör, Routerlar,Menzil Genişletici, Network Aksesuarları,Access Point,VDSL Modemler,ADSL Modemler, Elektronik Devre Elemanları,Ağ Modem Switchleri, 4G Taşınabilir Modem,Powerline Ürünleri,4G Modem & Router	11%
+Elektronik	Elektronik Aksesuarlar	Yazılım Ürünleri	12%
+Elektronik	Elektronik Aksesuarlar	Şarj Adaptörü,Araç Şarj Cihazları, Kablosuz Şarj Cihazları,Şarj Kablosu,Şarj Aletleri	23%
+Elektronik	Foto & Kamera	Dijital Fotoğraf Makinesi, SLR Fotoğraf Makinesi, Video Kamera, Aynasız Kompakt SLR Makinesi	11%
+Elektronik	Foto & Kamera	Foto & Kamera Aksesuarları, Foto & Kamera Lensleri, Vlog Kitleri	14%
+Elektronik	Giyilebilir Teknoloji & Kulaklıklar	Akıllı Bileklikler, Akıllı Çocuk Saatleri	16.5%
+Elektronik	Giyilebilir Teknoloji & Kulaklıklar	Akıllı Saatler	16.5%
+Elektronik	Giyilebilir Teknoloji & Kulaklıklar	Kulak içi TWS Bluetooth Kulaklık, Kulak üstü Bluetooth kulaklık	16%
+Elektronik	Giyilebilir Teknoloji & Kulaklıklar	Kulak İçi Kablolu Kulaklık,Kulak Üstü Kablolu Kulaklık, Boyun Bantlı Bluetooth kulaklık	18%
+Elektronik	Giyilebilir Teknoloji & Kulaklıklar	Sanal Gerçeklik Gözlüğü	16.5%
+Elektronik	Giyilebilir Teknoloji & Kulaklıklar	Yenilenmiş Akıllı Saat,Yenilenmiş Akıllı Çocuk Saati	9%
+Elektronik	Görüntü & Ses Sistemleri	DVR Kayıt Cihazı, DVD & Blu - Ray Oynatıcı	17%
+Elektronik	Görüntü & Ses Sistemleri	Ev Sinema Hoparlörü	14%
+Elektronik	Görüntü & Ses Sistemleri	Media Player	13%
+Elektronik	Görüntü & Ses Sistemleri	Projeksiyon Cihazı, Soundbar, Projeksiyon Sistemleri	13.5%
+Elektronik	Görüntü & Ses Sistemleri	TV Yedek Parça	21%
+Elektronik	Görüntü & Ses Sistemleri	Uydu Alıcı	18%
+Elektronik	Kişisel Bakım Aletleri	Epilatör	18.6%
+Elektronik	Kişisel Bakım Aletleri	Epilatör	18.6%
+Elektronik	Kişisel Bakım Aletleri	IPL Lazer Epilasyon Aletleri	18.1%
+Elektronik	Kişisel Bakım Aletleri	IPL Lazer Epilasyon Aletleri	18.1%
+Elektronik	Kişisel Bakım Aletleri	Kişisel Bakım Yedek Parça	20.1%
+Elektronik	Kişisel Bakım Aletleri	Kişisel Bakım Yedek Parça	20.1%
+Elektronik	Kişisel Bakım Aletleri	Saç Düzleştirici, Saç Maşası	19%
+Elektronik	Kişisel Bakım Aletleri	Saç Düzleştirici, Saç Maşası	19%
+Elektronik	Kişisel Bakım Aletleri	Saç Kurutma Makinesi, Tartı	19%
+Elektronik	Kişisel Bakım Aletleri	Saç Kurutma Makinesi, Tartı	19%
+Elektronik	Kişisel Bakım Aletleri	Tıraş Makinesi	18.6%
+Elektronik	Kişisel Bakım Aletleri	Tıraş Makinesi	18.6%
+Elektronik	Klima & Isıtıcı	Klima	11%
+Elektronik	Klima & Isıtıcı	Kombi	12%
+Elektronik	Klima & Isıtıcı	Kombi	12%
+Elektronik	Klima & Isıtıcı	Portatif Soğutucu, Isıtıcılar, Hava Perdeleri, Şofbenler, Termosifonlar	15%
+Elektronik	Klima & Isıtıcı	Vantilatörler	14%
+Elektronik	Oyun & Oyun Konsolları	Dijital Oyun	11.7%
+Elektronik	Oyun & Oyun Konsolları	Diğer Oyun Konsolları, Nintendo Oyunları, PS2 Oyunları, PS3 Oyunları, PS4 Oyunları, PS5 Oyunları, Xbox Oyunları, Bilgisayar Oyunları, PSP & Vita Oyunları, İkinci El, Yenilenmiş, Teşhir - Konsol Oyunları	12%
+Elektronik	Oyun & Oyun Konsolları	Playstation 3, İkinci El, Yenilenmiş, Teşhir - Oyun Konsolları	17.5%
+Elektronik	Oyun & Oyun Konsolları	Playstation 5, Playstation 4, Xbox Konsolları, Nintendo Konsolları	8%
+Elektronik	Oyun & Oyun Konsolları	PSP & Vita Konsolları	18%
+Elektronik	Tablet Grubu	Grafik Tablet	18%
+Elektronik	Tablet Grubu	Tablet	8.5%
+Elektronik	Tablet Grubu	Çocuk Çizim Tableti	19%
+Elektronik	Telefon	Android Cep Telefonları	7%
+Elektronik	Telefon	IOS Cep Telefonları	7%
+Elektronik	Telefon	İkinci El Cep Telefonları	12%
+Elektronik	Telefon	İthalatçı Garantili Telefonlar	10%
+Elektronik	Telefon	Telsiz/Masaüstü Telefonları	18.5%
+Elektronik	Telefon	Tuşlu Cep Telefonu	12%
+Elektronik	Telefon	Yenilenmiş Cep Telefonu	9%
+Elektronik	Yenilenmiş Bilgisayar Grubu	Yenilenmiş Dizüstü Bilgisayar, Yenilenmiş Oyuncu Dizüstü Bilgisayarı	11%
+Elektronik	Yenilenmiş Bilgisayar Grubu	Yenilenmiş Masaüstü Bilgisayar, Yenilenmiş Oyuncu Masaüstü Bilgisayarı, Yenilenmiş Mini Masaüstü Bilgisayar, Yenilenmiş All-in- One Monitor PC	11%
+Elektronik	Yenilenmiş Tablet Grubu	Yenilenmiş Tablet	11%
+Ev	Banyo	Banyo Aksesuarları	18.5%
+Ev	Banyo	Banyo Aksesuarları	18.5%
+Ev	Banyo	Banyo Tekstili	21%
+Ev	Banyo	Banyo Tekstili	21%
+Ev	Ev Tekstili	Yatak Odası Tekstili, Bebek & Çocuk Ev Tekstili, Salon Tekstili, Mutfak Tekstili	21%
+Ev	Ev Tekstili	Yatak Odası Tekstili, Bebek & Çocuk Ev Tekstili, Salon Tekstili, Mutfak Tekstili	21%
+Ev	Ev Tekstili	Yatak Odası Tekstili, Bebek & Çocuk Ev Tekstili, Salon Tekstili, Mutfak Tekstili	21%
+Ev	Sofra & Mutfak	Endüstriyel Mutfak Ekipmanları	19%
+Ev	Sofra & Mutfak	Endüstriyel Mutfak Ekipmanları	19%
+Ev	Sofra & Mutfak	Mutfak Gereçleri	21%
+Ev	Sofra & Mutfak	Mutfak Gereçleri	21%
+Ev	Sofra & Mutfak	Pişirme-Hazırlama	20%
+Ev	Sofra & Mutfak	Pişirme-Hazırlama	20%
+Ev	Sofra & Mutfak	Sofra Grubu	21%
+Ev	Sofra & Mutfak	Sofra Grubu	21%
+Giyim	Giyim	Spor Giyim	21.5%
+Giyim	Giyim	Spor Giyim	21.5%
+Giyim	Giyim	Spor Giyim	21.5%
+Giyim	Giyim	Üst Giyim, Alt Giyim, Çocuk, İç Giyim, Dış Giyim, Mayo	21.5%
+Giyim	Giyim	Üst Giyim, Alt Giyim, Çocuk, İç Giyim, Dış Giyim, Mayo	21.5%
+Giyim	Giyim	Üst Giyim, Alt Giyim, Çocuk, İç Giyim, Dış Giyim, Mayo	21.5%
+Hobi & Eğlence	Drone	Drone	12%
+Hobi & Eğlence	Drone Aksesuarı	Drone Aksesuarı	18.5%
+Hobi & Eğlence	Film	Film	11%
+Hobi & Eğlence	Hobi Malzemeleri	Hobi Malzemeleri	20.5%
+Hobi & Eğlence	Müzik Alet ve Ekipmanları, Müzik Albümü	Diğer Müzik Alet ve Ekipmanları, Müzik Albümü	15%
+Hobi & Eğlence	Müzik Alet ve Ekipmanları, Müzik Albümü	Gitar, Piyano, Plak, Org, Keman, DJ Urunleri, Mikrofon ve Aksesuarlar, Bağlama, Kayıt Teknolojileri, Amfi, Bateri, Stüdyo Kulaklık, Klarnet, Plak	15%
+Hobi & Eğlence	Parti ve Yılbaşı Ürünleri	Led Işık, Düğün & Kına & Nikah, Diğer Parti Ürünleri	20.5%
+Hobi & Eğlence	Parti ve Yılbaşı Ürünleri	Yılbaşı Ağacı, Yılbaşı Süsleri, Diğer Yılbaşı Ürünleri	19%
+Hobi & Eğlence	Pikap & Gramofon	Pikap & Gramofon	15%
+Hobi & Eğlence	RC Araç ve Aksesuarlar	RC Araç ve Aksesuarlar	19%
+Hobi & Eğlence	Yetişkin Hobi ve Oyun	Diğer Yetişkin Hobi ve Oyun	20%
+Hobi & Eğlence	Yetişkin Hobi ve Oyun	Hediyelik Ürün, Oyun Grupları	20%
+Hobi & Eğlence	Çakmaklar	Çakmaklar	20.5%
+Kitap	E-Kitap	E-Kitap Akseuarları	10%
+Kitap	Kitap	Aktivite Eğitici Kitaplar	15.5%
+Kitap	Kitap	Din Kitabı	15.5%
+Kitap	Kitap	Diğer Kitaplar	15.5%
+Kitap	Kitap	Eğitim Kitapları	15.5%
+Kitap	Kitap	Roman, Kişisel Gelişim Kitapları	15.5%
+Kitap	Kitap	Çizgi Roman, Dergi ve Gazete	15.5%
+Kitap	Kitap	Çocuk ve Ebeveyn Kitapları	15.5%
+Kozmetik & Kişisel Bakım	Kişisel Bakım	Ağda ve Epilasyon	19%
+Kozmetik & Kişisel Bakım	Kişisel Bakım	Ağız Bakım	19%
+Kozmetik & Kişisel Bakım	Kişisel Bakım	Banyo & Duş Ürünleri, Kolonya, Ayak Bakımı, El & Tırnak Bakımı, Vücut Spreyi	19%
+Kozmetik & Kişisel Bakım	Kişisel Bakım	Diş Macunu	19%
+Kozmetik & Kişisel Bakım	Kişisel Bakım	Günlük Ped, Hijyenik Ped	19%
+Kozmetik & Kişisel Bakım	Kişisel Bakım	Islak Tıraş	19%
+Kozmetik & Kişisel Bakım	Kişisel Bakım	Kadın Hijyen	19%
+Kozmetik & Kişisel Bakım	Kişisel Bakım	Saç Bakım	19%
+Kozmetik & Kişisel Bakım	Kişisel Bakım	Tıraş Bıçağı	19%
+Kozmetik & Kişisel Bakım	Kişisel Bakım	Şarj Edebilir Diş Fırçası/Pilli Diş Fırçası ve Başlıkları, Ağız Duşu	17%
+Kozmetik & Kişisel Bakım	Kozmetik	Cilt Bakım	19%
+Kozmetik & Kişisel Bakım	Kozmetik	Makyaj	19%
+Kozmetik & Kişisel Bakım	Kozmetik	Parfüm ve Deodorant	19%
+Kırtasiye & Ofis Malzemeleri	Boya Malzemeleri, Sanatsal Malzemeler, Sanatsal Kağıtlar & Kalemler	Akrilik Boya, Sanatsal Kağıtlar & Kalemler, Tuval, Boya Malzemeleri	18%
+Kırtasiye & Ofis Malzemeleri	Dosyalama / Arşivleme, Ofis Sarf Tüketim Malzemeleri, Diğer Kırtasiye Malzemeleri	Suluk & Matara	17%
+Kırtasiye & Ofis Malzemeleri	Dosyalama / Arşivleme, Ofis Sarf Tüketim Malzemeleri, Diğer Kırtasiye Malzemeleri	Yazı Tahtası, Etiketler, Bant & Bant Makinesi, Hesap Makinesi, Dosyalar, Klasörler, Kırtasiye Seti, Diğer Kırtasiye Malzemeleri, Keçeli Kalemler, Fosforlu Kalemler, Uçlu Kalem, Kurşun Kalemler, Tükenmez Kalemler, Teknik Çizim Kalemi, Diğer Kalemler	19%
+Kırtasiye & Ofis Malzemeleri	Fotokopi ve Baskı Kağıtları	Fotokopi ve Baskı Kağıtları	9%
+Kırtasiye & Ofis Malzemeleri	Kırtasiye Kağıt Ürünleri	Defterler, Ajanda	18%
+Kırtasiye & Ofis Malzemeleri	Kırtasiye Kağıt Ürünleri	Diğer Kırtasiye Kağıt Ürünleri	19%
+Kırtasiye & Ofis Malzemeleri	Ofis Teknolojileri	Ofis Makinesi ve Yazarkasa, Piller & Şarj Cihazları	15%
+Mobilya	Aydınlatma	Avize, Abajur, Aplik, Lambader, Masa ve Gece Lambası	23.5%
+Mobilya	Bahçe & Balkon Mobilyası	Salıncak & Hamak, Saksılık,Bahçe Sandalyesi,Bahçe Masası,Şezlong, Armut Koltuk, Şemsiye & Tente, Bahçe Dolabı,Bahçe Minderi, Bahçe Koruma Örtüsü	23%
+Mobilya	Bebek & Çocuk Odası Mobilyası	Oyuncak Dolabı, Oyun & Aktivite Masası,Bebek & Çocuk Yatak,Çocuk Dolap & Gardırop , Çocuk Çalışma Sandalyesi,Çocuk Çalışma Masası, Çocuk Komodin & Şifonyer,Çocuk Hamakları, Montessori Çocuk Odası,Öğrenme Kulesi, Beşik,Çocuk & Montessori Karyola	23%
+Mobilya	Bebek & Çocuk Odası Mobilyası	Çocuk & Montessori Kitaplık,Bebek Odası Sandalye & Koltuk, Ranza, Arabalı Yatak	22%
+Mobilya	Ev Dekorasyon	Dekoratif Kutu & Tabak & Kase, Kapı Süsü, Kitap Tutucu, Magnet, Masa Saati, Vazo, Çerçeve, Paravan	24%
+Mobilya	Ev Dekorasyon	Sanat Eseri	11.5%
+Mobilya	Ev Dekorasyon	Tablo, Kırlent & Kırlent Kılıfı, Duvar Saati, Duvar Kağıdı, Duvar Sticker, Biblo, Ayna	21%
+Mobilya	Ev Gereçleri	Ev Gereçleri	22%
+Mobilya	Ev Gereçleri	Çamaşır Gereçleri	21%
+Mobilya	Halı/Kilim	Halı, Kilim, Paspas, Seccade	22.5%
+Mobilya	Mutfak & Banyo Mobilyası	Çok Amaçlı Dolaplar,Banyo Dolabı,Mutfak Sandalyeleri, Mutfak Rafları, Mutfak Masaları, Tabureler,Hazır Mutfak Dolapları	23%
+Mobilya	Ofis Mobilyaları	Kitaplık,Duvar Rafı, Laptop Sehpası, Çalışma Masası, Çalışma Sandalyesi, Ofis Koltukları ve Kanepeleri,Ofis Masaları,Ofis Dolapları,Keson, Ofis Sehpası	23%
+Mobilya	Ofis Mobilyaları	Oyuncu Koltuğu	23%
+Mobilya	Ofis Mobilyaları	Oyuncu Masası	22%
+Mobilya	Perde	Perde, Cibinlik, Perde Aksesuarları	22.5%
+Mobilya	Salon Mobilyası	Ayakkabılık,Yemek Masası,Portmanto, Berjer,Dresuar,TV Koltuğu,Yemek Odası Sandalyesi, Vitrin & Gümüşlük, Portmanto Askılık, Dergilik & Gazetelikler, Yan Sehpa,Zigon,TV Sehpaları & Üniteleri,Orta Sehpa,Konsol, Puf & Bench, Şaraplık	23%
+Mobilya	Takım Mobilyalar	Köşe Takımı,Koltuk Takımları,Yemek Odası Takımı,Bahçe Takımları,Bebek Odası Takımı,Çocuk Odası Takımı,Genç Odası Takımı,Çocuk & Genç Odası Takımı,Mutfak Masası Takımları, Ofis Takımları, Kanepe,Yatak Odası Takımı	22%
+Mobilya	Takım Mobilyalar	Şark Köşesi, Çay Seti Koltuk Takımı, Mutfak Adası	23%
+Mobilya	Yatak Odası Mobilyası	Baza	23%
+Mobilya	Yatak Odası Mobilyası	Dolap ve Gardırop, Şifonyer,Makyaj Masası & Tuvalet Masası,Bez Dolaplar,Komodin, Sandıklar,Takı ve Aksesuar Dolapları, Yatak,Karyola,Yatak Pedi & Şiltesi,Yatak / Baza Başlığı	23%
+Otomobil & Motosiklet	Akü ve Akü Takviye Kabloları	Akü ve Akü Takviye Kabloları	13.5%
+Otomobil & Motosiklet	Elektrikli Motosiklet	Benzinli Motosiklet	10%
+Otomobil & Motosiklet	Elektrikli Motosiklet	Elektrikli Motosiklet	10%
+Otomobil & Motosiklet	Jantlar& Jant Kapakları	Jant, Jant Kapakları	17.5%
+Otomobil & Motosiklet	Motor Bakım Ürünleri	Motor Bakım Ürünleri	13.5%
+Otomobil & Motosiklet	Motosiklet Aksesuarları, Motosiklet Koruma Ekipmanları, Motosiklet Bakım, Motosiklet Ekipmanları, Motosiklet Giyim	Motosiklet Aksesuarları, Motosiklet Koruma Ekipmanları, Motosiklet Bakım, Motosiklet Ekipmanları, Motosiklet Giyim	15%
+Otomobil & Motosiklet	Motosiklet Aksesuarları, Motosiklet Koruma Ekipmanları, Motosiklet Bakım, Motosiklet Ekipmanları, Motosiklet Giyim	Motosiklet Eldiveni ve Montu	15%
+Otomobil & Motosiklet	Motosiklet Yedek Parça	Motosiklet Yedek Parça	17%
+Otomobil & Motosiklet	Motosiklet Çanta ve Kasklar	Motorcu Sırt Çantaları	13.5%
+Otomobil & Motosiklet	Motosiklet Çanta ve Kasklar	Motosiklet Kaskı ve Intercom	16%
+Otomobil & Motosiklet	Motosiklet Çanta ve Kasklar	Motosiklet Çantası	14%
+Otomobil & Motosiklet	Oto Aksesuar	Elektrikli Araç Şarj İstasyonu	12%
+Otomobil & Motosiklet	Oto Aksesuar	Elektrikli Araç Şarj İstasyonu Aksesuarları	12%
+Otomobil & Motosiklet	Oto Aksesuar	Oto Aksesuar	16.5%
+Otomobil & Motosiklet	Oto Aksesuar	Oto Güneşlik Perde	16.5%
+Otomobil & Motosiklet	Oto Aksesuar	Otomobil ve Motosiklet Branda	16%
+Otomobil & Motosiklet	Oto Aksesuar	Otomobil ve Motosiklet Egzoz	17%
+Otomobil & Motosiklet	Oto Bakım / Temizlik Ürünleri, Lastik Bakım Ürünleri	Oto Bakım / Temizlik Ürünleri, Lastik Bakım Ürünleri	16.5%
+Otomobil & Motosiklet	Oto Ses Görüntü Sistemleri	Oto Ses Görüntü Sistemleri	14%
+Otomobil & Motosiklet	Oto ve Motosiklet Lastikleri	Motosiklet Lastikleri	10%
+Otomobil & Motosiklet	Oto ve Motosiklet Lastikleri	Oto Lastikleri	10%
+Otomobil & Motosiklet	Otomobil Yedek Parça & Oto Krom Aksesuar	Oto Ampul & Oto Far	22.5%
+Otomobil & Motosiklet	Otomobil Yedek Parça & Oto Krom Aksesuar	Otomobil Yedek Parça & Oto Krom Aksesuar	21%
+Otomobil & Motosiklet	Yağ ve Motor Katkıları	Yağ ve Motor Katkıları, Yakıt Tasarruf Ürünleri	14%
+Spor	Outdoor Ekipmanları	Aksiyon Kamera Aksesuarları	12%
+Spor	Outdoor Ekipmanları	Aksiyon Kameraları	12%
+Spor	Outdoor Ekipmanları	Avcılık & Balıkçılık	17%
+Spor	Outdoor Ekipmanları	Diğer Outdoor Ekipman ve Aksesuarları	16.5%
+Spor	Outdoor Ekipmanları	Dürbün, Teleskop, GPS Cihazları, Lazerler	15.5%
+Spor	Outdoor Ekipmanları	Kamp Masa&Sandalye Seti, Kamp Sandalyesi, Kamp Masası	15.5%
+Spor	Outdoor Ekipmanları	Kamp Matarası, Mug, Suluk	17%
+Spor	Outdoor Ekipmanları	Kamp Mutfağı, Soğutucu - Buzluk, Diğer Kamp Ürünleri	16.5%
+Spor	Outdoor Ekipmanları	Tekne & Yat Ekipmanları	12%
+Spor	Outdoor Ekipmanları	Tekne Motorları	12%
+Spor	Outdoor Ekipmanları	Termos	16%
+Spor	Outdoor Ekipmanları	Çadır	15.5%
+Spor	Outdoor Ekipmanları	Şişme Yataklar - Koltuklar	16%
+Spor	Spor Ekipmanları	Ağırlık Ekipmanları	15%
+Spor	Spor Ekipmanları	Bisiklet Aksesuarları, Elektrikli Scooter Aksesuarları, Elektrikli Bisiklet Aksesuarları, Kaykay Aksesuarları	12%
+Spor	Spor Ekipmanları	Bisikletler	13%
+Spor	Spor Ekipmanları	Branş Sporları	15.5%
+Spor	Spor Ekipmanları	Dambıl ve Ağırlık Plakaları, Barfiks ve Şınav Barları	14%
+Spor	Spor Ekipmanları	Diğer Spor Aksesuarları	15.5%
+Spor	Spor Ekipmanları	Elektrikli Bisiklet, Hoverboard	13.5%
+Spor	Spor Ekipmanları	Elektrikli Scooter	13.5%
+Spor	Spor Ekipmanları	Havuz	12.5%
+Spor	Spor Ekipmanları	Kano	13%
+Spor	Spor Ekipmanları	Kondisyon Bisikletleri	14%
+Spor	Spor Ekipmanları	Kondisyon Küreği, Çalışma İstasyonları, Mekik Aleti, Mekik Sehpası	14%
+Spor	Spor Ekipmanları	Koşu Bantları	14%
+Spor	Spor Ekipmanları	Paten, Buz Pateni, Kaykay	14%
+Spor	Spor Ekipmanları	Pilates & Yoga	15.5%
+Spor	Spor Ekipmanları	Snowboard, Kızak, Kayak Takımı, Kış Sporları	16.5%
+Spor	Spor Ekipmanları	Yüzme Malzemeleri, Yüzücü Aksesuarları, Dalış Aksesuarları	15.5%
+Spor	Spor Ekipmanları	Şişme Bot	10.5%
+Süpermarket	Anne Bakım	Göğüs Ucu Kremi, Vücut Kremleri, Göğüs Pedleri / Koruyucular	20%
+Süpermarket	Bebek Bakım	Bebek Bakım Seti	20%
+Süpermarket	Bebek Bakım	Bebek Bakım ve Kozmetik, Bebek Sağlık Ürünleri, Diğer Bebek Bakım Ürünleri	20%
+Süpermarket	Bebek Bakım	Bebek Bakım Örtüsü	20%
+Süpermarket	Bebek Bakım	Bebek Bezi	14%
+Süpermarket	Bebek Bakım	Bebek Güneş Kremi	20%
+Süpermarket	Bebek Bakım	Bebek Islak Mendil / Havlu	14%
+Süpermarket	Bebek Bakım	Bebek Kremi ve Yağı	20%
+Süpermarket	Bebek Bakım	Bebek Kremi ve Yağı	20%
+Süpermarket	Bebek Bakım	Bebek Şampuanı	20%
+Süpermarket	Bebek Beslenme	Bebek Ek Besin, Bebek Maması, Süt Arttırıcı İçecekler	15%
+Süpermarket	Bebek Beslenme	Bebek Sütü, Devam Sütü	15%
+Süpermarket	Ev Bakım ve Temizlik	Bebek Deterjanı	17%
+Süpermarket	Ev Bakım ve Temizlik	Bulaşık Makinesi Deterjanı	17%
+Süpermarket	Ev Bakım ve Temizlik	Bulaşık Yıkama	17%
+Süpermarket	Ev Bakım ve Temizlik	Elde Bulaşık Deterjanı	16%
+Süpermarket	Ev Bakım ve Temizlik	Ev ve Temizlik Gereçleri	17%
+Süpermarket	Ev Bakım ve Temizlik	Islak Mendil	14%
+Süpermarket	Ev Bakım ve Temizlik	Kağıt Havlu	16%
+Süpermarket	Ev Bakım ve Temizlik	Kağıt Peçete, Mendil	16%
+Süpermarket	Ev Bakım ve Temizlik	Paspas ve Mop	17%
+Süpermarket	Ev Bakım ve Temizlik	Temizlik Ürünleri	17%
+Süpermarket	Ev Bakım ve Temizlik	Tuvalet Kağıdı	16%
+Süpermarket	Ev Bakım ve Temizlik	Tuvalet Kağıdı	16%
+Süpermarket	Ev Bakım ve Temizlik	Yüzey Temizlik Mendilleri	14%
+Süpermarket	Ev Bakım ve Temizlik	Çamaşır Deterjanı	16%
+Süpermarket	Ev Bakım ve Temizlik	Çamaşır Yıkama Yan Ürünleri	17%
+Süpermarket	Gıda & İçecek	Atıştırmalık, Kuru Gıda, Süt ve Kahvaltılık	19%
+Süpermarket	Gıda & İçecek	Bardak Poşet Çay	19%
+Süpermarket	Gıda & İçecek	Bisküvi ve Kraker	19%
+Süpermarket	Gıda & İçecek	Demlik Poşet Çay	16%
+Süpermarket	Gıda & İçecek	Diğer Gıda Ürünleri	19%
+Süpermarket	Gıda & İçecek	Dökme Çay	13%
+Süpermarket	Gıda & İçecek	Dökme Çay	13%
+Süpermarket	Gıda & İçecek	Enerji İçeceği	19%
+Süpermarket	Gıda & İçecek	Filtre ve Çekirdek Kahve	17%
+Süpermarket	Gıda & İçecek	Granül Kahve	17%
+Süpermarket	Gıda & İçecek	Gurme & Organik Ürünler	19%
+Süpermarket	Gıda & İçecek	Hazır Noodle	19%
+Süpermarket	Gıda & İçecek	Helva	19%
+Süpermarket	Gıda & İçecek	Hurma	8%
+Süpermarket	Gıda & İçecek	Kapsül Kahve	17%
+Süpermarket	Gıda & İçecek	Kapsül Kahve	17%
+Süpermarket	Gıda & İçecek	Krem Çikolata ve Ezme	17%
+Süpermarket	Gıda & İçecek	Küvertür, Pul Çikolata	17%
+Süpermarket	Gıda & İçecek	Peynir	13%
+Süpermarket	Gıda & İçecek	Polen ve Propolis	19%
+Süpermarket	Gıda & İçecek	Ramazan & Kurban Paketleri	8%
+Süpermarket	Gıda & İçecek	Sağlıklı Atıştırmalık	19%
+Süpermarket	Gıda & İçecek	Sürülebilir Çikolata	17%
+Süpermarket	Gıda & İçecek	Sıvı Yağ	13%
+Süpermarket	Gıda & İçecek	Tahin	19%
+Süpermarket	Gıda & İçecek	Tatlı Sosu	19%
+Süpermarket	Gıda & İçecek	Ton Balığı	19%
+Süpermarket	Gıda & İçecek	Türk Kahvesi	15%
+Süpermarket	Gıda & İçecek	Türk Kahvesi	15%
+Süpermarket	Gıda & İçecek	Türk Kahvesi	15%
+Süpermarket	Gıda & İçecek	Zeytinyağı	15%
+Süpermarket	Gıda & İçecek	Çikolata, Sıcak Çikolata	16%
+Süpermarket	Gıda & İçecek	Özel Ezme	19%
+Süpermarket	Pet Shop	Diğer Petshop ürünleri	20%
+Süpermarket	Pet Shop	Kedi Konserve Maması	16.5%
+Süpermarket	Pet Shop	Kedi Konserve Maması	16.5%
+Süpermarket	Pet Shop	Kedi Kumu	16.5%
+Süpermarket	Pet Shop	Kedi Kuru Mama ve Köpek Kuru/Konserve Mamaları	16.5%
+Süpermarket	Pet Shop	Kedi Vitamini	20%
+Süpermarket	Pet Shop	Kedi Vitamini	20%
+Süpermarket	Sağlık	Cinsel Sağlık	19%
+Süpermarket	Sağlık	Genel Sağlık	19%
+Süpermarket	Sağlık	Gıda Takviyesi ve Vitamin	19%
+Süpermarket	Sağlık	Hasta Bezi ve Temizlik	18%
+Süpermarket	Sağlık	Medikal Maske	20%
+Süpermarket	Sağlık	Sporcu Besini & Supplementler	19%
+Çocuk	Bebek Banyo & Tuvalet	Bebek Banyo Aksesuarları	19%
+Çocuk	Bebek Banyo & Tuvalet	Bebek Banyo Aksesuarları	19%
+Çocuk	Bebek Banyo & Tuvalet	Bebek Banyo Aksesuarları	19%
+Çocuk	Bebek Banyo & Tuvalet	Bebek Küveti	19%
+Çocuk	Bebek Banyo & Tuvalet	Bebek Küveti	19%
+Çocuk	Bebek Banyo & Tuvalet	Bebek Küveti	19%
+Çocuk	Bebek Banyo & Tuvalet	Klozet Adaptörü & Lazımlık	19%
+Çocuk	Bebek Banyo & Tuvalet	Klozet Adaptörü & Lazımlık	19%
+Çocuk	Bebek Banyo & Tuvalet	Klozet Adaptörü & Lazımlık	19%
+Çocuk	Bebek Beslenme/Emzirme	Alıştırma Bardakları	19%
+Çocuk	Bebek Beslenme/Emzirme	Alıştırma Bardakları	19%
+Çocuk	Bebek Beslenme/Emzirme	Alıştırma Bardakları	19%
+Çocuk	Bebek Beslenme/Emzirme	Bebek Hediyelik	19%
+Çocuk	Bebek Beslenme/Emzirme	Bebek Hediyelik	19%
+Çocuk	Bebek Beslenme/Emzirme	Bebek Hediyelik	19%
+Çocuk	Bebek Beslenme/Emzirme	Bebek Hediyelik	19%
+Çocuk	Bebek Beslenme/Emzirme	Bebek Hediyelik	19%
+Çocuk	Bebek Beslenme/Emzirme	Bebek Hediyelik	19%
+Çocuk	Bebek Beslenme/Emzirme	Beslenme Aksesuarı & Mama Seti	19%
+Çocuk	Bebek Beslenme/Emzirme	Beslenme Aksesuarı & Mama Seti	19%
+Çocuk	Bebek Beslenme/Emzirme	Beslenme Aksesuarı & Mama Seti	19%
+Çocuk	Bebek Beslenme/Emzirme	Beslenme Aksesuarı & Mama Seti	19%
+Çocuk	Bebek Beslenme/Emzirme	Beslenme Aksesuarı & Mama Seti	19%
+Çocuk	Bebek Beslenme/Emzirme	Biberon Isıtıcı & Sterilizatör, Emzirme Örtüsü, Emzirme Yastığı, Mama Önlüğü	19%
+Çocuk	Bebek Beslenme/Emzirme	Biberon Isıtıcı & Sterilizatör, Emzirme Örtüsü, Emzirme Yastığı, Mama Önlüğü	19%
+Çocuk	Bebek Beslenme/Emzirme	Biberon Isıtıcı & Sterilizatör, Emzirme Örtüsü, Emzirme Yastığı, Mama Önlüğü	19%
+Çocuk	Bebek Beslenme/Emzirme	Biberon Isıtıcı & Sterilizatör, Emzirme Örtüsü, Emzirme Yastığı, Mama Önlüğü	19%
+Çocuk	Bebek Beslenme/Emzirme	Biberon/Emzik	19%
+Çocuk	Bebek Beslenme/Emzirme	Biberon/Emzik	19%
+Çocuk	Bebek Beslenme/Emzirme	Biberon/Emzik	19%
+Çocuk	Bebek Beslenme/Emzirme	Biberon/Emzik	19%
+Çocuk	Bebek Beslenme/Emzirme	Biberon/Emzik	19%
+Çocuk	Bebek Beslenme/Emzirme	Emzirme & Saklama Aksesuarları, Mama Isıtıcı ve Hazırlayıcı	19%
+Çocuk	Bebek Beslenme/Emzirme	Emzirme & Saklama Aksesuarları, Mama Isıtıcı ve Hazırlayıcı	19%
+Çocuk	Bebek Beslenme/Emzirme	Emzirme & Saklama Aksesuarları, Mama Isıtıcı ve Hazırlayıcı	19%
+Çocuk	Bebek Beslenme/Emzirme	Emzirme & Saklama Aksesuarları, Mama Isıtıcı ve Hazırlayıcı	19%
+Çocuk	Bebek Beslenme/Emzirme	Emzirme & Saklama Aksesuarları, Mama Isıtıcı ve Hazırlayıcı	19%
+Çocuk	Bebek Beslenme/Emzirme	Emzirme & Saklama Aksesuarları, Mama Isıtıcı ve Hazırlayıcı	19%
+Çocuk	Bebek Beslenme/Emzirme	Göğüs Pompaları	19%
+Çocuk	Bebek Beslenme/Emzirme	Göğüs Pompaları	19%
+Çocuk	Bebek Beslenme/Emzirme	Göğüs Pompaları	19%
+Çocuk	Bebek Beslenme/Emzirme	Göğüs Pompaları	19%
+Çocuk	Bebek Odası ve Tekstili	Diğer Oda Aksesuarları	19%
+Çocuk	Bebek Odası ve Tekstili	Diğer Oda Aksesuarları	19%
+Çocuk	Oyuncak	Ahşap Oyuncaklar	19%
+Çocuk	Oyuncak	Ahşap Oyuncaklar	19%
+Çocuk	Oyuncak	Akülü Araçlar	19%
+Çocuk	Oyuncak	Akülü Araçlar	19%
+Çocuk	Oyuncak	Bebek & Aktivite Oyuncakları, Model Bebek	19%
+Çocuk	Oyuncak	Bebek & Aktivite Oyuncakları, Model Bebek	19%
+Çocuk	Oyuncak	Bebek & Aktivite Oyuncakları, Model Bebek	19%
+Çocuk	Oyuncak	Bebek & Aktivite Oyuncakları, Model Bebek	19%
+Çocuk	Oyuncak	Deniz Malzemeleri, Plaj Oyuncakları, Spor Oyuncakları	19%
+Çocuk	Oyuncak	Deniz Malzemeleri, Plaj Oyuncakları, Spor Oyuncakları	19%
+Çocuk	Oyuncak	Eğitici Oyuncak	19%
+Çocuk	Oyuncak	Eğitici Oyuncak	19%
+Çocuk	Oyuncak	Eğitici Oyuncak	19%
+Çocuk	Oyuncak	Eğitici Oyuncak	19%
+Çocuk	Oyuncak	Figür Oyuncaklar	19%
+Çocuk	Oyuncak	Figür Oyuncaklar	19%
+Çocuk	Oyuncak	Kolluk & Simit	16.5%
+Çocuk	Oyuncak	Kolluk & Simit	16.5%
+Çocuk	Oyuncak	Kutu Oyunları	19%
+Çocuk	Oyuncak	Kutu Oyunları	19%
+Çocuk	Oyuncak	Lego & Yapı Oyuncakları	19%
+Çocuk	Oyuncak	Lego & Yapı Oyuncakları	19%
+Çocuk	Oyuncak	Lego & Yapı Oyuncakları	19%
+Çocuk	Oyuncak	Oyuncak Bebek ve Aksesuarları	19%
+Çocuk	Oyuncak	Oyuncak Bebek ve Aksesuarları	19%
+Çocuk	Oyuncak	Oyuncak Silah & Su Tabancası, Bahçe Oyuncakları, Bebek Oyuncakları (0-2 yaş), Bez Bebek, Et Bebek, Öğretici Oyuncak Setleri, Oyun Hamurları, Peluş Oyuncaklar, Taşıtlar & Kumandalı Oyuncaklar	19%
+Çocuk	Oyuncak	Oyuncak Silah & Su Tabancası, Bahçe Oyuncakları, Bebek Oyuncakları (0-2 yaş), Bez Bebek, Et Bebek, Öğretici Oyuncak Setleri, Oyun Hamurları, Peluş Oyuncaklar, Taşıtlar & Kumandalı Oyuncaklar	19%
+Çocuk	Oyuncak	Oyuncak Silah & Su Tabancası, Bahçe Oyuncakları, Bebek Oyuncakları (0-2 yaş), Bez Bebek, Et Bebek, Öğretici Oyuncak Setleri, Oyun Hamurları, Peluş Oyuncaklar, Taşıtlar & Kumandalı Oyuncaklar	19%
+Çocuk	Oyuncak	Oyuncak Silah & Su Tabancası, Bahçe Oyuncakları, Bebek Oyuncakları (0-2 yaş), Bez Bebek, Et Bebek, Öğretici Oyuncak Setleri, Oyun Hamurları, Peluş Oyuncaklar, Taşıtlar & Kumandalı Oyuncaklar	19%
+Çocuk	Oyuncak	Pedallı Araçlar	19%
+Çocuk	Oyuncak	Pedallı Araçlar	19%
+Çocuk	Oyuncak	Scooterlar	19%
+Çocuk	Oyuncak	Scooterlar	19%
+Çocuk	Oyuncak	Çocuk Kask ve Güvenlik Aksesuarları	14%
+Çocuk	Oyuncak	Çocuk Kask ve Güvenlik Aksesuarları	14%
+Çocuk	Oyuncak	Çocuk Puzzle / Yapboz, Diğer Oyuncaklar	19%
+Çocuk	Oyuncak	Çocuk Puzzle / Yapboz, Diğer Oyuncaklar	19%
+Çocuk	Oyuncak	Çocuk Puzzle / Yapboz, Diğer Oyuncaklar	19%
+Çocuk	Oyuncak	Çocuk Puzzle / Yapboz, Diğer Oyuncaklar	19%
+Çocuk	Oyuncak	Çocuk Salıncak	19%
+Çocuk	Oyuncak	Şişme Havuz & Aksesuarları	19%
+Çocuk	Oyuncak	Şişme Havuz & Aksesuarları	19%
+Çocuk	Çocuk Gereçleri	3 Tekerlekli Bebek Arabası	19%
+Çocuk	Çocuk Gereçleri	3 Tekerlekli Bebek Arabası	19%
+Çocuk	Çocuk Gereçleri	3 Tekerlekli Bebek Arabası	19%
+Çocuk	Çocuk Gereçleri	Ana Kucağı	19%
+Çocuk	Çocuk Gereçleri	Ana Kucağı	19%
+Çocuk	Çocuk Gereçleri	Ana Kucağı	19%
+Çocuk	Çocuk Gereçleri	Arabada Güvenlik, Telsiz&Kamera&De dektör	19%
+Çocuk	Çocuk Gereçleri	Arabada Güvenlik, Telsiz&Kamera&De dektör	19%
+Çocuk	Çocuk Gereçleri	Baston Puset, Bebek Araba, Mama Sandalyesi, Park Yatak / Oyun Parkı	19%
+Çocuk	Çocuk Gereçleri	Baston Puset, Bebek Araba, Mama Sandalyesi, Park Yatak / Oyun Parkı	19%
+Çocuk	Çocuk Gereçleri	Baston Puset, Bebek Araba, Mama Sandalyesi, Park Yatak / Oyun Parkı	19%
+Çocuk	Çocuk Gereçleri	Bebek Arabası Aksesuar	19%
+Çocuk	Çocuk Gereçleri	Bebek Arabası Aksesuar	19%
+Çocuk	Çocuk Gereçleri	Bebek Bakım Çantası	19%
+Çocuk	Çocuk Gereçleri	Bebek Bakım Çantası	19%
+Çocuk	Çocuk Gereçleri	Bebek Bakım Çantası	19%
+Çocuk	Çocuk Gereçleri	Bebek Salıncağı & Hoppala	19%
+Çocuk	Çocuk Gereçleri	Bebek Salıncağı & Hoppala	19%
+Çocuk	Çocuk Gereçleri	Güvenlik Kapısı	19%
+Çocuk	Çocuk Gereçleri	Güvenlik Kapısı	19%
+Çocuk	Çocuk Gereçleri	Koruyucu Tekstil, Koruyucu ve Kilit	19%
+Çocuk	Çocuk Gereçleri	Koruyucu Tekstil, Koruyucu ve Kilit	19%
+Çocuk	Çocuk Gereçleri	Koruyucu Tekstil, Koruyucu ve Kilit	19%
+Çocuk	Çocuk Gereçleri	Koruyucu Tekstil, Koruyucu ve Kilit	19%
+Çocuk	Çocuk Gereçleri	Mama Sandalyesi Minderi, Yürüteç	19%
+Çocuk	Çocuk Gereçleri	Mama Sandalyesi Minderi, Yürüteç	19%
+Çocuk	Çocuk Gereçleri	Mama Sandalyesi Minderi, Yürüteç	19%
+Çocuk	Çocuk Gereçleri	Onarılmış Bebek Arabası & Puset, Onarılmış Oto Koltuğu ve Aksesuarları	10%
+Çocuk	Çocuk Gereçleri	Oto Koltuğu	19%
+Çocuk	Çocuk Gereçleri	Oto Koltuğu	19%
+Çocuk	Çocuk Gereçleri	Oto Koltuğu Aksesuarları	19%
+Çocuk	Çocuk Gereçleri	Oto Koltuğu Aksesuarları	19%
+Çocuk	Çocuk Gereçleri	Portbebe & Kanguru	19%
+Çocuk	Çocuk Gereçleri	Portbebe & Kanguru	19%

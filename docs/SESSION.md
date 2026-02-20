@@ -1,7 +1,24 @@
-# Session Memory
+ï»¿# Session Memory
 
-**Last updated:** 2026-02-17
+**Last updated:** 2026-02-18
 
+## Current Work (2026-02-18)
+- Goal: Continue from prior session by cleaning remaining UI mojibake text.
+- Status: Text quality scan clean; no issue detected.
+
+## Changes Made (2026-02-18)
+- Ran `scripts/check-ui-text-quality.ps1` and fixed all reported issues.
+- Updated files:
+  - `resources/views/admin/orders/index.blade.php` (`GÃ¶rsel`)
+  - `resources/views/admin/orders/show.blade.php` (`BaÅŸlangÄ±Ã§`)
+  - `resources/views/admin/products/partials/catalog-tabs.blade.php` (multiple mojibake fixes)
+- Validation:
+  - `powershell -ExecutionPolicy Bypass -File scripts/check-ui-text-quality.ps1 -Root .` => PASS.
+
+## Next Steps (2026-02-18)
+1) Run manual smoke check on `/portal/billing` for past-due copy/CTA.
+2) Continue functional QA for `/commission-tariffs` flow (upload -> map -> import -> recalc -> export).
+3) Optionally run targeted tests for billing and commission tariff flows.
 ## Current Work (2026-02-17)
 - Goal: Continue from prior session and stabilize test suite on current branch.
 - Status: Test suite stabilized; full run passes.
@@ -24,7 +41,7 @@
 1) If needed, run a quick manual check on billing UI (`/portal/billing`) for past-due state copy/CTA text.
 2) Optionally clean remaining mojibake text in views where visible (some labels are still mixed-encoding).
 3) Continue with functional QA for commission tariff UI flow (`/commission-tariffs`) as previously planned.`r`n`r`n## Current Work (2026-02-14)
-- Goal: Add “Ürün Komisyon Tarifeleri” module (Excel upload + mapping + profit calc + UI).
+- Goal: Add â€œÃœrÃ¼n Komisyon Tarifeleriâ€ module (Excel upload + mapping + profit calc + UI).
 - Status: Config, migrations, models, services, job/imports, API + export, UI page, routes, and tests added.
 
 ## Changes Made (2026-02-14)
@@ -102,7 +119,7 @@
   - Resolved `Namespace declaration statement has to be the very first statement` caused by BOM.
   - Removed UTF-8 BOM from affected PHP/Blade files (38 files), including `app/Models/Marketplace.php`.
 - Encoding cleanup:
-  - Fixed widespread mojibake (`Ã/Å/Ä` style) in many UI and backend strings.
+  - Fixed widespread mojibake (`Ãƒ/Ã…/Ã„` style) in many UI and backend strings.
   - Corrected key strings in orders/settings/sub-users/super-admin views and related controllers/tests.
 - Sidebar/menu cleanup:
   - Unified invoice label to `Faturalar`.
@@ -169,12 +186,12 @@
 - Host-based routes now use `pazar.test` / `app.pazar.test` / `sa.pazar.test` on port `8020`.
 - Super admin credentials: `admin@pazaryeri.com` / `12345678`.
 
-## Mail Altyapýsý Özeti
-- Akýþ: Event -> Listener (ShouldQueue) -> MailSender -> mail_logs
+## Mail AltyapÄ±sÄ± Ã–zeti
+- AkÄ±ÅŸ: Event -> Listener (ShouldQueue) -> MailSender -> mail_logs
 - Policy hook: MailPolicyService + mail_rule_assignments
-- Admin panel: mail loglarý ve mail template yönetimi
+- Admin panel: mail loglarÄ± ve mail template yÃ¶netimi
 
-## Tamamlanan Mail Senaryolarý (M001-M012)
+## Tamamlanan Mail SenaryolarÄ± (M001-M012)
 - M001: Support view bildirimi
   - Event: app/Events/SupportViewStarted.php
   - Listener: app/Listeners/SendSupportViewStartedMail.php
@@ -182,93 +199,93 @@
   - Dispatch: app/Services/Admin/SupportViewService.php::start
   - Dedupe: yok
   - Test: tests/Feature/Mail/SupportViewStartedMailTest.php
-- M002: Pazaryeri baðlantýsý koptu
+- M002: Pazaryeri baÄŸlantÄ±sÄ± koptu
   - Event: app/Events/MarketplaceConnectionLost.php
   - Listener: app/Listeners/SendMarketplaceConnectionLostMail.php
   - Template: mp.connection_lost
   - Dispatch: app/Services/Marketplace/Category/TrendyolCategoryProvider.php::fetchCategoryTree
   - Dedupe: yok
   - Test: tests/Feature/Mail/MarketplaceConnectionLostMailTest.php
-- M003: Ödeme baþarýsýz
+- M003: Ã–deme baÅŸarÄ±sÄ±z
   - Event: app/Events/PaymentFailed.php
   - Listener: app/Listeners/SendPaymentFailedMail.php
   - Template: payment.failed
   - Dispatch: app/Http/Controllers/Payments/IyzicoCheckoutCallbackController.php::__invoke
-  - Dedupe: error_code bazlý 30 dk
+  - Dedupe: error_code bazlÄ± 30 dk
   - Test: tests/Feature/Mail/PaymentFailedMailTest.php
 - M004: Trial bitti
   - Event: app/Events/TrialEnded.php
   - Listener: app/Listeners/SendTrialEndedMail.php
   - Template: trial.ended
   - Dispatch: app/Console/Commands/SubscriptionMaintenanceCommand.php::handle
-  - Dedupe: user bazlý 24 saat
+  - Dedupe: user bazlÄ± 24 saat
   - Test: tests/Feature/Mail/TrialEndedMailTest.php
-- M005: Kota aþýldý
+- M005: Kota aÅŸÄ±ldÄ±
   - Event: app/Events/QuotaExceeded.php
   - Listener: app/Listeners/SendQuotaExceededMail.php
   - Template: quota.exceeded
   - Dispatch: app/Http/Controllers/Admin/ProductController.php::store
-  - Dedupe: quota_key + period bazlý 24 saat
+  - Dedupe: quota_key + period bazlÄ± 24 saat
   - Test: tests/Feature/Mail/QuotaExceededMailTest.php
-- M006: Ödeme baþarýlý
+- M006: Ã–deme baÅŸarÄ±lÄ±
   - Event: app/Events/PaymentSucceeded.php
   - Listener: app/Listeners/SendPaymentSucceededMail.php
   - Template: payment.succeeded
   - Dispatch: app/Http/Controllers/Payments/IyzicoCheckoutCallbackController.php::__invoke
-  - Dedupe: transaction_id varsa tekrar yok, yoksa occurred_at dakika bazlý
+  - Dedupe: transaction_id varsa tekrar yok, yoksa occurred_at dakika bazlÄ±
   - Test: tests/Feature/Mail/PaymentSucceededMailTest.php
-- M007: Kota %80 uyarýsý
+- M007: Kota %80 uyarÄ±sÄ±
   - Event: app/Events/QuotaWarningReached.php
   - Listener: app/Listeners/SendQuotaWarningMail.php
   - Template: quota.warning_80
   - Dispatch: app/Http/Controllers/Admin/ProductController.php::store
   - Dispatch: app/Http/Controllers/Admin/IntegrationController.php::update
   - Dispatch: app/Observers/OrderObserver.php::created
-  - Dedupe: user + quota_type + period bazlý 7 gün
+  - Dedupe: user + quota_type + period bazlÄ± 7 gÃ¼n
   - Test: tests/Feature/Mail/QuotaWarningReachedMailTest.php
-- M008: Fatura oluþturuldu
+- M008: Fatura oluÅŸturuldu
   - Event: app/Events/InvoiceCreated.php
   - Listener: app/Listeners/SendInvoiceCreatedMail.php
   - Template: invoice.created
   - Dispatch: app/Services/EInvoices/EInvoiceService.php::issue
-  - Dedupe: invoice_id bazlý
+  - Dedupe: invoice_id bazlÄ±
   - Test: tests/Feature/Mail/InvoiceCreatedMailTest.php
-- M009: Fatura oluþturulamadý
+- M009: Fatura oluÅŸturulamadÄ±
   - Event: app/Events/InvoiceFailed.php
   - Listener: app/Listeners/SendInvoiceFailedMail.php
   - Template: invoice.failed
   - Dispatch: app/Services/EInvoices/EInvoiceService.php::issue (catch)
-  - Dedupe: invoice_id bazlý
+  - Dedupe: invoice_id bazlÄ±
   - Test: tests/Feature/Mail/InvoiceFailedMailTest.php
-- M010: Token bitiþi yaklaþýyor
+- M010: Token bitiÅŸi yaklaÅŸÄ±yor
   - Event: app/Events/MarketplaceTokenExpiring.php
   - Listener: app/Listeners/SendMarketplaceTokenExpiringMail.php
   - Template: mp.token_expiring
   - Dispatch: app/Console/Commands/CheckMarketplaceTokenExpirationsCommand.php::handle
-  - Dedupe: marketplace_credential_id + days_left bazlý 24 saat
+  - Dedupe: marketplace_credential_id + days_left bazlÄ± 24 saat
   - Test: tests/Feature/Mail/MarketplaceTokenExpiringMailTest.php
-- M011: Abonelik baþladý
+- M011: Abonelik baÅŸladÄ±
   - Event: app/Events/SubscriptionStarted.php
   - Listener: app/Listeners/SendSubscriptionStartedMail.php
   - Template: subscription.started
   - Dispatch: app/Http/Controllers/SubscriptionController.php::store, app/Http/Controllers/SubscriptionController.php::renew
-  - Dedupe: subscription_id bazlý
+  - Dedupe: subscription_id bazlÄ±
   - Test: tests/Feature/Mail/SubscriptionStartedMailTest.php
 - M012: Abonelik yenilendi
   - Event: app/Events/SubscriptionRenewed.php
   - Listener: app/Listeners/SendSubscriptionRenewedMail.php
   - Template: subscription.renewed
   - Dispatch: app/Http/Controllers/SubscriptionController.php::store
-  - Dedupe: subscription_id + period_end veya renewed_at bazlý
+  - Dedupe: subscription_id + period_end veya renewed_at bazlÄ±
   - Test: tests/Feature/Mail/SubscriptionRenewedMailTest.php
 
 Not:
-- subscription.cancelled senaryosu ayrýca mevcut.
+- subscription.cancelled senaryosu ayrÄ±ca mevcut.
   - Event: app/Events/SubscriptionCancelled.php
   - Listener: app/Listeners/SendSubscriptionCancelledMail.php
   - Template: subscription.cancelled
   - Dispatch: app/Http/Controllers/SubscriptionController.php::cancel
-  - Dedupe: subscription_id bazlý
+  - Dedupe: subscription_id bazlÄ±
   - Test: tests/Feature/Mail/SubscriptionCancelledMailTest.php
 
 ## Scheduler
@@ -287,12 +304,12 @@ Not:
   - app/Enums/NotificationChannel.php
   - app/Enums/NotificationSource.php
 
-## Sistem Ayarlarý (Super Admin)
-- Mail & Bildirim Ayarlarý sekmesi eklendi.
-- system_settings tablosu + SettingsRepository ile DB tabanlý mail override ve test mail akýþý.
-- Incident & SLA ayarlarý artýk super-admin Sistem Ayarlarý’ndan yönetilir; incident_sla config defaultlarý override edilir.
-- Integration Health eþikleri artýk super-admin Sistem Ayarlarý’ndan yönetilir; integration_health config defaultlarý DB ile override edilir.
-- Feature gating: plan bazli plan_matrix (system_settings: features.plan_matrix), FeatureGate + EnsureFeatureEnabled ve admin upgrade ekraný.
+## Sistem AyarlarÄ± (Super Admin)
+- Mail & Bildirim AyarlarÄ± sekmesi eklendi.
+- system_settings tablosu + SettingsRepository ile DB tabanlÄ± mail override ve test mail akÄ±ÅŸÄ±.
+- Incident & SLA ayarlarÄ± artÄ±k super-admin Sistem AyarlarÄ±â€™ndan yÃ¶netilir; incident_sla config defaultlarÄ± override edilir.
+- Integration Health eÅŸikleri artÄ±k super-admin Sistem AyarlarÄ±â€™ndan yÃ¶netilir; integration_health config defaultlarÄ± DB ile override edilir.
+- Feature gating: plan bazli plan_matrix (system_settings: features.plan_matrix), FeatureGate + EnsureFeatureEnabled ve admin upgrade ekranÄ±.
 - Billing MVP eklendi: plan katalogu system_settings billing.plans_catalog; admin billing/plans + checkout stub + success ile tenant plan_code guncellenir (user.plan_code legacy).
 - Iyzico checkout init eklendi: iyzico.enabled true ise checkout iframe formu basiliyor; callback/webhook sonraki adimda.
 - Iyzico callback + webhook eklendi: callback token ile API retrieve dogrular, webhook signature HMAC ile dogrular ve idempotent completion yapar. Webhook secret olmadan 400 doner.
@@ -305,7 +322,7 @@ Not:
   - app/Jobs/SendNotificationEmailJob.php
   - app/Mail/NotificationHubMail.php
   - resources/views/emails/notification-hub.blade.php
-- Event -> Listener örnekleri:
+- Event -> Listener Ã¶rnekleri:
   - app/Events/OrderSyncFailed.php -> app/Listeners/NotificationHub/SendOrderSyncFailedNotification.php
   - app/Events/StockSyncFailed.php -> app/Listeners/NotificationHub/SendStockSyncFailedNotification.php
   - app/Events/InvoiceCreationFailed.php -> app/Listeners/NotificationHub/SendInvoiceCreationFailedNotification.php
@@ -314,7 +331,7 @@ Not:
 - Policy/Composer:
   - app/Policies/NotificationPolicy.php
   - app/Policies/NotificationPreferencePolicy.php
-  - app/Providers/AppServiceProvider.php: bildirim sayacý + bell route paylaþýmý
+  - app/Providers/AppServiceProvider.php: bildirim sayacÄ± + bell route paylaÅŸÄ±mÄ±
 - Routes (notification-hub namespace):
   - routes/customer.php: admin.notification-hub.*
   - routes/admin.php: super-admin.notification-hub.*
@@ -331,28 +348,28 @@ Not:
 - Middleware/support izinleri:
   - config/support.php: admin.notification-hub.notifications.index + admin.notification-hub.preferences.index
   - app/Http/Middleware/EnsureSubUserPermission.php: admin.notification-hub.* => settings
-- Varsayýlan filtre:
-  - Son 30 gün (admin + super-admin)
+- VarsayÄ±lan filtre:
+  - Son 30 gÃ¼n (admin + super-admin)
 - Factories & Tests:
   - database/factories/NotificationFactory.php
   - database/factories/NotificationPreferenceFactory.php
   - tests/Feature/Notifications/NotificationHubTest.php
 - README notu:
-  - README.md Notification Hub bölümü eklendi
+  - README.md Notification Hub bÃ¶lÃ¼mÃ¼ eklendi
 
-## Son Ýþlemler
+## Son Ä°ÅŸlemler
 - Prod readiness runbook eklendi:
   - docs/PROD.md (deployment, queue/scheduler, webhook, monitoring, backups, domain/SSL, smoke test)
 - php artisan test: PASS (242 tests).
-- Portal fatura ekranlarý terminoloji sadeleþtirildi:
-  - resources/views/customer/invoices/index.blade.php (Faturalar, kolonlar: Tarih/Tutar/Durum/Dönem, Detay)
-  - resources/views/customer/invoices/show.blade.php (Fatura Detayý, PDF Ýndir vb.)
-- Portal billing/çeþitli view ve servislerde bozuk ?? ifadeleri temizlendi (parse error fixleri):
+- Portal fatura ekranlarÄ± terminoloji sadeleÅŸtirildi:
+  - resources/views/customer/invoices/index.blade.php (Faturalar, kolonlar: Tarih/Tutar/Durum/DÃ¶nem, Detay)
+  - resources/views/customer/invoices/show.blade.php (Fatura DetayÄ±, PDF Ä°ndir vb.)
+- Portal billing/Ã§eÅŸitli view ve servislerde bozuk ?? ifadeleri temizlendi (parse error fixleri):
   - NotificationService, BillingEventLogger, IyzicoClient, SettingsController, input-label, register, admin billing/plans, einvoices pdf vb.
-- Queueable çakýþmasý fix:
-  - app/Jobs/SyncMarketplaceCategoriesJob.php: $queue property kaldýrýldý, constructor’da onQueue('integrations')
-- php artisan test: PASS (pdo_sqlite olmayan ortamlarda bazý testler WARN/skip).
-- Admin Billing Events izleme ekraný eklendi:
+- Queueable Ã§akÄ±ÅŸmasÄ± fix:
+  - app/Jobs/SyncMarketplaceCategoriesJob.php: $queue property kaldÄ±rÄ±ldÄ±, constructorâ€™da onQueue('integrations')
+- php artisan test: PASS (pdo_sqlite olmayan ortamlarda bazÄ± testler WARN/skip).
+- Admin Billing Events izleme ekranÄ± eklendi:
   - routes/customer.php: /admin/observability/billing-events (super_admin)
   - app/Http/Controllers/Admin/BillingEventController.php
   - resources/views/admin/observability/billing_events/index|show.blade.php
@@ -360,18 +377,18 @@ Not:
 - Observability eklendi:
   - CorrelationIdMiddleware + correlation alias + AppServiceProvider queue/command propagation.
   - billing_events tablosu + BillingEvent modeli + BillingEventLogger servisi.
-  - Iyzico webhook/dunning ve invoice create/paid noktalarýnda billing event loglama.
+  - Iyzico webhook/dunning ve invoice create/paid noktalarÄ±nda billing event loglama.
 - Customer invoice portal eklendi:
-  - routes/customer.php altýnda invoices list/show/download (signed+throttle).
-  - InvoicePolicy + Customer InvoiceController + customer invoice blade’leri.
-- API token expired davranýþý düzeltildi:
-  - EnsureApiTokenValid middleware priority auth öncesine alýndý (bootstrap/app.php).
-- Testler eklendi ve çalýþtýrýldý:
+  - routes/customer.php altÄ±nda invoices list/show/download (signed+throttle).
+  - InvoicePolicy + Customer InvoiceController + customer invoice bladeâ€™leri.
+- API token expired davranÄ±ÅŸÄ± dÃ¼zeltildi:
+  - EnsureApiTokenValid middleware priority auth Ã¶ncesine alÄ±ndÄ± (bootstrap/app.php).
+- Testler eklendi ve Ã§alÄ±ÅŸtÄ±rÄ±ldÄ±:
   - CustomerInvoicePortalTest, InvoiceDownloadSignedTest, BillingCorrelationIdTest.
-  - php artisan test: PASS (sqlite uyarýlarý bazý webhook testlerinde).
+  - php artisan test: PASS (sqlite uyarÄ±larÄ± bazÄ± webhook testlerinde).
 - Billing dunning/grace period eklendi:
   - billing_subscriptions: past_due_since, grace_until, last_dunning_sent_at + index
-  - Sistem Ayarlarý (billing) dunning alanlarý + UI
+  - Sistem AyarlarÄ± (billing) dunning alanlarÄ± + UI
   - Iyzico webhook sync: UNPAID/PAST_DUE grace set, ACTIVE reset, CANCELED downgrade
   - Command: billing:dunning-run (hourly) + reminder/downgrade notifications
   - Tests: tests/Feature/SubscriptionDunningTest.php
@@ -381,7 +398,7 @@ Not:
   - UI: billing_plans partial butonlar + JS (product/pricing ref otomatik doldurma)
   - Test: tests/Feature/SuperAdminIyzicoCatalogAutoCreateTest.php
 - Not: Pricing plan interval MVP olarak MONTHLY sabit.
-- Not: Upgrade stratejisi için tek product + çok pricing plan önerilir.
+- Not: Upgrade stratejisi iÃ§in tek product + Ã§ok pricing plan Ã¶nerilir.
 - Iyzico card update callback hardening:
   - token/state zorunlu ve provider_token ile esleme
   - duplicate callback ignore + BillingEvent log (card_update.callback_duplicate)
@@ -390,24 +407,24 @@ Not:
 - Testler eklendi:
   - tests/Feature/IyzicoCardUpdateCallbackUnknownTokenTest.php
   - tests/Feature/IyzicoCardUpdateCallbackDuplicateTest.php
-- php artisan test: PASS (sqlite uyarilari bazý webhook testlerinde).
-- app_notifications hatasý için migration çalýþtýrýldý:
+- php artisan test: PASS (sqlite uyarilari bazÄ± webhook testlerinde).
+- app_notifications hatasÄ± iÃ§in migration Ã§alÄ±ÅŸtÄ±rÄ±ldÄ±:
   - php artisan migrate
 - ParseError fix:
-  - super-admin plans edit view: fazla @endforeach kaldýrýldý.
+  - super-admin plans edit view: fazla @endforeach kaldÄ±rÄ±ldÄ±.
 - Notification Hub deliverability testleri eklendi:
   - tests/Feature/NotificationHubDeliverabilityTest.php
-- Quiet hours için email job dispatch gecikmesi eklendi:
+- Quiet hours iÃ§in email job dispatch gecikmesi eklendi:
   - app/Services/Notifications/NotificationService.php
-- Email job retry/backoff ayarlarý eklendi:
+- Email job retry/backoff ayarlarÄ± eklendi:
   - app/Jobs/SendNotificationEmailJob.php
-- Email suppression altyapýsý eklendi (DB + servis + admin ekran):
+- Email suppression altyapÄ±sÄ± eklendi (DB + servis + admin ekran):
   - database/migrations/2026_02_05_120000_create_email_suppressions_table.php
   - app/Models/EmailSuppression.php
   - app/Services/Notifications/EmailSuppressionService.php
   - app/Http/Controllers/Admin/NotificationSuppressionController.php
   - resources/views/admin/notification-hub/suppressions/*
-- Notification audit log action enum geniþletildi:
+- Notification audit log action enum geniÅŸletildi:
   - database/migrations/2026_02_05_120010_expand_notification_audit_log_actions.php
 - Suppression + audit log entegrasyonu (dispatch/defer/fail):
   - app/Services/Notifications/NotificationService.php
@@ -443,15 +460,15 @@ Not:
 - Audit action artik string; enum kullanilmiyor.
 
 ## Next steps
-- Kullanýcý bildirirse kalan Türkçe karakter/encoding sorunlarýný noktasal düzelt.
-- Bildirim merkezi ekranlarýnda kalan UX/iyileþtirmeler varsa toparla.
-- Super-admin panel düzenleme (menü ve sayfa tutarlýlýðý) için kapsam çýkar.
-- Gerekirse Notification Hub için ek testler (UI route 200) ekle.
-- Yeni deliverability testlerini çalýþtýr:
+- KullanÄ±cÄ± bildirirse kalan TÃ¼rkÃ§e karakter/encoding sorunlarÄ±nÄ± noktasal dÃ¼zelt.
+- Bildirim merkezi ekranlarÄ±nda kalan UX/iyileÅŸtirmeler varsa toparla.
+- Super-admin panel dÃ¼zenleme (menÃ¼ ve sayfa tutarlÄ±lÄ±ÄŸÄ±) iÃ§in kapsam Ã§Ä±kar.
+- Gerekirse Notification Hub iÃ§in ek testler (UI route 200) ekle.
+- Yeni deliverability testlerini Ã§alÄ±ÅŸtÄ±r:
   - php artisan test --filter=NotificationHubDeliverabilityTest
-- Email suppression testlerini çalýþtýr:
+- Email suppression testlerini Ã§alÄ±ÅŸtÄ±r:
   - php artisan test --filter=EmailSuppressionTest
-- Integration Health testlerini çalýþtýr:
+- Integration Health testlerini Ã§alÄ±ÅŸtÄ±r:
   - php artisan test --filter=IntegrationHealthTest
 
 ## Current Work (2026-02-07)
@@ -498,7 +515,7 @@ Not:
   - Routes under `portal.profitability.*`.
   - Controllers: `ProfitabilityController`, `ProfitabilityAccountController`.
   - Views: `resources/views/admin/profitability/*`.
-  - Sidebar nav entry for Kârlýlýk.
+  - Sidebar nav entry for KÃ¢rlÄ±lÄ±k.
   - Sub-user permission mapping for `portal.profitability.*`.
 - Refreshed admin + customer portal skin with a pastel coral/mint palette in `resources/views/layouts/admin.blade.php`.
 - Updated KPI card gradients and chart colors in `resources/views/admin/profitability/index.blade.php`.
@@ -509,6 +526,8 @@ Not:
 ## Next Steps
 - Phase 6/7: Security review, tests (if desired), and finalize deliverables.
 - Implement real marketplace API calls in adapters (roadmap prepared).
-- Manuel doðrulama: bir marketplace hesabýnda `base_url` deðerini `http://127.0.0.1` veya allowlist dýþý bir host yapýn, "Baðlantý testi" çalýþtýrýn; generic hata dönmeli ve logda "Marketplace base_url rejected" görünmeli.
+- Manuel doÄŸrulama: bir marketplace hesabÄ±nda `base_url` deÄŸerini `http://127.0.0.1` veya allowlist dÄ±ÅŸÄ± bir host yapÄ±n, "BaÄŸlantÄ± testi" Ã§alÄ±ÅŸtÄ±rÄ±n; generic hata dÃ¶nmeli ve logda "Marketplace base_url rejected" gÃ¶rÃ¼nmeli.
+
+
 
 

@@ -13,8 +13,9 @@
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^2.10.1",
         "league/commonmark": "^2.7",
+        "maatwebsite/excel": "^3.1",
         "mews/purifier": "^3.4",
-        "phpoffice/phpspreadsheet": "^5.4"
+        "phpoffice/phpspreadsheet": "^1.30.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -49,11 +50,31 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
+            "@fix:utf8-tr",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
         ],
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
+        ],
+        "fix:utf8-tr": [
+            "powershell -ExecutionPolicy Bypass -File scripts/fix-turkish-utf8.ps1 -Root ."
+        ],
+        "check:text-ui": [
+            "powershell -ExecutionPolicy Bypass -File scripts/check-ui-text-quality.ps1 -Root . -Strict"
+        ],
+        "check:views": [
+            "@php artisan view:clear",
+            "@php artisan view:cache",
+            "@php artisan view:clear"
+        ],
+        "check:quality": [
+            "@fix:utf8-tr",
+            "@check:text-ui",
+            "@check:views"
+        ],
+        "hooks:install": [
+            "git config core.hooksPath .githooks"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

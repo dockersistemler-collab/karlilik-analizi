@@ -90,6 +90,7 @@ $mailSettings = $this->loadMailSettings(app(SettingsRepository::class));
         $billingPlansCatalog = $this->loadBillingPlansCatalog(app(SettingsRepository::class), $featureGate);
         $iyzicoSettings = $this->loadIyzicoSettings(app(SettingsRepository::class));
         $dunningSettings = $this->loadDunningSettings(app(SettingsRepository::class));
+        $neKazanirimSettings = $this->loadNeKazanirimSettings(app(SettingsRepository::class));
 
         return view('super-admin.settings.index', compact(
             'program',
@@ -120,7 +121,8 @@ $mailSettings = $this->loadMailSettings(app(SettingsRepository::class));
             'featureKeys',
             'billingPlansCatalog',
             'iyzicoSettings',
-            'dunningSettings'
+            'dunningSettings',
+            'neKazanirimSettings'
         ));
     }
 
@@ -476,6 +478,56 @@ $settings->set('billing', 'iyzico.sandbox', $request->boolean('iyzico_sandbox'),
             ->with('success', 'Plan kataloğu güncellendi.');
     }
 
+    public function updateNeKazanirimSettings(Request $request, SettingsRepository $settings): RedirectResponse
+    {
+        $validated = $request->validate([
+            'service_fee_brackets' => 'required|array|min:1',
+            'service_fee_brackets.*.min' => 'required|numeric|min:0',
+            'service_fee_brackets.*.max' => 'nullable|numeric|min:0',
+            'service_fee_brackets.*.fee' => 'required|numeric|min:0',
+            'withholding_rate_percent' => 'required|numeric|min:0|max:100',
+            'extra_service_fee_amount' => 'required|numeric|min:0|max:1000000',
+            'platform_service_amount_trendyol' => 'required|numeric|min:0|max:1000000',
+            'platform_service_amount_hepsiburada' => 'required|numeric|min:0|max:1000000',
+            'platform_service_amount_n11' => 'required|numeric|min:0|max:1000000',
+            'platform_service_amount_amazon' => 'required|numeric|min:0|max:1000000',
+            'platform_service_amount_ciceksepeti' => 'required|numeric|min:0|max:1000000',
+        ]);
+
+        $brackets = [];
+        foreach ($validated['service_fee_brackets'] as $row) {
+            $min = (float) ($row['min'] ?? 0);
+            $maxRaw = $row['max'] ?? null;
+            $max = ($maxRaw === '' || $maxRaw === null) ? null : (float) $maxRaw;
+            $fee = (float) ($row['fee'] ?? 0);
+
+            if ($max !== null && $max < $min) {
+                return redirect()->route('super-admin.settings.index', ['tab' => 'ne-kazanirim'])
+                    ->with('error', 'Hizmet bedeli araliginda max deger min degerden kucuk olamaz.');
+            }
+
+            $brackets[] = [
+                'min' => round($min, 2),
+                'max' => $max !== null ? round($max, 2) : null,
+                'fee' => round($fee, 2),
+            ];
+        }
+
+        usort($brackets, fn ($a, $b) => ($a['min'] <=> $b['min']) ?: (($a['max'] ?? INF) <=> ($b['max'] ?? INF)));
+
+        $settings->set('ne_kazanirim', 'service_fee_brackets', json_encode($brackets), false, $request->user()?->id);
+        $settings->set('ne_kazanirim', 'withholding_rate_percent', (float) $validated['withholding_rate_percent'], false, $request->user()?->id);
+        $settings->set('ne_kazanirim', 'extra_service_fee_amount', (float) $validated['extra_service_fee_amount'], false, $request->user()?->id);
+        $settings->set('ne_kazanirim', 'platform_service_amount_trendyol', (float) $validated['platform_service_amount_trendyol'], false, $request->user()?->id);
+        $settings->set('ne_kazanirim', 'platform_service_amount_hepsiburada', (float) $validated['platform_service_amount_hepsiburada'], false, $request->user()?->id);
+        $settings->set('ne_kazanirim', 'platform_service_amount_n11', (float) $validated['platform_service_amount_n11'], false, $request->user()?->id);
+        $settings->set('ne_kazanirim', 'platform_service_amount_amazon', (float) $validated['platform_service_amount_amazon'], false, $request->user()?->id);
+        $settings->set('ne_kazanirim', 'platform_service_amount_ciceksepeti', (float) $validated['platform_service_amount_ciceksepeti'], false, $request->user()?->id);
+
+        return redirect()->route('super-admin.settings.index', ['tab' => 'ne-kazanirim'])
+            ->with('success', 'Ne Kazanirim modulu ayarlari guncellendi.');
+    }
+
     public function createIyzicoProduct(Request $request, SettingsRepository $settings, IyzicoSubscriptionClient $client): RedirectResponse|JsonResponse
     {
         $planCode = $this->resolvePlanCode($request);
@@ -707,6 +759,94 @@ $flash = $status >= 400 ? 'error' : 'success';
             'reminder_day_1' => (int) $settings->get('billing', 'dunning.reminder_day_1', 0),
             'reminder_day_2' => (int) $settings->get('billing', 'dunning.reminder_day_2', 2),
             'auto_downgrade' => filter_var($settings->get('billing', 'dunning.auto_downgrade', true), FILTER_VALIDATE_BOOLEAN),
+        ];
+    }
+
+    private function loadNeKazanirimSettings(SettingsRepository $settings): array
+    {
+        $raw = $settings->get('ne_kazanirim', 'service_fee_brackets', null);
+        $decoded = null;
+
+        if (is_string($raw)) {
+            $decoded = json_decode($raw, true);
+        } elseif (is_array($raw)) {
+            $decoded = $raw;
+        }
+
+        if (!is_array($decoded)) {
+            $decoded = config('ne_kazanirim.service_fee_brackets', []);
+        }
+
+        $normalized = [];
+        foreach ($decoded as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $min = isset($row['min']) ? (float) $row['min'] : 0.0;
+            $max = array_key_exists('max', $row) && $row['max'] !== null && $row['max'] !== ''
+                ? (float) $row['max']
+                : null;
+            $fee = isset($row['fee']) ? (float) $row['fee'] : 0.0;
+
+            if ($max !== null && $max < $min) {
+                continue;
+            }
+
+            $normalized[] = [
+                'min' => round($min, 2),
+                'max' => $max !== null ? round($max, 2) : null,
+                'fee' => round($fee, 2),
+            ];
+        }
+
+        if ($normalized === []) {
+            $normalized = config('ne_kazanirim.service_fee_brackets', []);
+        }
+
+        usort($normalized, fn ($a, $b) => ($a['min'] <=> $b['min']) ?: (($a['max'] ?? INF) <=> ($b['max'] ?? INF)));
+
+        return [
+            'service_fee_brackets' => $normalized,
+            'withholding_rate_percent' => (float) $settings->get(
+                'ne_kazanirim',
+                'withholding_rate_percent',
+                config('ne_kazanirim.withholding_rate_percent', 1.0)
+            ),
+            'extra_service_fee_amount' => (float) $settings->get(
+                'ne_kazanirim',
+                'extra_service_fee_amount',
+                config('ne_kazanirim.extra_service_fee_amount', 0.0)
+            ),
+            'platform_service_amount_trendyol' => (float) $settings->get(
+                'ne_kazanirim',
+                'platform_service_amount_trendyol',
+                $settings->get(
+                    'ne_kazanirim',
+                    'platform_service_amount',
+                    config('ne_kazanirim.platform_service_amount_trendyol', 0.0)
+                )
+            ),
+            'platform_service_amount_hepsiburada' => (float) $settings->get(
+                'ne_kazanirim',
+                'platform_service_amount_hepsiburada',
+                config('ne_kazanirim.platform_service_amount_hepsiburada', 0.0)
+            ),
+            'platform_service_amount_n11' => (float) $settings->get(
+                'ne_kazanirim',
+                'platform_service_amount_n11',
+                config('ne_kazanirim.platform_service_amount_n11', 0.0)
+            ),
+            'platform_service_amount_amazon' => (float) $settings->get(
+                'ne_kazanirim',
+                'platform_service_amount_amazon',
+                config('ne_kazanirim.platform_service_amount_amazon', 0.0)
+            ),
+            'platform_service_amount_ciceksepeti' => (float) $settings->get(
+                'ne_kazanirim',
+                'platform_service_amount_ciceksepeti',
+                config('ne_kazanirim.platform_service_amount_ciceksepeti', 0.0)
+            ),
         ];
     }
 

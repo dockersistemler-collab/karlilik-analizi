@@ -3,15 +3,21 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\Plan;
-use App\Models\Subscription;
-use App\Models\Product;
-use App\Models\Order;
-use App\Models\MarketplaceCredential;
 use App\Models\Invoice;
-use Illuminate\Http\Request;
+use App\Models\MarketplaceCredential;
+use App\Models\Module;
+use App\Models\ModulePurchase;
+use App\Models\Order;
+use App\Models\Plan;
+use App\Models\Product;
+use App\Models\Subscription;
+use App\Models\User;
+use App\Models\UserModule;
+use App\Services\Entitlements\EntitlementService;
+use App\Services\Purchases\ModulePurchaseService;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -47,14 +53,50 @@ class UserController extends Controller
         if ($dateTo !== '') {
             $query->whereDate('created_at', '<=', $dateTo);
         }
-$users = $query->paginate(20)->withQueryString();
+
+        $users = $query->paginate(20)->withQueryString();
+        $subUsersModule = Module::query()->where('code', 'feature.sub_users')->first();
+        $subUsersModuleStates = [];
+        $subUsersModulePending = [];
+
+        if ($subUsersModule && $users->count() > 0) {
+            $userIds = $users->pluck('id')->all();
+
+            $subUsersModuleStates = UserModule::query()
+                ->where('module_id', $subUsersModule->id)
+                ->whereIn('user_id', $userIds)
+                ->pluck('status', 'user_id')
+                ->toArray();
+
+            $pendingUserIds = ModulePurchase::query()
+                ->where('module_id', $subUsersModule->id)
+                ->where('provider', 'manual')
+                ->where('status', 'pending')
+                ->whereIn('user_id', $userIds)
+                ->pluck('user_id')
+                ->all();
+
+            $subUsersModulePending = array_fill_keys($pendingUserIds, true);
+        }
+
         $roles = [
             'super_admin' => 'Super Admin',
             'support_agent' => 'Destek',
-            'client' => 'Müşteri',
+            'client' => 'Musteri',
         ];
 
-        return view('super-admin.users.index', compact('users', 'roles', 'search', 'role', 'status', 'dateFrom', 'dateTo'));
+        return view('super-admin.users.index', compact(
+            'users',
+            'roles',
+            'search',
+            'role',
+            'status',
+            'dateFrom',
+            'dateTo',
+            'subUsersModule',
+            'subUsersModuleStates',
+            'subUsersModulePending'
+        ));
     }
 
     public function edit(User $user)
@@ -69,7 +111,8 @@ $users = $query->paginate(20)->withQueryString();
 
     public function update(Request $request, User $user)
     {
-        $validated = $request->validate(['name' => 'required|string|max:255',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'role' => 'required|in:super_admin,client,support_agent',
             'is_active' => 'boolean',
@@ -105,13 +148,15 @@ $users = $query->paginate(20)->withQueryString();
 
             $active = $user->subscription;
             if ($active && $active->isActive()) {
-                $active->update(['status' => 'cancelled',
+                $active->update([
+                    'status' => 'cancelled',
                     'cancelled_at' => now(),
                     'ends_at' => now(),
                     'auto_renew' => false,
                 ]);
             }
-$newSubscription = Subscription::create([
+
+            $newSubscription = Subscription::create([
                 'user_id' => $user->id,
                 'plan_id' => $plan->id,
                 'status' => 'active',
@@ -143,9 +188,69 @@ $newSubscription = Subscription::create([
         }
 
         return redirect()->route('super-admin.users.index')
-            ->with('success', 'Kullanıcı başarıyla güncellendi.');
+            ->with('success', 'Kullanici basariyla guncellendi.');
+    }
+
+    public function toggleSubUsersModule(
+        Request $request,
+        User $user,
+        EntitlementService $entitlements,
+        ModulePurchaseService $purchaseService
+    ): RedirectResponse {
+        if ($user->role !== 'client') {
+            return back()->with('info', 'Bu islem yalnizca client hesaplar icin kullanilabilir.');
+        }
+
+        $module = Module::query()->where('code', 'feature.sub_users')->first();
+        if (!$module) {
+            return back()->with('error', 'feature.sub_users modulu bulunamadi.');
+        }
+
+        $enable = $request->boolean('enable');
+
+        if ($enable) {
+            $pendingPurchase = ModulePurchase::query()
+                ->where('user_id', $user->id)
+                ->where('module_id', $module->id)
+                ->where('provider', 'manual')
+                ->where('status', 'pending')
+                ->latest('id')
+                ->first();
+
+            if ($pendingPurchase) {
+                $purchaseService->markPaid($pendingPurchase, [
+                    'approved_by' => auth()->id(),
+                    'approval_source' => 'super_admin_user_list',
+                ], 'manual:sub-users:' . $pendingPurchase->id);
+            } else {
+                $entitlements->setModuleStatus(
+                    $user,
+                    'feature.sub_users',
+                    'active',
+                    null,
+                    Carbon::now(),
+                    [
+                        'granted_by' => auth()->id(),
+                        'grant_source' => 'super_admin_user_list',
+                    ]
+                );
+            }
+
+            return back()->with('success', 'Alt kullanici modulu aktif edildi.');
+        }
+
+        $entitlements->setModuleStatus(
+            $user,
+            'feature.sub_users',
+            'inactive',
+            Carbon::now(),
+            null,
+            [
+                'updated_by' => auth()->id(),
+                'update_source' => 'super_admin_user_list',
+            ]
+        );
+
+        return back()->with('success', 'Alt kullanici modulu pasif edildi.');
     }
 }
-
-
-

@@ -29,6 +29,7 @@ class EnsureSubUserPermission
         'portal.reports.stock-value' => 'reports.stock_value',
         'portal.reports.order-profitability' => 'reports.profitability',
         'portal.profitability.' => 'reports.profitability',
+        'ne-kazanirim.' => 'reports.profitability',
         'portal.integrations.' => 'integrations',
         'portal.addons.' => 'addons',
         'portal.subscription' => 'subscription',
