@@ -220,6 +220,75 @@
         object-fit: contain;
         background: #f8fafc;
     }
+    .inline-edit-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+    }
+    .inline-edit-box input[type='number'] {
+        border: 1px solid #dbe3ee;
+        border-radius: 10px;
+        background: #ffffff;
+        min-height: 36px;
+        transition: border-color .15s ease, box-shadow .2s ease;
+    }
+    .inline-edit-box input[type='number']:focus {
+        border-color: #94a3b8;
+        box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.2);
+    }
+    .inline-update-btn {
+        appearance: none;
+        -webkit-appearance: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: auto !important;
+        max-width: 78%;
+        flex: 0 0 auto;
+        align-self: center;
+        border: 1px solid #dbe3ee;
+        border-radius: 10px;
+        background: #f8fafc;
+        color: #334155 !important;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .01em;
+        line-height: 1;
+        min-height: 22px;
+        padding: 4px 9px;
+        box-shadow:
+            0 8px 18px rgba(15, 23, 42, 0.14),
+            0 0 0 1px rgba(255, 255, 255, 0.85) inset;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-2px);
+        cursor: pointer;
+        transition: opacity .16s ease, transform .16s ease, border-color .16s ease, background-color .16s ease, box-shadow .16s ease, filter .16s ease;
+    }
+    .inline-update-btn.is-visible {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+    }
+    .inline-update-btn:hover {
+        border-color: #c7d4e7;
+        background: #ffffff;
+        box-shadow:
+            0 10px 20px rgba(15, 23, 42, 0.18),
+            0 0 0 1px rgba(255, 255, 255, 0.92) inset,
+            0 0 14px rgba(148, 163, 184, 0.18);
+        filter: none;
+        color: #1f2937 !important;
+    }
+    .inline-update-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.22);
+    }
+    .inline-update-btn:disabled {
+        opacity: .7;
+        pointer-events: none;
+    }
     @media (max-width: 1024px) {
         .inventory-toolbar-actions {
             justify-content: flex-start;
@@ -539,27 +608,10 @@
 
                     <div class="flex items-center gap-2">
 
-                        <input type="number" step="0.01" min="0" class="w-24 text-sm"
-
-                               value="{{ $product->cost_price }}"
-
-                               data-product-cost="{{ $product->id }}">
-
-                        <span class="text-xs text-slate-500">{{ $product->currency }}</span>
-
-                    </div>
-
-                </td>
-
-                <td class="px-6 py-4 whitespace-nowrap">
-
-                    <div class="flex items-center gap-2">
-
-                        <input type="number" step="0.01" min="0" class="w-24 text-sm"
-
-                               value="{{ $product->price }}"
-
-                               data-product-price="{{ $product->id }}">
+                        <div class="inline-edit-box" data-inline-edit-box="{{ $product->id }}">
+                            <input type="number" step="0.01" min="0" class="w-24 text-sm" value="{{ $product->cost_price }}" data-product-cost="{{ $product->id }}" data-inline-edit-input="1">
+                            <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">Guncelle</button>
+                        </div>
 
                         <span class="text-xs text-slate-500">{{ $product->currency }}</span>
 
@@ -571,11 +623,25 @@
 
                     <div class="flex items-center gap-2">
 
-                        <input type="number" min="0" class="w-20 text-sm"
+                        <div class="inline-edit-box" data-inline-edit-box="{{ $product->id }}">
+                            <input type="number" step="0.01" min="0" class="w-24 text-sm" value="{{ $product->price }}" data-product-price="{{ $product->id }}" data-inline-edit-input="1">
+                            <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">Guncelle</button>
+                        </div>
 
-                               value="{{ $product->stock_quantity }}"
+                        <span class="text-xs text-slate-500">{{ $product->currency }}</span>
 
-                               data-product-stock="{{ $product->id }}">
+                    </div>
+
+                </td>
+
+                <td class="px-6 py-4 whitespace-nowrap">
+
+                    <div class="flex items-center gap-2">
+
+                        <div class="inline-edit-box" data-inline-edit-box="{{ $product->id }}">
+                            <input type="number" min="0" class="w-20 text-sm" value="{{ $product->stock_quantity }}" data-product-stock="{{ $product->id }}" data-inline-edit-input="1">
+                            <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">Guncelle</button>
+                        </div>
 
                         <span class="text-xs text-slate-500">adet</span>
 
@@ -621,15 +687,6 @@
                 </td>
 
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-
-                    <button type="button" class="text-emerald-600 hover:text-emerald-800 mr-3 quick-save"
-
-                            data-product-id="{{ $product->id }}">
-
-                        <i class="fas fa-check"></i>
-
-                    </button>
-
                     <a href="{{ route('portal.products.show', $product) }}" class="text-blue-600 hover:text-blue-900 mr-3">
 
                         <i class="fas fa-eye"></i>
@@ -793,7 +850,6 @@
     const inventoryFlashMessage = @json(session('error') ?? (session('success') ?? ($errors->any() ? $errors->first() : null)));
     const inventoryFlashType = @json(session('error') || $errors->any() ? 'error' : (session('success') ? 'success' : null));
 
-    const inlineSaveTimers = {};
     const inlineLastSavedState = {};
 
     function closeProductEditModal() {
@@ -832,8 +888,10 @@
             return;
         }
 
+        const originalButtonText = triggerButton ? triggerButton.textContent : null;
         if (triggerButton) {
             triggerButton.disabled = true;
+            triggerButton.textContent = 'Kaydediliyor';
         }
 
         const response = await fetch(`{{ url('/products') }}/${productId}/quick-update`, {
@@ -853,6 +911,7 @@
 
         if (triggerButton) {
             triggerButton.disabled = false;
+            triggerButton.textContent = originalButtonText || 'Guncelle';
         }
 
         if (!response.ok) {
@@ -866,43 +925,60 @@
 
     function bindQuickSave() {
 
-        const quickSaveButtons = document.querySelectorAll('.quick-save');
         const costInputs = Array.from(document.querySelectorAll('[data-product-cost]'));
         const priceInputs = Array.from(document.querySelectorAll('[data-product-price]'));
         const stockInputs = Array.from(document.querySelectorAll('[data-product-stock]'));
+        const inlineEditBoxes = Array.from(document.querySelectorAll('[data-inline-edit-box]'));
 
-        quickSaveButtons.forEach((btn) => {
-
-            btn.addEventListener('click', async () => {
-
-                const productId = btn.dataset.productId;
-                await submitInlineUpdate(productId, btn);
-
-            });
-
-        });
-
-        const registerAutoSave = (inputEl) => {
-            const productId = inputEl.getAttribute('data-product-cost') || inputEl.getAttribute('data-product-price') || inputEl.getAttribute('data-product-stock');
-            if (!productId) {
+        const hasInputValue = (inputEl) => String(inputEl?.value ?? '').trim().length > 0;
+        const refreshInlineButtonState = (boxEl) => {
+            const inputEl = boxEl?.querySelector('[data-inline-edit-input]');
+            const buttonEl = boxEl?.querySelector('[data-inline-update-button]');
+            if (!inputEl || !buttonEl) {
                 return;
             }
 
-            const scheduleSave = () => {
-                window.clearTimeout(inlineSaveTimers[productId]);
-                inlineSaveTimers[productId] = window.setTimeout(() => {
-                    submitInlineUpdate(productId);
-                }, 500);
-            };
-
-            inputEl.addEventListener('input', scheduleSave);
-            inputEl.addEventListener('change', scheduleSave);
-            inputEl.addEventListener('blur', scheduleSave);
+            const isFocused = boxEl.classList.contains('is-focused');
+            const shouldShow = isFocused && hasInputValue(inputEl);
+            buttonEl.classList.toggle('is-visible', shouldShow);
         };
 
-        costInputs.forEach(registerAutoSave);
-        priceInputs.forEach(registerAutoSave);
-        stockInputs.forEach(registerAutoSave);
+        inlineEditBoxes.forEach((boxEl) => {
+            const inputEl = boxEl.querySelector('[data-inline-edit-input]');
+            const buttonEl = boxEl.querySelector('[data-inline-update-button]');
+            const productId = buttonEl?.getAttribute('data-inline-update-product')
+                || inputEl?.getAttribute('data-product-cost')
+                || inputEl?.getAttribute('data-product-price')
+                || inputEl?.getAttribute('data-product-stock');
+
+            if (!inputEl || !buttonEl || !productId) {
+                return;
+            }
+
+            buttonEl.addEventListener('click', async () => {
+                await submitInlineUpdate(productId, buttonEl);
+                refreshInlineButtonState(boxEl);
+            });
+
+            boxEl.addEventListener('focusin', () => {
+                boxEl.classList.add('is-focused');
+                refreshInlineButtonState(boxEl);
+            });
+
+            boxEl.addEventListener('focusout', () => {
+                window.setTimeout(() => {
+                    if (!boxEl.contains(document.activeElement)) {
+                        boxEl.classList.remove('is-focused');
+                    }
+                    refreshInlineButtonState(boxEl);
+                }, 0);
+            });
+
+            inputEl.addEventListener('input', () => refreshInlineButtonState(boxEl));
+            inputEl.addEventListener('change', () => refreshInlineButtonState(boxEl));
+
+            refreshInlineButtonState(boxEl);
+        });
 
         const seenProductIds = new Set();
         [...costInputs, ...priceInputs, ...stockInputs].forEach((inputEl) => {

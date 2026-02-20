@@ -62,7 +62,13 @@
         }
 
         .nk-right-stack .nk-card {
+            position: relative;
+            z-index: 1;
             transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .nk-right-stack .nk-card.nk-card-has-open-category {
+            z-index: 5200;
         }
 
         .nk-right-stack .nk-card:hover {
@@ -111,7 +117,11 @@
 
         .nk-category-select-wrap {
             position: relative;
-            z-index: 20;
+            z-index: 1;
+        }
+
+        .nk-category-select-wrap.is-open {
+            z-index: 5300;
         }
 
         .nk-category-select-trigger {
@@ -151,7 +161,7 @@
             border-radius: 12px;
             background: #ffffff;
             box-shadow: 0 16px 28px rgba(15, 23, 42, 0.14);
-            z-index: 9999;
+            z-index: 5400;
             isolation: isolate;
             overflow: hidden;
             display: none;
@@ -1482,6 +1492,7 @@
             const categorySearchInput = document.getElementById('category_search_input');
             const categoryOptionsWrap = document.getElementById('category_options');
             const categoryCard = categorySelectTrigger?.closest('.nk-category-select-wrap');
+            const categoryOuterCard = categorySelectTrigger?.closest('.nk-card');
             const stockCalcModal = document.getElementById('nk-stock-calc-modal');
             const marketplacePlatformSelect = document.getElementById('marketplace_platform');
 
@@ -1527,6 +1538,7 @@
                 categoryDropdown.classList.add('is-open');
                 categorySelectTrigger.setAttribute('aria-expanded', 'true');
                 categoryCard?.classList.add('is-open');
+                categoryOuterCard?.classList.add('nk-card-has-open-category');
                 categorySearchInput?.focus();
             };
 
@@ -1535,6 +1547,7 @@
                 categoryDropdown.classList.remove('is-open');
                 categorySelectTrigger.setAttribute('aria-expanded', 'false');
                 categoryCard?.classList.remove('is-open');
+                categoryOuterCard?.classList.remove('nk-card-has-open-category');
             };
 
             const renderCategoryOptions = (query = '') => {
@@ -1975,9 +1988,21 @@
                 imagePopover.style.top = `${Math.max(8, top)}px`;
             };
 
+            const resolvePreviewSource = (trigger) => {
+                if (!trigger) {
+                    return '';
+                }
+
+                const thumbImg = trigger.querySelector('img');
+                const imgSrc = thumbImg?.currentSrc || thumbImg?.getAttribute('src') || '';
+                const dataSrc = trigger.getAttribute('data-nk-preview-src') || '';
+
+                return imgSrc || dataSrc;
+            };
+
             imageTriggers.forEach((trigger) => {
                 trigger.addEventListener('mouseenter', (event) => {
-                    const src = trigger.getAttribute('data-nk-preview-src');
+                    const src = resolvePreviewSource(trigger);
                     if (!src || !imagePopover || !imagePopoverImg) return;
                     imagePopoverImg.src = src;
                     imagePopoverImg.alt = trigger.getAttribute('data-nk-preview-alt') || 'Urun gorseli';
