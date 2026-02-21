@@ -1,6 +1,30 @@
 ﻿# Session Memory
 
-**Last updated:** 2026-02-20
+**Last updated:** 2026-02-21
+
+## Current Work (2026-02-21)
+- Goal: Continue prior session by validating pending billing/commission targets and fixing newly detected mojibake.
+- Status: Target tests passing; mojibake cleanup completed on affected files; text quality scan clean.
+
+## Changes Made (2026-02-21)
+- Ran targeted continuation tests:
+  - `php artisan test --filter=TRNumberParserTest` => PASS
+  - `php artisan test --filter=CommissionTariffMatcherTest` => PASS
+  - `php artisan test --filter=CommissionTariffProfitCalculatorTest` => PASS
+  - `php artisan test --filter=PortalPastDueCtaTest` => PASS
+  - `php artisan test --filter=PortalActiveNoWarningTest` => PASS
+- Ran text quality scan and fixed reported mojibake in:
+  - `resources/views/admin/orders/index.blade.php`
+  - `app/Http/Controllers/Admin/ProductController.php`
+- Normalized changed files to UTF-8 without BOM (to avoid namespace/BOM runtime issues in PHP files).
+- Validation:
+  - `powershell -ExecutionPolicy Bypass -File scripts/check-ui-text-quality.ps1 -Root .` => PASS
+  - `php -l app/Http/Controllers/Admin/ProductController.php` => PASS
+
+## Next Steps (2026-02-21)
+1) Manual smoke check on `/portal/billing` past-due copy/CTA state.
+2) Functional QA pass for `/commission-tariffs` flow (upload -> map -> import -> recalc -> export).
+3) If needed, run broader billing/commission feature tests after manual QA.
 
 ## Current Work (2026-02-20)
 - Goal: Continue from prior session by executing queued deliverability/integration tests and re-check UI text quality.

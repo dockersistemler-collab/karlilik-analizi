@@ -17,26 +17,33 @@
     $ownerUser = auth()->user();
 
     $canExport = $ownerUser ? app(\App\Services\Entitlements\EntitlementService::class)->hasModule($ownerUser, 'feature.exports') : false;
-    $inventoryMarketplaceBadgeClass = static function (?string $marketplaceName): string {
-        $name = strtolower(trim((string) $marketplaceName));
-
-        if (str_contains($name, 'trendyol')) {
-            return 'bg-amber-400 text-slate-900';
+    $normalizeMarketplaceKey = static function (?string $marketplaceName): string {
+        return \Illuminate\Support\Str::of(trim((string) $marketplaceName))->lower()->ascii()->value();
+    };
+    $inventoryMarketplaceLogoUrl = static function (?string $marketplaceName) use ($normalizeMarketplaceKey): ?string {
+        $normalized = $normalizeMarketplaceKey($marketplaceName);
+        $map = [
+            'trendyol' => 'images/brands/trendyol.png',
+            'hepsiburada' => 'images/brands/hepsiburada.png',
+            'n11' => 'images/brands/n11.png',
+            'amazon' => 'images/brands/amazon.png',
+        ];
+        foreach ($map as $key => $path) {
+            if (str_contains($normalized, $key)) {
+                return asset($path);
+            }
         }
-        if (str_contains($name, 'hepsiburada')) {
-            return 'bg-orange-400 text-slate-900';
+        return null;
+    };
+    $fallbackMarketplaceNames = collect(['Trendyol', 'Hepsiburada', 'N11', 'Amazon TR']);
+    $isMarketplaceActive = static function (string $displayName, array $assignedKeys) use ($normalizeMarketplaceKey): bool {
+        $displayKey = $normalizeMarketplaceKey($displayName);
+        foreach ($assignedKeys as $assignedKey) {
+            if ($assignedKey === $displayKey || str_contains($assignedKey, $displayKey) || str_contains($displayKey, $assignedKey)) {
+                return true;
+            }
         }
-        if (str_contains($name, 'n11')) {
-            return 'bg-violet-300 text-slate-900';
-        }
-        if (str_contains($name, 'cicek')) {
-            return 'bg-emerald-200 text-slate-900';
-        }
-        if (str_contains($name, 'amazon')) {
-            return 'bg-slate-900 text-white';
-        }
-
-        return 'bg-slate-200 text-slate-700';
+        return false;
     };
 
 @endphp
@@ -278,11 +285,179 @@
         object-fit: contain;
         background: #f8fafc;
     }
-    .inline-edit-box {
-        display: flex;
+    .inventory-market-cell {
+        display: inline-flex;
         flex-direction: column;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
+        width: 82px;
+        flex: 0 0 82px;
+        transition: transform .2s ease, background-color .2s ease, border-color .2s ease, opacity .2s ease;
+        cursor: pointer;
+        position: relative;
+        border: 0;
+        border-radius: 10px;
+        padding: 4px 2px;
+        background: transparent !important;
+    }
+    .inventory-market-list {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+    .inventory-market-logo-wrap {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        border: 1px solid #dbe7f5;
+        background: #ffffff;
+        transition: border-color .2s ease, background-color .2s ease, transform .2s ease;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+    .inventory-market-logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        object-fit: contain;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        transition: transform .24s cubic-bezier(0.2, 0.7, 0.2, 1), filter .2s ease, opacity .2s ease, box-shadow .24s ease;
+    }
+    .inventory-market-logo-fallback {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 0;
+        background: transparent;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform .18s ease, opacity .2s ease, box-shadow .2s ease;
+    }
+    .inventory-market-cell.is-active .inventory-market-logo,
+    .inventory-market-cell.is-active .inventory-market-logo-fallback {
+        filter: brightness(1.08) saturate(1.18) contrast(1.04);
+        opacity: 1;
+        box-shadow: none;
+    }
+    .inventory-market-cell.is-active {
+        background: transparent !important;
+        border-color: transparent;
+    }
+    .inventory-market-cell.is-active .inventory-market-logo-wrap {
+        border-color: #94a3b8;
+        background: #ffffff;
+    }
+    .inventory-market-cell.is-inactive .inventory-market-logo,
+    .inventory-market-cell.is-inactive .inventory-market-logo-fallback {
+        filter: grayscale(100%) saturate(0.1);
+        opacity: .3;
+        box-shadow: none;
+    }
+    .inventory-market-cell.is-inactive .inventory-market-logo-wrap {
+        border-color: #e5e7eb;
+        background: #ffffff;
+    }
+    .inventory-market-name {
+        font-size: 11px;
+        line-height: 1.1;
+        color: #000000 !important;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        text-align: center;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        width: 100%;
+        max-width: 100%;
+        padding: 0 1px;
+        opacity: 1 !important;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        min-height: 22px;
+    }
+    .inventory-market-hint {
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%) translateY(4px);
+        opacity: 0;
+        pointer-events: none;
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: #f8fafc;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        white-space: nowrap;
+        border-radius: 999px;
+        padding: 6px 10px;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.28);
+        transition: opacity .16s ease, transform .16s ease;
+        z-index: 4;
+    }
+    .inventory-market-hint::before {
+        content: "\f0a9";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-right: 6px;
+        font-size: 10px;
+        opacity: .9;
+    }
+    .inventory-market-cell.is-inactive .inventory-market-name {
+        color: #94a3b8 !important;
+        opacity: .85 !important;
+    }
+    .inventory-market-cell:hover {
+        transform: translateY(-2px);
+    }
+    .inventory-market-cell:hover .inventory-market-logo,
+    .inventory-market-cell:hover .inventory-market-logo-fallback {
+        transform: scale(1.08);
+        box-shadow: none;
+    }
+    .inventory-market-cell:hover .inventory-market-logo-wrap {
+        transform: translateY(-1px) scale(1.06);
+        border-color: #94a3b8;
+    }
+    .inventory-market-cell.is-active:hover .inventory-market-logo,
+    .inventory-market-cell.is-active:hover .inventory-market-logo-fallback {
+        filter: brightness(1.14) saturate(1.24) contrast(1.06);
+        opacity: 1;
+    }
+    .inventory-market-cell.is-inactive:hover .inventory-market-logo,
+    .inventory-market-cell.is-inactive:hover .inventory-market-logo-fallback {
+        filter: grayscale(100%) saturate(0.1);
+        opacity: .45;
+    }
+    .inventory-market-cell:hover .inventory-market-name {
+        color: #1f2937;
+    }
+    .inventory-market-cell:hover .inventory-market-hint {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    .inline-edit-box {
+        display: flex;
+        align-items: center;
+        position: relative;
     }
     .inline-edit-box input[type='number'] {
         border: 1px solid #dbe3ee;
@@ -298,49 +473,95 @@
     .inline-update-btn {
         appearance: none;
         -webkit-appearance: none;
-        display: inline-flex;
+        display: none;
         align-items: center;
         justify-content: center;
         width: auto !important;
-        max-width: 78%;
+        max-width: 88%;
         flex: 0 0 auto;
         align-self: center;
-        border: 1px solid #f97316;
-        border-radius: 10px;
-        background: #fff7ed;
+        border: 1px solid #fdba74;
+        border-radius: 12px;
+        background: linear-gradient(180deg, #fff7ed 0%, #ffedd5 100%);
         color: #9a3412 !important;
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 700;
         letter-spacing: .01em;
         line-height: 1;
-        min-height: 22px;
-        padding: 4px 9px;
-        box-shadow: 0 6px 14px rgba(249, 115, 22, 0.18);
+        min-height: 28px;
+        padding: 6px 12px;
+        box-shadow: 0 10px 24px rgba(249, 115, 22, 0.22);
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 50%;
+        z-index: 5;
+        transform: translateX(-50%) translateY(-2px);
         opacity: 0;
         pointer-events: none;
-        transform: translateY(-2px);
         cursor: pointer;
-        transition: opacity .16s ease, transform .16s ease, border-color .16s ease, background-color .16s ease, box-shadow .16s ease, filter .16s ease;
+        transition: opacity .16s ease, transform .16s ease, border-color .16s ease, background-color .16s ease, box-shadow .16s ease, color .16s ease;
     }
     .inline-update-btn.is-visible {
+        display: inline-flex;
         opacity: 1;
         pointer-events: auto;
-        transform: translateY(0);
+        transform: translateX(-50%) translateY(0);
     }
     .inline-update-btn:hover {
-        border-color: #ea580c;
-        background: #ffedd5;
-        box-shadow: 0 8px 16px rgba(249, 115, 22, 0.24);
-        filter: none;
+        border-color: #f97316;
+        background: linear-gradient(180deg, #ffedd5 0%, #fed7aa 100%);
+        box-shadow: 0 12px 26px rgba(249, 115, 22, 0.28);
         color: #7c2d12 !important;
     }
     .inline-update-btn:active {
-        transform: translateY(0);
-        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.22);
+        transform: translateX(-50%) translateY(0);
+        box-shadow: 0 6px 14px rgba(15, 23, 42, 0.2);
     }
     .inline-update-btn:disabled {
         opacity: .7;
         pointer-events: none;
+    }
+    .inline-toast-anchor {
+        position: relative;
+    }
+    .inline-toast-stack {
+        position: absolute;
+        right: 0;
+        top: 6px;
+        z-index: 1600;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+        width: min(360px, calc(100vw - 32px));
+        pointer-events: none;
+    }
+    .inline-toast {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid transparent;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.4;
+        box-shadow: 0 10px 26px rgba(15, 23, 42, 0.2);
+        opacity: 0;
+        transform: translateX(14px);
+        transition: opacity .2s ease, transform .2s ease;
+    }
+    .inline-toast.is-visible {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    .inline-toast--success {
+        background: #ecfdf5;
+        border-color: #6ee7b7;
+        color: #065f46;
+    }
+    .inline-toast--error {
+        background: #fef2f2;
+        border-color: #fca5a5;
+        color: #991b1b;
     }
     @media (max-width: 1024px) {
         .inventory-toolbar-actions {
@@ -350,6 +571,9 @@
 </style>
 @if($isInventoryView ?? false)
 <div class="inventory-sticky-shell">
+<div class="inline-toast-anchor">
+    <div id="inline-toast-stack" class="inline-toast-stack" aria-live="polite"></div>
+</div>
 <div class="panel-card p-3 mb-4 inventory-top-card">
         @include('admin.products.partials.catalog-tabs', [
             'isInventoryView' => ($isInventoryView ?? false),
@@ -359,7 +583,8 @@
 </div>
 <div class="panel-card p-4 mb-4 inventory-search-card">
 @else
-<div class="mb-4">
+<div class="mb-4 inline-toast-anchor">
+    <div id="inline-toast-stack" class="inline-toast-stack" aria-live="polite"></div>
     @include('admin.products.partials.catalog-tabs', [
         'isInventoryView' => ($isInventoryView ?? false),
         'inventoryMarketplaces' => ($inventoryMarketplaces ?? collect()),
@@ -545,7 +770,7 @@
 
                 </th>
 
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">
+                <th class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase">
 
                     <a href="{{ $sortLink('cost') }}" class="inline-flex items-center gap-2">
 
@@ -581,9 +806,9 @@
 
                 </th>
 
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">
+                <th class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase">
 
-                    <a href="{{ $sortLink('marketplace') }}" class="inline-flex items-center gap-2">
+                    <a href="{{ $sortLink('marketplace') }}" class="inline-flex w-full items-center justify-center gap-2">
 
                         Pazaryeri
 
@@ -620,7 +845,7 @@
                     <input type="checkbox" class="inventory-row-select rounded border-slate-300 text-[#ff4439] focus:ring-[#ff4439]" value="{{ $product->id }}" data-product-id="{{ $product->id }}">
                 </td>
 
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="px-6 py-4 whitespace-nowrap text-center">
 
                     @if($product->display_image_url)
 
@@ -699,7 +924,7 @@
                     <div class="flex items-center gap-2">
 
                         <div class="inline-edit-box" data-inline-edit-box="{{ $product->id }}">
-                            <input type="number" min="0" class="w-20 text-sm" value="{{ $product->stock_quantity }}" data-product-stock="{{ $product->id }}" data-inline-edit-input="1">
+                            <input type="number" min="0" class="w-24 text-sm" value="{{ $product->stock_quantity }}" data-product-stock="{{ $product->id }}" data-inline-edit-input="1">
                             <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">G&uuml;ncelle</button>
                         </div>
 
@@ -713,21 +938,49 @@
 
                     @php
 
-                        $marketplaceNames = $product->marketplaceProducts
+                        $assignedMarketplaceNames = $product->marketplaceProducts
                             ->pluck('marketplace')
                             ->filter()
                             ->unique('id')
                             ->pluck('name')
                             ->filter()
-                            ->shuffle()
+                            ->reject(fn ($name) => str_contains($normalizeMarketplaceKey((string) $name), 'cicek'))
+                            ->values();
+                        $assignedMarketplaceKeys = $assignedMarketplaceNames
+                            ->map(fn ($name) => $normalizeMarketplaceKey((string) $name))
+                            ->filter()
+                            ->values()
+                            ->all();
+                        $displayMarketplaceNames = collect($inventoryMarketplaces ?? [])
+                            ->pluck('name')
+                            ->filter()
+                            ->reject(fn ($name) => str_contains($normalizeMarketplaceKey((string) $name), 'cicek'))
+                            ->values();
+                        if ($displayMarketplaceNames->isEmpty()) {
+                            $displayMarketplaceNames = $fallbackMarketplaceNames;
+                        }
+                        $displayMarketplaceNames = $displayMarketplaceNames
+                            ->sortByDesc(fn ($name) => $isMarketplaceActive((string) $name, $assignedMarketplaceKeys))
                             ->values();
 
                     @endphp
 
-                    <div class="flex flex-wrap items-center gap-2 max-w-[280px]">
-                        @forelse($marketplaceNames as $marketplaceName)
-                            <span class="panel-pill text-xs {{ $inventoryMarketplaceBadgeClass($marketplaceName) }}">
-                                {{ $marketplaceName }}
+                    <div class="inventory-market-list">
+                        @forelse($displayMarketplaceNames as $marketplaceName)
+                            @php
+                                $marketLogoUrl = $inventoryMarketplaceLogoUrl($marketplaceName);
+                                $marketIsActive = $isMarketplaceActive((string) $marketplaceName, $assignedMarketplaceKeys);
+                            @endphp
+                            <span class="inventory-market-cell {{ $marketIsActive ? 'is-active' : 'is-inactive' }}">
+                                <span class="inventory-market-hint">Pazaryerinde açılır</span>
+                                <span class="inventory-market-logo-wrap">
+                                    @if($marketLogoUrl)
+                                        <img src="{{ $marketLogoUrl }}" alt="{{ $marketplaceName }}" class="inventory-market-logo">
+                                    @else
+                                        <span class="inventory-market-logo-fallback">{{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr((string) $marketplaceName, 0, 2)) }}</span>
+                                    @endif
+                                </span>
+                                <span class="inventory-market-name">{{ $marketplaceName }}</span>
                             </span>
                         @empty
                             <span class="text-xs text-slate-400">-</span>
@@ -747,7 +1000,10 @@
                 </td>
 
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    <a href="{{ route('portal.products.show', $product) }}" class="text-blue-600 hover:text-blue-900 mr-3">
+                    <a href="{{ route('portal.products.show', $product) }}"
+                       class="text-blue-600 hover:text-blue-900 mr-3"
+                       data-product-edit-popup="1"
+                       data-product-name="{{ $product->name }} Detay">
 
                         <i class="fas fa-eye"></i>
 
@@ -933,7 +1189,42 @@
         document.body.style.overflow = 'hidden';
     }
 
-    async function submitInlineUpdate(productId, triggerButton = null) {
+    function ensureInlineToastStack() {
+        let stack = document.getElementById('inline-toast-stack');
+        if (!stack) {
+            stack = document.createElement('div');
+            stack.id = 'inline-toast-stack';
+            stack.className = 'inline-toast-stack';
+            document.body.appendChild(stack);
+        }
+        return stack;
+    }
+
+    function showInlineToast(message, type = 'success') {
+        if (!message) return;
+        const stack = ensureInlineToastStack();
+        const toast = document.createElement('div');
+        toast.className = `inline-toast inline-toast--${type === 'error' ? 'error' : 'success'}`;
+        toast.textContent = message;
+        stack.appendChild(toast);
+        window.requestAnimationFrame(() => {
+            toast.classList.add('is-visible');
+        });
+        window.setTimeout(() => {
+            toast.classList.remove('is-visible');
+            window.setTimeout(() => toast.remove(), 220);
+        }, 2600);
+    }
+
+    function resolveInlineFieldLabel(inputEl) {
+        if (!inputEl) return 'Alan';
+        if (inputEl.hasAttribute('data-product-cost')) return 'Maliyet fiyatı';
+        if (inputEl.hasAttribute('data-product-price')) return 'Satış fiyatı';
+        if (inputEl.hasAttribute('data-product-stock')) return 'Stok';
+        return 'Alan';
+    }
+
+    async function submitInlineUpdate(productId, triggerButton = null, preferredFieldLabel = null) {
         const costInput = document.querySelector(`[data-product-cost="${productId}"]`);
         const priceInput = document.querySelector(`[data-product-price="${productId}"]`);
         const stockInput = document.querySelector(`[data-product-stock="${productId}"]`);
@@ -943,10 +1234,18 @@
         }
 
         const costValue = costInput ? costInput.value : '';
-        const stateKey = `${costValue}|${priceInput.value}|${stockInput.value}`;
+        const priceValue = priceInput.value;
+        const stockValue = stockInput.value;
+        const stateKey = `${costValue}|${priceValue}|${stockValue}`;
         if (inlineLastSavedState[productId] === stateKey) {
             return;
         }
+
+        const previousParts = String(inlineLastSavedState[productId] ?? '').split('|');
+        const changedFields = [];
+        if ((previousParts[0] ?? '') !== costValue) changedFields.push('Maliyet fiyatı');
+        if ((previousParts[1] ?? '') !== priceValue) changedFields.push('Satış fiyatı');
+        if ((previousParts[2] ?? '') !== stockValue) changedFields.push('Stok');
 
         const originalButtonText = triggerButton ? triggerButton.textContent : null;
         if (triggerButton) {
@@ -964,8 +1263,8 @@
             },
             body: JSON.stringify({
                 cost_price: costValue,
-                price: priceInput.value,
-                stock_quantity: stockInput.value,
+                price: priceValue,
+                stock_quantity: stockValue,
             }),
         });
 
@@ -975,11 +1274,15 @@
         }
 
         if (!response.ok) {
-            alert('Kaydedilemedi. Lutfen degerleri kontrol edin.');
+            showInlineToast('Kaydedilemedi. Lütfen değerleri kontrol edin.', 'error');
             return;
         }
 
         inlineLastSavedState[productId] = stateKey;
+        const label = changedFields.length > 0
+            ? changedFields.join(', ')
+            : (preferredFieldLabel || 'Alan');
+        showInlineToast(`${label} güncellendi.`, 'success');
     }
 
 
@@ -1015,9 +1318,13 @@
                 return;
             }
 
-            buttonEl.addEventListener('click', async () => {
-                await submitInlineUpdate(productId, buttonEl);
+            const submitFromInline = async () => {
+                await submitInlineUpdate(productId, buttonEl, resolveInlineFieldLabel(inputEl));
                 refreshInlineButtonState(boxEl);
+            };
+
+            buttonEl.addEventListener('click', async () => {
+                await submitFromInline();
             });
 
             boxEl.addEventListener('focusin', () => {
@@ -1036,6 +1343,13 @@
 
             inputEl.addEventListener('input', () => refreshInlineButtonState(boxEl));
             inputEl.addEventListener('change', () => refreshInlineButtonState(boxEl));
+            inputEl.addEventListener('keydown', async (event) => {
+                if (event.key !== 'Enter') {
+                    return;
+                }
+                event.preventDefault();
+                await submitFromInline();
+            });
 
             refreshInlineButtonState(boxEl);
         });
@@ -1437,18 +1751,7 @@
     bindListImagePreview();
     bindInventoryImportForm();
     if (inventoryFlashMessage) {
-        const toast = document.createElement('div');
-        toast.className = 'fixed right-4 bottom-4 z-[120] px-4 py-3 rounded-xl shadow-lg border text-sm max-w-sm';
-        if (inventoryFlashType === 'error') {
-            toast.classList.add('bg-red-50', 'border-red-200', 'text-red-700');
-        } else {
-            toast.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-700');
-        }
-        toast.textContent = inventoryFlashMessage;
-        document.body.appendChild(toast);
-        window.setTimeout(() => {
-            toast.remove();
-        }, 4500);
+        showInlineToast(inventoryFlashMessage, inventoryFlashType === 'error' ? 'error' : 'success');
     }
 
 

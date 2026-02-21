@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends(request()->boolean('embed') ? 'layouts.admin-embed' : 'layouts.admin')
 
 
 
@@ -14,7 +14,7 @@
 
 <div class="mb-6">
 
-    <a href="{{ route('portal.products.edit', $product) }}" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded">
+    <a href="{{ route('portal.products.edit', ['product' => $product, 'embed' => request()->query('embed')]) }}" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded">
 
         <i class="fas fa-edit mr-2"></i> Düzenle
 

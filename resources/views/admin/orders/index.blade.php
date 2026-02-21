@@ -1,10 +1,10 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 
 
 @section('header')
 
-    SipariÃ…Å¸ler
+    Siparişler
 
 @endsection
 
@@ -16,7 +16,7 @@
 
     $tabs = [
 
-        'all' => 'TÃ¼m SipariÃ…Å¸ler',
+        'all' => 'Tüm Siparişler',
 
         'pending' => 'Onay Bekleyen',
 
@@ -26,9 +26,9 @@
 
         'delivered' => 'Teslim',
 
-        'cancelled' => 'Ä°ptal',
+        'cancelled' => 'İptal',
 
-        'returned' => 'Ä°ade',
+        'returned' => 'İade',
 
     ];
 
@@ -178,7 +178,7 @@
 
             <select name="marketplace_id" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
 
-                <option value="">TÃ¼mÃ¼</option>
+                <option value="">Tümü</option>
 
                 @foreach($marketplaces as $marketplace)
 
@@ -202,19 +202,19 @@
 
             <select name="status" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
 
-                <option value="">TÃ¼mÃ¼</option>
+                <option value="">Tümü</option>
 
                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Beklemede</option>
 
-                <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>OnaylandÄ±</option>
+                <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Onaylandı</option>
 
                 <option value="shipped" {{ request('status') == 'shipped' ? 'selected' : '' }}>Kargoda</option>
 
                 <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>Teslim</option>
 
-                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Ä°ptal</option>
+                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>İptal</option>
 
-                <option value="returned" {{ request('status') == 'returned' ? 'selected' : '' }}>Ä°ade</option>
+                <option value="returned" {{ request('status') == 'returned' ? 'selected' : '' }}>İade</option>
 
             </select>
 
@@ -224,7 +224,7 @@
 
         <div>
 
-            <label class="block text-xs font-medium text-slate-500 mb-1">BaÃ…Å¸langÄ±Ã§</label>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Başlangıç</label>
 
             <input type="date" name="date_from" value="{{ request('date_from') }}"
 
@@ -236,7 +236,7 @@
 
         <div>
 
-            <label class="block text-xs font-medium text-slate-500 mb-1">BitiÃ…Å¸</label>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Bitiş</label>
 
             <input type="date" name="date_to" value="{{ request('date_to') }}"
 
@@ -280,19 +280,19 @@
 
             <select name="status" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white" required>
 
-                <option value="">SeÃ§iniz</option>
+                <option value="">Seçiniz</option>
 
                 <option value="pending">Beklemede</option>
 
-                <option value="approved">OnaylandÄ±</option>
+                <option value="approved">Onaylandı</option>
 
                 <option value="shipped">Kargoda</option>
 
                 <option value="delivered">Teslim</option>
 
-                <option value="cancelled">Ä°ptal</option>
+                <option value="cancelled">İptal</option>
 
-                <option value="returned">Ä°ade</option>
+                <option value="returned">İade</option>
 
             </select>
 
@@ -302,13 +302,13 @@
 
             <label class="block text-xs font-medium text-slate-500 mb-1">Not (opsiyonel)</label>
 
-            <input type="text" name="note" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white" placeholder="Toplu gÃ¼ncelleme notu">
+            <input type="text" name="note" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white" placeholder="Toplu güncelleme notu">
 
         </div>
 
         <button type="submit" class="btn btn-solid-accent">
 
-            SeÃ§ili SipariÃ…Å¸leri GÃ¼ncelle
+            Seçili Siparişleri Güncelle
 
         </button>
 
@@ -346,15 +346,15 @@
 
                 <th class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase">Pazaryeri</th>
 
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">MÃ¼ÅŸteri</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Müşteri</th>
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Tutar</th>
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Durum</th>
 
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">SipariÃ…Å¸ Tarihi</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Sipariş Tarihi</th>
 
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Ä°Ã…Å¸lem</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">İşlem</th>
 
             </tr>
 
@@ -482,7 +482,7 @@
 
             <tr>
 
-                <td colspan="9" class="px-6 py-4 text-center text-slate-500">HenÃ¼z sipariÃ…Å¸ bulunmuyor</td>
+                <td colspan="9" class="px-6 py-4 text-center text-slate-500">Henüz sipariş bulunmuyor</td>
 
             </tr>
 
@@ -506,7 +506,7 @@
 
         <div class="md:col-span-2">
 
-            <label class="block text-xs font-medium text-slate-500 mb-1">Kargo FirmasÄ±</label>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Kargo Firması</label>
 
             <input type="text" name="cargo_company" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white" required>
 
@@ -532,7 +532,7 @@
 
             <button type="submit" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">
 
-                SeÃ§ili SipariÃ…Å¸leri Kargoya Al
+                Seçili Siparişleri Kargoya Al
 
             </button>
 
@@ -635,13 +635,3 @@
 </script>
 
 @endsection
-
-
-
-
-
-
-
-
-
-

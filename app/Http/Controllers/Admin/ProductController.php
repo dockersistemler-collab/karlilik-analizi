@@ -93,18 +93,18 @@ $filename = 'products-' . now()->format('Ymd-His') . '.xlsx';
         $headers = [
             'Stok Kodu',
             'Barkod',
-            'ÃƒÅ“rÃƒÂ¼n AdÃ„Â±',
-            'AÃƒÂ§Ã„Â±klama',
+            'Ürün Adı',
+            'Açıklama',
             'Marka',
             'Kategori',
-            'SatÃ„Â±Ã…Å¸ FiyatÃ„Â±',
-            'AlÃ„Â±Ã…Å¸ Maliyeti',
+            'Satış Fiyatı',
+            'Alış Maliyeti',
             'Stok',
             'Para Birimi',
-            'AÃ„Å¸Ã„Â±rlÃ„Â±k',
+            'Ağırlık',
             'Desi',
-            'KDV OranÃ„Â±',
-            'GÃƒÂ¶rsel URL',
+            'KDV Oranı',
+            'Görsel URL',
             'Aktif',
         ];
 
@@ -147,18 +147,18 @@ $filename = 'products-' . now()->format('Ymd-His') . '.xlsx';
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->fromArray(['Stok Kodu',
             'Barkod',
-            'ÃƒÅ“rÃƒÂ¼n AdÃ„Â±',
-            'AÃƒÂ§Ã„Â±klama',
+            'Ürün Adı',
+            'Açıklama',
             'Marka',
             'Kategori',
-            'SatÃ„Â±Ã…Å¸ FiyatÃ„Â±',
-            'AlÃ„Â±Ã…Å¸ Maliyeti',
+            'Satış Fiyatı',
+            'Alış Maliyeti',
             'Stok',
             'Para Birimi',
-            'AÃ„Å¸Ã„Â±rlÃ„Â±k',
+            'Ağırlık',
             'Desi',
-            'KDV OranÃ„Â±',
-            'GÃƒÂ¶rsel URL',
+            'KDV Oranı',
+            'Görsel URL',
             'Aktif',
         ], null, 'A1');
 
@@ -178,7 +178,7 @@ $filename = 'products-' . now()->format('Ymd-His') . '.xlsx';
         if ($user && !$user->isSuperAdmin()) {
             $subscription = $user->subscription;
             if (!$subscription || !$subscription->isActive()) {
-                return back()->with('info', 'ÃƒÅ“rÃƒÂ¼n iÃƒÂ§e aktarmak iÃƒÂ§in aktif abonelik gerekiyor.');
+                return back()->with('info', 'Ürün içe aktarmak için aktif abonelik gerekiyor.');
             }
         }
 $file = $request->file('file');
@@ -187,18 +187,18 @@ $file = $request->file('file');
         $rows = $sheet->toArray(null, true, true, false);
 
         if (empty($rows)) {
-            return back()->with('info', 'Excel baÃ…Å¸lÃ„Â±Ã„Å¸Ã„Â± bulunamadÃ„Â±.');
+            return back()->with('info', 'Excel başlığı bulunamadı.');
         }
 $header = array_shift($rows);
         $header = array_map(function ($value) {
             $normalized = Str::of((string) $value)->trim()->lower()->value();
             $normalized = strtr($normalized, [
-                'ÃƒÂ§' => 'c',
-                'Ã„Å¸' => 'g',
-                'Ã„Â±' => 'i',
-                'ÃƒÂ¶' => 'o',
-                'Ã…Å¸' => 's',
-                'ÃƒÂ¼' => 'u',
+                'ç' => 'c',
+                'ğ' => 'g',
+                'ı' => 'i',
+                'ö' => 'o',
+                'ş' => 's',
+                'ü' => 'u',
             ]);
             $normalized = preg_replace('/\s+/', '_', $normalized);
             return $normalized;
@@ -245,7 +245,7 @@ $header = $mappedHeader;
         $required = ['sku', 'name', 'price', 'stock_quantity'];
         foreach ($required as $req) {
             if (!in_array($req, $header, true)) {
-                return back()->with('info', 'Excel baÃ…Å¸lÃ„Â±Ã„Å¸Ã„Â±nda zorunlu alan eksik: ' . $req);
+                return back()->with('info', 'Excel başlığında zorunlu alan eksik: ' . $req);
             }
         }
 $imported = 0;
@@ -326,16 +326,16 @@ $product = Product::create([
             }
 $imported++;
         }
-$skipped = $skippedEmpty + $skippedInvalid + $skippedMissing + $skippedLimit + $skippedDuplicate;
+        $skipped = $skippedEmpty + $skippedInvalid + $skippedMissing + $skippedLimit + $skippedDuplicate;
         $details = [
-            "boÃ…Å¸ satÃ„Â±r: {$skippedEmpty}",
-            "geÃƒÂ§ersiz satÃ„Â±r: {$skippedInvalid}",
+            "boş satır: {$skippedEmpty}",
+            "geçersiz satır: {$skippedInvalid}",
             "eksik zorunlu alan: {$skippedMissing}",
             "abonelik limiti: {$skippedLimit}",
-            "aynÃ„Â± SKU: {$skippedDuplicate}",
+            "aynı SKU: {$skippedDuplicate}",
         ];
 
-        return back()->with('success', "Ã„Â°ÃƒÂ§e aktarma tamamlandÃ„Â±. BaÃ…Å¸arÃ„Â±lÃ„Â±: {$imported}, Atlanan: {$skipped} (" . implode(', ', $details) . ")");
+        return back()->with('success', "İçe aktarma tamamlandı. Başarılı: {$imported}, Atlanan: {$skipped} (" . implode(', ', $details) . ")");
     }
 
     public function create()
@@ -411,7 +411,7 @@ $validated = $request->validate(['sku' => $skuRule,
                         now()->toDateTimeString()
                     ));
                 }
-                return back()->with('info', 'Abonelik limitiniz doldu. Daha fazla ÃƒÂ¼rÃƒÂ¼n ekleyemezsiniz.');
+                return back()->with('info', 'Abonelik limitiniz doldu. Daha fazla ürün ekleyemezsiniz.');
             }
 $validated['user_id'] = $user->id;
         }
@@ -452,7 +452,7 @@ $limit = (int) ($plan?->max_products ?? 0);
         }
 
         return redirect()->route('portal.products.index')
-            ->with('success', 'ÃƒÅ“rÃƒÂ¼n baÃ…Å¸arÃ„Â±yla oluÃ…Å¸turuldu.');
+            ->with('success', 'Ürün başarıyla oluşturuldu.');
     }
 
     public function show(Product $product)
@@ -583,7 +583,7 @@ $product->update($validated);
         }
 
         return redirect()->route('portal.products.index')
-            ->with('success', 'ÃƒÅ“rÃƒÂ¼n gÃƒÂ¼ncellendi.');
+            ->with('success', 'Ürün güncellendi.');
     }
 
     public function destroy(Product $product)
@@ -597,7 +597,7 @@ $product->update($validated);
         }
 
         return redirect()->route('portal.products.index')
-            ->with('success', 'ÃƒÅ“rÃƒÂ¼n baÃ…Å¸arÃ„Â±yla silindi.');
+            ->with('success', 'Ürün başarıyla silindi.');
     }
 
     private function sanitizeDescription(?string $html): ?string
@@ -622,6 +622,3 @@ $product->update($validated);
         return $sku;
     }
 }
-
-
-

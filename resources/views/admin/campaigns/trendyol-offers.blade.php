@@ -5,61 +5,60 @@
 @endsection
 
 @section('content')
-    <div class="commission-page">
-        <div class="commission-hero">
-            <div class="commission-hero-content">
-                <div class="commission-hero-title">
-                    <span class="commission-badge-hero">Teklif Yönetimi</span>
-                    <span class="commission-status-pill">Canlı</span>
+    <div class="commission-sticky-shell">
+        <div class="commission-page commission-top-shell">
+            <div class="commission-hero">
+                <div class="commission-hero-content">
+                    <div class="commission-hero-title">
+                        <span class="commission-badge-hero">Teklif Yönetimi</span>
+                        <span class="commission-status-pill">Canlı</span>
+                    </div>
+                    <p>Excel ile teklifleri içe aktar, kategoriye göre filtrele ve fiyat aralıklarını tek tabloda hızlıca güncelle.</p>
                 </div>
-                <h2>Trendyol tekliflerini komisyon tarifeleriyle aynı modern yapıda yönet.</h2>
-                <p>Excel ile teklifleri içe aktar, kategoriye göre filtrele ve fiyat aralıklarını tek tabloda hızlıca güncelle.</p>
+                <div class="commission-hero-aside">
+                    <div class="commission-hero-actions">
+                        <button id="commission-upload-btn" class="btn btn-solid-accent">
+                            <i class="fa-solid fa-file-arrow-up mr-2"></i>
+                            Excel Yükle
+                        </button>
+                        <button id="commission-errors-btn" class="btn btn-outline-accent">
+                            <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+                            Hataları Gör
+                        </button>
+                        <button id="commission-bulk-download" class="btn btn-outline-accent">
+                            <i class="fa-solid fa-file-export mr-2"></i>
+                            Kaydet & İndir
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="commission-hero-aside">
-                <div class="commission-hero-actions">
-                    <button id="commission-upload-btn" class="btn btn-solid-accent">
-                        <i class="fa-solid fa-file-arrow-up mr-2"></i>
-                        Excel Yükle
-                    </button>
-                    <button id="commission-errors-btn" class="btn btn-outline-accent">
-                        <i class="fa-solid fa-triangle-exclamation mr-2"></i>
-                        Hataları Gör
-                    </button>
-                    <button id="commission-bulk-download" class="btn btn-outline-accent">
-                        <i class="fa-solid fa-file-export mr-2"></i>
-                        Kaydet & İndir
-                    </button>
+
+            <div id="commission-filters-visible" class="commission-filters-visible">
+                <div class="commission-filter-block commission-filter-wide">
+                    <label class="commission-filter-label">Arama</label>
+                    <input id="commission-search" type="text" placeholder="SKU, barkod veya ürün adı ara" class="commission-filter-input">
+                </div>
+                <div class="commission-filter-block commission-filter-category">
+                    <label class="commission-filter-label">Kategori</label>
+                    <select id="commission-category" class="commission-filter-input">
+                        <option value="">Kategori (Tümü)</option>
+                    </select>
+                </div>
+                <div class="commission-filter-block commission-filter-selection">
+                    <label class="commission-filter-label">Toplu Seçim</label>
+                    <div class="commission-selection-wrap">
+                        <label class="commission-selection-item">
+                            <input type="checkbox" id="commission-select-all" class="rounded">
+                            Tümünü seç
+                        </label>
+                        <label class="commission-selection-item">
+                            <input type="checkbox" id="commission-all-variants" class="rounded">
+                            Tüm varyantları seç
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Toplu atama kaldırıldı (Excel tabanlı akış) -->
-    </div>
-
-    <div id="commission-filters-visible" style="display:flex !important;visibility:visible !important;opacity:1 !important;position:relative;z-index:40;flex-wrap:wrap;align-items:flex-end;gap:14px;margin:0 0 12px 0;padding:14px 16px;border:1px solid #dbe3ee;border-radius:14px;background:linear-gradient(180deg,#ffffff,#f8fafc);box-shadow:0 8px 20px rgba(15,23,42,.06);">
-            <div style="min-width:340px;flex:1 1 460px;">
-                <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:6px;letter-spacing:.03em;text-transform:uppercase;">Arama</label>
-                <input id="commission-search" type="text" placeholder="SKU, barkod veya ürün adı ara" style="width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;background:#fff;">
-            </div>
-            <div style="width:230px;min-width:230px;">
-                <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:6px;letter-spacing:.03em;text-transform:uppercase;">Kategori</label>
-                <select id="commission-category" style="width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;background:#fff;">
-                    <option value="">Kategori (Tümü)</option>
-                </select>
-            </div>
-            <div style="min-width:280px;flex:0 0 auto;">
-                <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:6px;letter-spacing:.03em;text-transform:uppercase;">Toplu Seçim</label>
-                <div style="display:flex;align-items:center;gap:14px;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#f8fafc;color:#334155;font-size:13px;">
-                    <label style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-weight:600;">
-                        <input type="checkbox" id="commission-select-all" class="rounded">
-                        Tümünü seç
-                    </label>
-                    <label style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-weight:600;">
-                        <input type="checkbox" id="commission-all-variants" class="rounded">
-                        Tüm varyantları seç
-                    </label>
-                </div>
-            </div>
     </div>
 
     <div class="panel-card p-4 commission-table-card">
@@ -183,6 +182,14 @@
 @push('styles')
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap');
+    .commission-sticky-shell {
+        position: sticky;
+        top: 0;
+        z-index: 70;
+        background: #fff;
+        padding-top: 8px;
+        margin-bottom: 12px;
+    }
     .commission-page {
         --commission-primary: #0f172a;
         --commission-accent: #f97316;
@@ -194,26 +201,28 @@
         color: var(--commission-ink);
         position: relative;
         isolation: isolate;
-        margin-bottom: 10px;
+        margin-bottom: 0;
     }
     .commission-page::before {
-        content: "";
-        position: absolute;
-        inset: -40px 0 auto 0;
-        height: 280px;
-        background: #f8fafc;
-        z-index: -1;
+        content: none;
+    }
+    .commission-top-shell {
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 14px;
+        background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
     }
     .commission-hero {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(420px, 520px);
         gap: 16px;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(250, 250, 252, 0.7));
-        border-radius: 20px;
-        padding: 20px;
-        margin-bottom: 10px;
-        border: 1px solid #f3e8ff;
-        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+        background: transparent;
+        border-radius: 0;
+        padding: 0;
+        margin-bottom: 12px;
+        border: 0;
+        box-shadow: none;
     }
     .commission-hero-aside {
         display: flex;
@@ -283,6 +292,68 @@
         align-items: end;
         gap: 12px;
         width: 100%;
+    }
+    .commission-filters-visible {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 14px;
+        margin: 0;
+        padding: 14px 16px;
+        border: 1px solid #dbe3ee;
+        border-radius: 14px;
+        background: linear-gradient(180deg, #ffffff, #f8fafc);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+    }
+    .commission-filter-block {
+        min-width: 0;
+    }
+    .commission-filter-wide {
+        min-width: 340px;
+        flex: 1 1 460px;
+    }
+    .commission-filter-category {
+        width: 230px;
+        min-width: 230px;
+    }
+    .commission-filter-selection {
+        min-width: 280px;
+        flex: 0 0 auto;
+    }
+    .commission-filter-label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #475569;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+    }
+    .commission-filter-input {
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 14px;
+        background: #fff;
+    }
+    .commission-selection-wrap {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: #f8fafc;
+        color: #334155;
+        font-size: 13px;
+    }
+    .commission-selection-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        font-weight: 600;
     }
     .commission-table-toolbar {
         margin-bottom: 12px;
@@ -484,6 +555,9 @@
         color: #0f172a;
     }
     @media (max-width: 1024px) {
+        .commission-sticky-shell {
+            top: 0;
+        }
         .commission-hero {
             grid-template-columns: 1fr;
         }
@@ -498,6 +572,19 @@
         }
         .commission-table-filters {
             grid-template-columns: 1fr;
+        }
+        .commission-filters-visible {
+            padding: 12px;
+        }
+        .commission-filter-wide,
+        .commission-filter-category,
+        .commission-filter-selection {
+            min-width: 0;
+            width: 100%;
+            flex: 1 1 100%;
+        }
+        .commission-selection-wrap {
+            flex-wrap: wrap;
         }
         .commission-toggle {
             flex-wrap: wrap;

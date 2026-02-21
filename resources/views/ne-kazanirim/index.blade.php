@@ -336,6 +336,13 @@
             padding: 10px 2px;
             font-weight: 600;
             white-space: normal;
+            text-align: left !important;
+        }
+        .nk-profit-table thead th:first-child {
+            text-align: center !important;
+        }
+        .nk-profit-table thead th:not(:first-child) {
+            padding-left: 2px !important;
         }
         .nk-profit-table thead th:nth-child(4),
         .nk-profit-table thead th:nth-child(5),
@@ -357,6 +364,35 @@
             padding: 10px 2px;
             color: #475569;
             vertical-align: middle;
+        }
+        .nk-profit-table .nk-check-col {
+            width: 44px;
+            min-width: 44px;
+            max-width: 44px;
+        }
+        .nk-profit-table thead th:nth-child(1),
+        .nk-profit-table tbody td:nth-child(1) {
+            width: 44px;
+            min-width: 44px;
+            max-width: 44px;
+            padding: 10px 6px 10px 14px;
+            text-align: left;
+        }
+        .nk-profit-table thead th:nth-child(2),
+        .nk-profit-table tbody td:nth-child(2) {
+            width: 72px;
+            min-width: 72px;
+            max-width: 72px;
+            padding: 10px 10px 10px 0;
+            text-align: left;
+        }
+        .nk-profit-table .nk-check-col input[type="checkbox"] {
+            margin: 0;
+            transform: none;
+        }
+        .nk-profit-table tbody td:nth-child(2) .nk-stock-thumb-wrap,
+        .nk-profit-table tbody td:nth-child(2) .nk-stock-thumb-placeholder {
+            margin-left: 0;
         }
 
         .nk-profit-table tbody tr:last-child td {
@@ -1076,8 +1112,8 @@
                         <div class="nk-table-wrap nk-table-panel" id="nk-profit-table-panel">
                             <table class="nk-profit-table">
                                 <colgroup>
-                                    <col style="width:40px">
-                                    <col style="width:52px">
+                                    <col style="width:44px">
+                                    <col style="width:72px">
                                     <col style="width:76px">
                                     <col style="width:90px">
                                     <col style="width:72px">
