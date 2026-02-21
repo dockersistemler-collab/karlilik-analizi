@@ -1013,7 +1013,7 @@
                                             </td>
                                             <td>
                                                 @if($orderImageUrl)
-                                                    <span class="nk-stock-thumb-wrap" data-nk-preview-src="{{ $orderImageUrl }}" data-nk-preview-alt="{{ $orderNo }}">
+                                                    <span class="nk-stock-thumb-wrap" tabindex="0" role="button" data-nk-preview-src="{{ $orderImageUrl }}" data-nk-preview-alt="{{ $orderNo }}">
                                                         <img
                                                             src="{{ $orderImageUrl }}"
                                                             alt="{{ $orderNo }}"
@@ -1134,7 +1134,7 @@
                                             </td>
                                             <td>
                                                 @if($stockImageUrl)
-                                                    <span class="nk-stock-thumb-wrap" data-nk-preview-src="{{ $stockImageUrl }}" data-nk-preview-alt="{{ $stockProduct->name }}">
+                                                    <span class="nk-stock-thumb-wrap" tabindex="0" role="button" data-nk-preview-src="{{ $stockImageUrl }}" data-nk-preview-alt="{{ $stockProduct->name }}">
                                                         <img src="{{ $stockImageUrl }}" alt="{{ $stockProduct->name }}" class="nk-stock-thumb">
                                                     </span>
                                                 @else
@@ -1856,7 +1856,6 @@
             const stockViewToggle = document.getElementById('nk-stock-view-toggle');
             const profitTablePanel = document.getElementById('nk-profit-table-panel');
             const stockTablePanel = document.getElementById('nk-stock-table-panel');
-            const stockViewStorageKey = 'ne-kazanirim-stock-table-enabled';
 
             const closeStockCalcModal = () => {
                 if (!stockCalcModal) return;
@@ -1944,13 +1943,11 @@
                 });
             };
 
-            const savedStockView = localStorage.getItem(stockViewStorageKey);
-            if (stockViewToggle && savedStockView !== null) {
-                stockViewToggle.checked = savedStockView === '1';
+            if (stockViewToggle) {
+                stockViewToggle.checked = false;
             }
 
             stockViewToggle?.addEventListener('change', () => {
-                localStorage.setItem(stockViewStorageKey, stockViewToggle.checked ? '1' : '0');
                 syncTableView();
             });
             syncTableView();
@@ -2001,21 +1998,47 @@
             };
 
             imageTriggers.forEach((trigger) => {
-                trigger.addEventListener('mouseenter', (event) => {
+                const hidePopover = () => {
+                    imagePopover?.classList.remove('is-open');
+                    if (imagePopoverImg) {
+                        imagePopoverImg.removeAttribute('src');
+                    }
+                };
+
+                const openPopover = (event) => {
                     const src = resolvePreviewSource(trigger);
                     if (!src || !imagePopover || !imagePopoverImg) return;
                     imagePopoverImg.src = src;
                     imagePopoverImg.alt = trigger.getAttribute('data-nk-preview-alt') || 'Urun gorseli';
                     imagePopover.classList.add('is-open');
                     placePopover(event);
+                };
+
+                trigger.addEventListener('mouseenter', (event) => {
+                    openPopover(event);
                 });
 
                 trigger.addEventListener('mousemove', placePopover);
 
                 trigger.addEventListener('mouseleave', () => {
-                    imagePopover?.classList.remove('is-open');
-                    if (imagePopoverImg) {
-                        imagePopoverImg.removeAttribute('src');
+                    hidePopover();
+                });
+
+                trigger.addEventListener('focus', () => {
+                    const rect = trigger.getBoundingClientRect();
+                    openPopover({
+                        clientX: rect.left + (rect.width / 2),
+                        clientY: rect.top + (rect.height / 2),
+                    });
+                });
+
+                trigger.addEventListener('blur', () => {
+                    hidePopover();
+                });
+
+                trigger.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') {
+                        hidePopover();
                     }
                 });
             });

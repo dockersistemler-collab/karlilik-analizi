@@ -1727,6 +1727,80 @@
             max-width: 760px;
         }
 
+        body.menu-modern-shell .menu-modern-hero-inline {
+            margin-top: 12px;
+        }
+
+        body.menu-modern-shell .menu-modern-mini-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        body.menu-modern-shell .menu-modern-hero.has-inline-cards {
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: start;
+        }
+
+        body.menu-modern-shell .menu-modern-hero.has-inline-cards .menu-modern-hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        body.menu-modern-shell .menu-modern-hero.has-inline-cards .menu-modern-hero-title {
+            justify-content: flex-start;
+        }
+
+        body.menu-modern-shell .menu-modern-hero.has-inline-cards .menu-modern-title {
+            max-width: none;
+            width: 100%;
+        }
+
+        body.menu-modern-shell .menu-modern-hero.has-inline-cards .menu-modern-hero-inline {
+            width: 100%;
+            max-width: 1500px;
+            margin-inline: 0;
+        }
+
+        body.menu-modern-shell .menu-modern-hero.has-inline-cards .menu-modern-hero-aside {
+            display: flex;
+            justify-self: end;
+            align-self: start;
+            min-width: 340px;
+        }
+
+        body.menu-modern-shell .menu-modern-mini-card {
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            background: #fff;
+            min-height: 66px;
+            width: 235px;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        body.menu-modern-shell .menu-modern-mini-card-label {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        body.menu-modern-shell .menu-modern-mini-card-value {
+            margin-top: 3px;
+            font-size: 22px;
+            line-height: 1.1;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
         body.menu-modern-shell .menu-modern-subtitle {
             margin-top: 6px;
             margin-bottom: 0;
@@ -1784,6 +1858,10 @@
             body.menu-modern-shell .menu-modern-title {
                 font-size: 26px;
             }
+
+            body.menu-modern-shell .menu-modern-mini-card {
+                width: calc(50% - 6px);
+            }
         }
     </style>
 
@@ -1802,6 +1880,7 @@
     if ($resolvedHeader === '') {
         $resolvedHeader = 'Yönetim Paneli';
     }
+    $heroInlineCards = trim((string) $__env->yieldContent('hero-inline-cards'));
 @endphp
 
 <body class="antialiased {{ $useModernMenuShell ? 'menu-modern-shell' : '' }}">
@@ -2159,23 +2238,17 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                         @endif
 
-                        @if($canReports('reports.category_sales'))
+                        @if($canReports('reports.category_sales') || $canReports('reports.brand_sales'))
 
-                            <a href="{{ route('portal.reports.category-sales') }}" class="sidebar-link {{ request()->routeIs('portal.reports.category-sales') ? 'is-active' : '' }}">
+                            @php
+                                $categoryBrandRoute = $canReports('reports.category_sales')
+                                    ? route('portal.reports.category-sales')
+                                    : route('portal.reports.brand-sales');
+                            @endphp
+                            <a href="{{ $categoryBrandRoute }}" class="sidebar-link {{ request()->routeIs('portal.reports.category-sales') || request()->routeIs('portal.reports.brand-sales') ? 'is-active' : '' }}">
                                 <i class="fa-solid fa-layer-group w-6"></i>
 
-                                <span class="sidebar-label">Kategori Bazlı Satış</span>
-
-                            </a>
-
-                        @endif
-
-                        @if($canReports('reports.brand_sales'))
-
-                            <a href="{{ route('portal.reports.brand-sales') }}" class="sidebar-link {{ request()->routeIs('portal.reports.brand-sales') ? 'is-active' : '' }}">
-                                <i class="fa-solid fa-tag w-6"></i>
-
-                                <span class="sidebar-label">Marka Bazlı Satış</span>
+                                <span class="sidebar-label">Kategori/Marka Raporu</span>
 
                             </a>
 
@@ -2651,13 +2724,18 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
             <div class="px-6 pb-6 pt-6">
                 @if($useModernMenuShell)
-                    <div class="menu-modern-hero">
+                    <div class="menu-modern-hero {{ $heroInlineCards !== '' ? 'has-inline-cards' : '' }}">
                         <div class="menu-modern-hero-content">
                             <div class="menu-modern-hero-title">
                                 <span class="menu-modern-badge">Menü Alanı</span>
                                 <span class="menu-modern-status-pill">Canlı</span>
                             </div>
                             <h1 class="menu-modern-title">{{ $resolvedHeader }}</h1>
+                            @if($heroInlineCards !== '')
+                                <div class="menu-modern-hero-inline">
+                                    {!! $heroInlineCards !!}
+                                </div>
+                            @endif
                         </div>
                         <div class="menu-modern-hero-aside">
                             <div class="menu-modern-hero-actions">
@@ -3405,6 +3483,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 </body>
 
 </html>
+
 
 
 

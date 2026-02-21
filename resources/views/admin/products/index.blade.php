@@ -4,7 +4,7 @@
 
 @section('header')
 
-    {{ ($isInventoryView ?? false) ? 'Stok Takip' : 'ÃœrÃ¼nler' }}
+    {{ ($isInventoryView ?? false) ? 'Stok Takip' : 'Urunler' }}
 
 @endsection
 
@@ -29,7 +29,7 @@
         if (str_contains($name, 'n11')) {
             return 'bg-violet-300 text-slate-900';
         }
-        if (str_contains($name, 'cicek') || str_contains($name, 'Ã§iÃ§ek')) {
+        if (str_contains($name, 'cicek')) {
             return 'bg-emerald-200 text-slate-900';
         }
         if (str_contains($name, 'amazon')) {
@@ -326,7 +326,7 @@
 
                     <span class="inventory-search-icon"><i class="fa-solid fa-magnifying-glass text-sm"></i></span>
 
-                    <input type="text" id="product-search-input" name="search" placeholder="Barkod, SKU, ÃœrÃ¼n adÄ±, Marka..."
+                    <input type="text" id="product-search-input" name="search" placeholder="Barkod, SKU, &Uuml;r&uuml;n ad&#305;, Marka..."
 
                            class="border-0 focus:ring-0 text-sm w-full"
 
@@ -350,13 +350,13 @@
 
                 <a href="{{ route('portal.products.template') }}" class="inventory-action-pill">
 
-                    Excel Åablonu
+                    Excel &#350;ablonu
 
                 </a>
 
                 <a href="{{ route('portal.products.export') }}" class="inventory-action-pill">
 
-                    Excel DÄ±ÅŸa Aktar
+                    Excel D&#305;&#351;a Aktar
 
                 </a>
 
@@ -370,7 +370,7 @@
 
                     <button type="submit" class="inventory-action-pill">
 
-                        Excel Ä°Ã§eri Aktar
+                        Excel &#304;&ccedil;eri Aktar
 
                     </button>
 
@@ -378,7 +378,7 @@
 
                 <a href="{{ route('portal.products.create') }}" class="inventory-action-pill is-primary">
 
-                    <i class="fas fa-plus mr-2"></i> Yeni ÃœrÃ¼n
+                    <i class="fas fa-plus mr-2"></i> Yeni &Uuml;r&uuml;n
 
                 </a>
 
@@ -449,7 +449,7 @@
                     <input type="checkbox" id="inventory-select-all" class="rounded border-slate-300 text-[#ff4439] focus:ring-[#ff4439]">
                 </th>
 
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">GÃ¶rsel</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">G&ouml;rsel</th>
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">
 
@@ -467,7 +467,7 @@
 
                     <a href="{{ $sortLink('name') }}" class="inline-flex items-center gap-2">
 
-                        ÃœrÃ¼n
+                        &Uuml;r&uuml;n
 
                         <i class="fa-solid {{ $sortIcon('name') }}"></i>
 
@@ -547,7 +547,7 @@
 
                 </th>
 
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Ä°ÅŸlem</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">&#304;&#351;lem</th>
 
             </tr>
 
@@ -567,6 +567,8 @@
                     @if($product->display_image_url)
 
                         <span class="list-thumb-wrap"
+                              tabindex="0"
+                              role="button"
                               data-list-preview-src="{{ $product->display_image_url }}"
                               data-list-preview-alt="{{ $product->name }}">
                             <img src="{{ $product->display_image_url }}" alt="{{ $product->name }}" class="list-thumb">
@@ -610,7 +612,7 @@
 
                         <div class="inline-edit-box" data-inline-edit-box="{{ $product->id }}">
                             <input type="number" step="0.01" min="0" class="w-24 text-sm" value="{{ $product->cost_price }}" data-product-cost="{{ $product->id }}" data-inline-edit-input="1">
-                            <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">Guncelle</button>
+                            <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">G&uuml;ncelle</button>
                         </div>
 
                         <span class="text-xs text-slate-500">{{ $product->currency }}</span>
@@ -625,7 +627,7 @@
 
                         <div class="inline-edit-box" data-inline-edit-box="{{ $product->id }}">
                             <input type="number" step="0.01" min="0" class="w-24 text-sm" value="{{ $product->price }}" data-product-price="{{ $product->id }}" data-inline-edit-input="1">
-                            <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">Guncelle</button>
+                            <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">G&uuml;ncelle</button>
                         </div>
 
                         <span class="text-xs text-slate-500">{{ $product->currency }}</span>
@@ -640,7 +642,7 @@
 
                         <div class="inline-edit-box" data-inline-edit-box="{{ $product->id }}">
                             <input type="number" min="0" class="w-20 text-sm" value="{{ $product->stock_quantity }}" data-product-stock="{{ $product->id }}" data-inline-edit-input="1">
-                            <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">Guncelle</button>
+                            <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">G&uuml;ncelle</button>
                         </div>
 
                         <span class="text-xs text-slate-500">adet</span>
@@ -715,7 +717,7 @@
 
                         @method('DELETE')
 
-                        <button type="submit" class="text-rose-600 hover:text-rose-800" onclick="return confirm('Silmek istediÄŸinize emin misiniz?')">
+                        <button type="submit" class="text-rose-600 hover:text-rose-800" onclick="return confirm('Silmek istedi&#287;inize emin misiniz?')">
 
                             <i class="fas fa-trash"></i>
 
@@ -764,7 +766,7 @@
 
             <tr>
 
-                <td colspan="11" class="px-6 py-4 text-center text-slate-500">HenÃ¼z Ã¼rÃ¼n bulunmuyor</td>
+                <td colspan="11" class="px-6 py-4 text-center text-slate-500">Hen&uuml;z &uuml;r&uuml;n bulunmuyor</td>
 
             </tr>
 
@@ -782,7 +784,7 @@
 
         <form method="GET" class="flex items-center gap-2 text-sm">
 
-            <label for="per-page" class="text-slate-500">Sayfa baÅŸÄ±na</label>
+            <label for="per-page" class="text-slate-500">Sayfa ba&#351;&#305;na</label>
 
             <select id="per-page" name="per_page" class="w-24" onchange="this.form.submit()">
 
@@ -820,7 +822,7 @@
     <div class="absolute inset-0 bg-slate-900/55" data-product-edit-close></div>
     <div class="relative mx-auto mt-6 w-[96%] max-w-6xl h-[90vh] rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
         <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-            <h3 class="text-sm font-semibold text-slate-800">ÃœrÃ¼n DÃ¼zenle: <span id="product-edit-modal-title" class="text-slate-600">-</span></h3>
+            <h3 class="text-sm font-semibold text-slate-800">&Uuml;r&uuml;n D&uuml;zenle: <span id="product-edit-modal-title" class="text-slate-600">-</span></h3>
             <button type="button" class="btn btn-outline text-xs" data-product-edit-close>Kapat</button>
         </div>
         <iframe id="product-edit-modal-frame" class="w-full h-[calc(90vh-56px)] border-0" src="about:blank" loading="lazy"></iframe>
@@ -1197,7 +1199,12 @@
         };
 
         triggers.forEach((trigger) => {
-            trigger.addEventListener('mouseenter', (event) => {
+            const hidePopover = () => {
+                popover.classList.remove('is-open');
+                popoverImg.removeAttribute('src');
+            };
+
+            const openPopover = (event) => {
                 const src = trigger.getAttribute('data-list-preview-src');
                 if (!src) {
                     return;
@@ -1206,13 +1213,34 @@
                 popoverImg.alt = trigger.getAttribute('data-list-preview-alt') || 'Urun gorseli';
                 popover.classList.add('is-open');
                 placePopover(event);
+            };
+
+            trigger.addEventListener('mouseenter', (event) => {
+                openPopover(event);
             });
 
             trigger.addEventListener('mousemove', placePopover);
 
             trigger.addEventListener('mouseleave', () => {
-                popover.classList.remove('is-open');
-                popoverImg.removeAttribute('src');
+                hidePopover();
+            });
+
+            trigger.addEventListener('focus', () => {
+                const rect = trigger.getBoundingClientRect();
+                openPopover({
+                    clientX: rect.left + (rect.width / 2),
+                    clientY: rect.top + (rect.height / 2),
+                });
+            });
+
+            trigger.addEventListener('blur', () => {
+                hidePopover();
+            });
+
+            trigger.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    hidePopover();
+                }
             });
         });
     }
