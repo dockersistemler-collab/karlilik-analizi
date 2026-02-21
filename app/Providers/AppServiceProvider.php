@@ -46,6 +46,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use App\Services\SystemSettings\SettingsRepository;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -80,6 +81,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Carbon::setLocale('tr');
+        setlocale(LC_TIME, 'tr_TR.UTF-8', 'tr_TR', 'turkish');
+
         if ($this->app->environment('production') && config('queue.default') === 'sync') {
             throw new \RuntimeException('QUEUE_CONNECTION=sync production ortaminda kullanilamaz. Redis/Database queue + worker zorunlu.');
         }

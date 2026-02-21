@@ -135,40 +135,98 @@
     }
     .inventory-action-pill {
         border: 1px solid #dbe3ee;
-        border-radius: 999px;
-        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-        color: #1f2937;
-        font-size: 15px;
-        font-weight: 700;
-        padding: 10px 18px;
+        border-radius: 10px;
+        background: #ffffff;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 8px 12px;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease;
-        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+        gap: 6px;
+        min-height: 36px;
+        transition: background-color .16s ease, border-color .16s ease, color .16s ease;
+        box-shadow: none;
     }
     .inventory-action-pill:hover {
-        transform: translateY(-1px);
-        border-color: #c9d8ee;
-        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
+        border-color: #cbd5e1;
+        background: #f8fafc;
+        color: #1f2937;
     }
     .inventory-action-pill.is-primary {
-        background: #3f3f46;
+        background: #111827;
         color: #fff;
-        border-color: #3f3f46;
+        border-color: #111827;
+        min-height: 34px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
+    .inventory-action-pill.is-primary:hover {
+        background: #0f172a;
+        border-color: #0f172a;
+        color: #fff;
     }
     .inventory-import-form {
         display: inline-flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
         border: 1px solid #dbe3ee;
-        border-radius: 12px;
+        border-radius: 10px;
         background: #fff;
-        padding: 6px 10px;
-        min-height: 44px;
+        padding: 6px 8px;
+        min-height: 40px;
+    }
+    .inventory-import-form .inventory-action-pill {
+        appearance: none;
+        -webkit-appearance: none;
+        border: 1px solid #dbe3ee !important;
+        border-radius: 10px !important;
+        background: #ffffff !important;
+        color: #334155 !important;
+        min-height: 34px !important;
+        padding: 6px 12px !important;
+        line-height: 1.1;
+    }
+    .inventory-import-form .inventory-action-pill:hover {
+        border-color: #cbd5e1 !important;
+        background: #f8fafc !important;
+        color: #1f2937 !important;
     }
     .inventory-file-input {
-        max-width: 290px;
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+    }
+    .inventory-file-trigger {
+        border: 1px solid #dbe3ee;
+        border-radius: 8px;
+        background: #f8fafc;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 600;
+        min-height: 30px;
+        padding: 6px 10px;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background-color .16s ease, border-color .16s ease, color .16s ease;
+    }
+    .inventory-file-trigger:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #1f2937;
+    }
+    .inventory-file-name {
+        min-width: 130px;
+        max-width: 180px;
+        font-size: 12px;
+        color: #64748b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .list-thumb-wrap {
         width: 48px;
@@ -247,19 +305,17 @@
         max-width: 78%;
         flex: 0 0 auto;
         align-self: center;
-        border: 1px solid #dbe3ee;
+        border: 1px solid #f97316;
         border-radius: 10px;
-        background: #f8fafc;
-        color: #334155 !important;
+        background: #fff7ed;
+        color: #9a3412 !important;
         font-size: 10px;
         font-weight: 700;
         letter-spacing: .01em;
         line-height: 1;
         min-height: 22px;
         padding: 4px 9px;
-        box-shadow:
-            0 8px 18px rgba(15, 23, 42, 0.14),
-            0 0 0 1px rgba(255, 255, 255, 0.85) inset;
+        box-shadow: 0 6px 14px rgba(249, 115, 22, 0.18);
         opacity: 0;
         pointer-events: none;
         transform: translateY(-2px);
@@ -272,14 +328,11 @@
         transform: translateY(0);
     }
     .inline-update-btn:hover {
-        border-color: #c7d4e7;
-        background: #ffffff;
-        box-shadow:
-            0 10px 20px rgba(15, 23, 42, 0.18),
-            0 0 0 1px rgba(255, 255, 255, 0.92) inset,
-            0 0 14px rgba(148, 163, 184, 0.18);
+        border-color: #ea580c;
+        background: #ffedd5;
+        box-shadow: 0 8px 16px rgba(249, 115, 22, 0.24);
         filter: none;
-        color: #1f2937 !important;
+        color: #7c2d12 !important;
     }
     .inline-update-btn:active {
         transform: translateY(0);
@@ -366,7 +419,12 @@
 
                     @csrf
 
-                    <input type="file" name="file" accept=".xlsx" class="text-sm inventory-file-input">
+                    <label class="inventory-file-trigger">
+                        Dosya Sec
+                        <input type="file" name="file" accept=".xlsx" class="inventory-file-input" data-inventory-file-input>
+                    </label>
+
+                    <span class="inventory-file-name" data-inventory-file-name>Dosya secilmedi</span>
 
                     <button type="submit" class="inventory-action-pill">
 
@@ -1245,6 +1303,22 @@
         });
     }
 
+    function bindInventoryImportForm() {
+        const fileInput = document.querySelector('[data-inventory-file-input]');
+        const fileName = document.querySelector('[data-inventory-file-name]');
+        if (!fileInput || !fileName) {
+            return;
+        }
+
+        const renderName = () => {
+            const selected = fileInput.files && fileInput.files.length ? fileInput.files[0].name : '';
+            fileName.textContent = selected || 'Dosya secilmedi';
+        };
+
+        fileInput.addEventListener('change', renderName);
+        renderName();
+    }
+
 
     async function fetchResults(url) {
 
@@ -1361,6 +1435,7 @@
     bindInventoryMarketplaceActions();
     bindInventorySelection();
     bindListImagePreview();
+    bindInventoryImportForm();
     if (inventoryFlashMessage) {
         const toast = document.createElement('div');
         toast.className = 'fixed right-4 bottom-4 z-[120] px-4 py-3 rounded-xl shadow-lg border text-sm max-w-sm';

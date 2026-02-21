@@ -315,14 +315,15 @@
             border-radius: 12px;
             background: #ffffff;
             max-height: 520px;
-            overflow-y: auto;
+            overflow-y: scroll;
             overflow-x: hidden;
+            scrollbar-gutter: stable both-edges;
             width: 100%;
         }
 
         .nk-profit-table {
             width: 100%;
-            table-layout: auto;
+            table-layout: fixed;
             font-size: 13px;
         }
 
@@ -332,14 +333,28 @@
             letter-spacing: .03em;
             font-size: 11px;
             border-bottom: 1px solid #e2e8f0;
-            padding: 10px 8px;
+            padding: 10px 2px;
             font-weight: 600;
             white-space: normal;
+        }
+        .nk-profit-table thead th:nth-child(4),
+        .nk-profit-table thead th:nth-child(5),
+        .nk-profit-table thead th:nth-child(6),
+        .nk-profit-table thead th:nth-child(7),
+        .nk-profit-table thead th:nth-child(8),
+        .nk-profit-table thead th:nth-child(9),
+        .nk-profit-table tbody td:nth-child(4),
+        .nk-profit-table tbody td:nth-child(5),
+        .nk-profit-table tbody td:nth-child(6),
+        .nk-profit-table tbody td:nth-child(7),
+        .nk-profit-table tbody td:nth-child(8),
+        .nk-profit-table tbody td:nth-child(9) {
+            white-space: nowrap;
         }
 
         .nk-profit-table tbody td {
             border-bottom: 1px solid #f1f5f9;
-            padding: 10px 8px;
+            padding: 10px 2px;
             color: #475569;
             vertical-align: middle;
         }
@@ -370,10 +385,44 @@
         }
 
         .nk-detail-col {
-            width: 118px;
-            min-width: 118px;
+            width: 96px;
+            min-width: 96px;
             text-align: right;
             vertical-align: bottom;
+        }
+        .nk-profit-table .nk-detail-col {
+            width: 66px;
+            min-width: 66px;
+            text-align: left;
+        }
+        .nk-profit-table thead th.nk-detail-col {
+            text-align: left;
+            padding-left: 2px !important;
+            padding-right: 4px !important;
+        }
+        .nk-profit-table tbody td.nk-detail-col {
+            text-align: left;
+            padding-left: 2px !important;
+            padding-right: 4px !important;
+        }
+        .nk-profit-table tbody td.nk-detail-col .nk-detail-btn {
+            position: relative;
+            left: -10px;
+        }
+        .nk-profit-table .nk-market-col {
+            text-align: center;
+        }
+        .nk-profit-table .nk-order-col {
+            min-width: 0;
+        }
+        .nk-profit-table .nk-date-col {
+            min-width: 0;
+        }
+        .nk-profit-table .nk-money-col {
+            min-width: 0;
+        }
+        .nk-profit-table .nk-rate-col {
+            min-width: 0;
         }
 
         .nk-table-wrap .nk-detail-col .nk-detail-btn,
@@ -381,31 +430,33 @@
         .nk-table-wrap .nk-detail-col a.nk-detail-btn {
             appearance: none !important;
             -webkit-appearance: none !important;
-            border: 0 !important;
-            border-radius: 10px !important;
-            font-size: 11px !important;
-            font-weight: 800 !important;
-            width: 90px !important;
-            height: 28px !important;
-            padding: 0 !important;
+            border: 1px solid #dbe3ee !important;
+            border-radius: 8px !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+            width: auto !important;
+            min-width: 66px !important;
+            height: 22px !important;
+            padding: 0 8px !important;
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
             line-height: 1 !important;
-            color: #ffffff !important;
-            background-color: #f68b2e !important;
+            color: #334155 !important;
+            background-color: #ffffff !important;
             background-image: none !important;
-            box-shadow: none !important;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08) !important;
             white-space: nowrap !important;
             text-decoration: none !important;
             cursor: pointer !important;
-            transition: filter .15s ease !important;
+            transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease !important;
         }
 
         .nk-table-wrap .nk-detail-col .nk-detail-btn:hover {
-            color: #ffffff !important;
-            background-color: #eb7f22 !important;
-            filter: none !important;
+            color: #1f2937 !important;
+            background-color: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12) !important;
         }
 
         .nk-inline-detail-row > td {
@@ -598,30 +649,84 @@
         .nk-stock-table {
             width: 100% !important;
             min-width: 100% !important;
-            table-layout: fixed;
+            table-layout: auto;
+            border-collapse: separate;
+            border-spacing: 0 8px;
             font-size: 13px;
         }
 
         .nk-stock-table thead th {
-            color: #94a3b8;
+            color: #6b7280;
             text-transform: uppercase;
-            letter-spacing: .03em;
-            font-size: 11px;
+            letter-spacing: .08em;
+            font-size: 12px;
             border-bottom: 1px solid #e2e8f0;
-            padding: 10px 8px;
+            padding: 10px 14px;
             font-weight: 600;
-            white-space: normal;
+            white-space: nowrap;
         }
 
         .nk-stock-table tbody td {
-            border-bottom: 1px solid #f1f5f9;
-            padding: 10px 8px;
-            color: #475569;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 14px;
+            color: #334155;
             vertical-align: middle;
         }
 
-        .nk-stock-table tbody tr:last-child td {
-            border-bottom: 0;
+        .nk-stock-table tbody td:first-child {
+            border-left: 1px solid #e2e8f0;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
+        .nk-stock-table tbody td:last-child {
+            border-right: 1px solid #e2e8f0;
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+        .nk-stock-table .nk-kstok-col {
+            width: 82px;
+            min-width: 82px;
+            white-space: nowrap;
+        }
+        .nk-stock-table .nk-sku-col {
+            min-width: 124px;
+        }
+        .nk-stock-table .nk-product-col {
+            min-width: 136px;
+        }
+        .nk-stock-table .nk-brand-col {
+            min-width: 104px;
+        }
+        .nk-stock-table .nk-detail-col {
+            width: 92px;
+            min-width: 92px;
+            text-align: center;
+        }
+        .nk-stock-table td.nk-detail-col {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .nk-stock-table .nk-detail-col .nk-detail-btn {
+            min-width: 74px !important;
+            height: 24px !important;
+            padding: 0 8px !important;
+            border-radius: 8px !important;
+            border: 1px solid #dbe3ee !important;
+            background: #ffffff !important;
+            color: #334155 !important;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08) !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+            line-height: 1 !important;
+            white-space: nowrap !important;
+        }
+        .nk-stock-table .nk-detail-col .nk-detail-btn:hover {
+            background: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+            color: #1f2937 !important;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12) !important;
         }
 
         .nk-stock-alert-badge {
@@ -665,6 +770,34 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+        }
+        .nk-market-cell {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            width: 96px;
+            margin: 0 auto;
+        }
+        .nk-market-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            object-fit: contain;
+            background: #fff;
+            border: 1px solid #dbe7f5;
+            padding: 2px;
+        }
+        .nk-market-name {
+            font-size: 10px;
+            line-height: 1.1;
+            color: #64748b;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 96px;
         }
 
         .nk-stock-pill {
@@ -914,6 +1047,14 @@
 
             return 0.0;
         };
+        $marketplaceLogoMap = [
+            'amazon tr' => 'images/brands/amazon.png',
+            'amazon' => 'images/brands/amazon.png',
+            'hepsiburada' => 'images/brands/hepsiburada.png',
+            'n11' => 'images/brands/n11.png',
+            'trendyol' => 'images/brands/trendyol.png',
+            'cicek sepeti' => 'images/brands/ciceksepeti.png',
+        ];
 
     @endphp
 
@@ -934,19 +1075,31 @@
                     <div class="card-body">
                         <div class="nk-table-wrap nk-table-panel" id="nk-profit-table-panel">
                             <table class="nk-profit-table">
+                                <colgroup>
+                                    <col style="width:40px">
+                                    <col style="width:52px">
+                                    <col style="width:76px">
+                                    <col style="width:90px">
+                                    <col style="width:72px">
+                                    <col style="width:78px">
+                                    <col style="width:74px">
+                                    <col style="width:66px">
+                                    <col style="width:66px">
+                                    <col style="width:66px">
+                                </colgroup>
                                 <thead>
                                     <tr>
                                         <th class="nk-check-col">
                                             <input type="checkbox" id="nk-select-all">
                                         </th>
                                         <th class="text-left">Gorsel</th>
-                                        <th class="text-left">Pazaryeri</th>
-                                        <th class="text-left">Siparis Numarasi</th>
-                                        <th class="text-left">TAR&#304;H</th>
-                                        <th class="nk-num-col">Siparis Tutari</th>
-                                        <th class="nk-num-col">Kar Tutari</th>
-                                        <th class="nk-num-col">Kar Orani</th>
-                                        <th class="nk-num-col">Kar Marji</th>
+                                        <th class="nk-market-col">Pazaryeri</th>
+                                        <th class="text-left nk-order-col">Siparis Numarasi</th>
+                                        <th class="text-left nk-date-col">TAR&#304;H</th>
+                                        <th class="nk-num-col nk-money-col">Siparis Tutari</th>
+                                        <th class="nk-num-col nk-money-col">Kar Tutari</th>
+                                        <th class="nk-num-col nk-rate-col">Kar Orani</th>
+                                        <th class="nk-num-col nk-rate-col">Kar Marji</th>
                                         <th class="nk-detail-col">Detay</th>
                                     </tr>
                                 </thead>
@@ -956,9 +1109,12 @@
                                             $reportRow = is_array($row->_profitability_report ?? null) ? $row->_profitability_report : [];
                                             $breakdown = json_decode((string) ($reportRow['breakdown'] ?? null), true) ?: [];
                                             $marketplaceName = $reportRow['marketplace_name'] ?? ($row->marketplace?->name ?: '-');
+                                            $marketplaceKey = \Illuminate\Support\Str::of(trim((string) $marketplaceName))->lower()->ascii()->value();
+                                            $marketplaceLogoPath = $marketplaceLogoMap[$marketplaceKey] ?? null;
+                                            $marketplaceLogoUrl = $marketplaceLogoPath ? asset($marketplaceLogoPath) : null;
                                             $platformFeeAmount = $resolvePlatformServiceAmount((string) $marketplaceName);
                                             $orderNo = $reportRow['order_number'] ?? ($row->marketplace_order_id ?: ($row->order_number ?: ('ORD-'.$row->id)));
-                                            $orderDate = $row->order_date?->isoFormat('D MMM YYYY') ?: '-';
+                                            $orderDate = $row->order_date?->locale('tr')->translatedFormat('j M Y') ?: '-';
                                             $salePriceRaw = (float) (array_key_exists('sale_price', $reportRow)
                                                 ? $reportRow['sale_price']
                                                 : ($row->total_amount ?? 0));
@@ -1026,7 +1182,16 @@
                                                     <span class="nk-stock-thumb-placeholder"><i class="fas fa-image text-slate-400"></i></span>
                                                 @endif
                                             </td>
-                                            <td>{{ $marketplaceName }}</td>
+                                            <td class="text-center">
+                                                @if($marketplaceLogoUrl)
+                                                    <span class="nk-market-cell">
+                                                        <img src="{{ $marketplaceLogoUrl }}" alt="{{ $marketplaceName }}" class="nk-market-logo">
+                                                        <span class="nk-market-name">{{ $marketplaceName }}</span>
+                                                    </span>
+                                                @else
+                                                    <span class="nk-market-name">{{ $marketplaceName }}</span>
+                                                @endif
+                                            </td>
                                             <td>{{ $orderNo }}</td>
                                             <td>{{ $orderDate }}</td>
                                             <td class="nk-num-col">{{ $salePrice }}</td>
@@ -1050,11 +1215,11 @@
                                                     data-withholding-tax="{{ number_format($withholdingTaxAmount, 2, ',', '.') }} ₺"
                                                     data-sales-vat="{{ number_format((float) ($breakdown['sales_vat_amount'] ?? 0), 2, ',', '.') }} ₺"
                                                     data-vat-rate="{{ number_format((float) ($breakdown['vat_rate_percent'] ?? 0), 2, ',', '.') }} %"
-                                                >Detayi Gor</button>
+                                                >Detayı Gör</button>
                                             </td>
                                         </tr>
                                         <tr class="nk-inline-detail-row is-hidden" data-nk-inline-row>
-                                            <td colspan="11">
+                                            <td colspan="10">
                                                 <div class="nk-inline-detail-panel" data-nk-inline-panel>
                                                     <div class="nk-inline-detail-title" data-nk-inline-title>Siparis Karlilik Detayi</div>
                                                     <div class="nk-inline-detail-subtitle" data-nk-inline-subtitle>-</div>
@@ -1085,7 +1250,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="11" class="text-center text-muted py-4">Siparis bulunamadi.</td>
+                                            <td colspan="10" class="text-center text-muted py-4">Siparis bulunamadi.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -1093,19 +1258,32 @@
                         </div>
                         <div class="nk-table-wrap nk-table-panel is-hidden" id="nk-stock-table-panel">
                             <table class="nk-stock-table">
+                                <colgroup>
+                                    <col style="width:44px">
+                                    <col style="width:72px">
+                                    <col style="width:124px">
+                                    <col style="width:136px">
+                                    <col style="width:104px">
+                                    <col style="width:118px">
+                                    <col style="width:118px">
+                                    <col style="width:86px">
+                                    <col style="width:82px">
+                                    <col style="width:110px">
+                                    <col style="width:92px">
+                                </colgroup>
                                 <thead>
                                     <tr>
                                         <th class="nk-check-col">
                                             <input type="checkbox" id="nk-stock-select-all">
                                         </th>
                                         <th class="text-left">Gorsel</th>
-                                        <th class="text-left">Marka</th>
-                                        <th class="text-left">SKU</th>
-                                        <th class="text-left">Urun</th>
+                                        <th class="text-left nk-sku-col">SKU</th>
+                                        <th class="text-left nk-product-col">Urun</th>
+                                        <th class="text-left nk-brand-col">Marka</th>
                                         <th class="text-left">Maliyet</th>
                                         <th class="text-left">Fiyat</th>
                                         <th class="text-left">Stok</th>
-                                        <th class="text-left">Kritik Seviye</th>
+                                        <th class="text-left nk-kstok-col">K.STOK</th>
                                         <th class="text-left">Uyari</th>
                                         <th class="nk-detail-col">Detay</th>
                                     </tr>
@@ -1141,9 +1319,9 @@
                                                     <span class="nk-stock-thumb-placeholder"><i class="fas fa-image text-slate-400"></i></span>
                                                 @endif
                                             </td>
-                                            <td>{{ $stockProduct->brand ?: '-' }}</td>
                                             <td>{{ $stockProduct->sku ?: '-' }}</td>
                                             <td class="fw-semibold">{{ $stockProduct->name }}</td>
+                                            <td>{{ $stockProduct->brand ?: '-' }}</td>
                                             <td>{{ number_format((float) ($stockProduct->cost_price ?? 0), 2, ',', '.') }} {{ $stockProduct->currency ?: 'TRY' }}</td>
                                             <td>{{ number_format((float) $stockProduct->price, 2, ',', '.') }} {{ $stockProduct->currency ?: 'TRY' }}</td>
                                             <td class="{{ $isCritical ? 'nk-negative fw-semibold' : '' }}">{{ $stockProduct->stock_quantity }}</td>
@@ -1170,7 +1348,7 @@
                                                     data-critical-level="{{ $stockProduct->critical_stock_level }}"
                                                     data-alert="{{ $alertText }}"
                                                     data-status="{{ $stockStatus }}"
-                                                >Detayi Gor</button>
+                                                >Detayı Gör</button>
                                             </td>
                                         </tr>
                                         <tr class="nk-inline-detail-row is-hidden" data-nk-inline-row>
@@ -2108,7 +2286,7 @@
 
                     const btn = detailRow.previousElementSibling?.querySelector('[data-nk-detail]');
                     if (btn) {
-                        btn.textContent = 'Detayi Gor';
+                        btn.textContent = 'Detayı Gör';
                         btn.setAttribute('aria-expanded', 'false');
                     }
                 });
@@ -2175,7 +2353,7 @@
                             panel.classList.add('is-open');
                         });
 
-                        button.textContent = 'Detayi Gizle';
+                        button.textContent = 'Detayı Gizle';
                         button.setAttribute('aria-expanded', 'true');
                     });
                 });

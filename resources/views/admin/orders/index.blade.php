@@ -39,6 +39,14 @@
     $canExport = $ownerUser ? app(\App\Services\Entitlements\EntitlementService::class)->hasModule($ownerUser, 'feature.exports') : false;
 
     $supportViewEnabled = \App\Support\SupportUser::isEnabled();
+    $marketplaceLogoMap = [
+        'amazon tr' => 'images/brands/amazon.png',
+        'amazon' => 'images/brands/amazon.png',
+        'hepsiburada' => 'images/brands/hepsiburada.png',
+        'n11' => 'images/brands/n11.png',
+        'trendyol' => 'images/brands/trendyol.png',
+        'cicek sepeti' => 'images/brands/ciceksepeti.png',
+    ];
 
 @endphp
 
@@ -75,8 +83,8 @@
         position: fixed;
         z-index: 1400;
         pointer-events: none;
-        width: 150px;
-        height: 150px;
+        width: 220px;
+        height: 220px;
         border-radius: 12px;
         border: 1px solid #e2e8f0;
         background: #ffffff;
@@ -92,6 +100,51 @@
         height: 100%;
         object-fit: contain;
         background: #f8fafc;
+    }
+    .orders-market-logo-wrap {
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    .orders-market-cell {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        width: 96px;
+        margin: 0 auto;
+    }
+    .orders-market-name {
+        font-size: 10px;
+        line-height: 1.1;
+        color: #64748b;
+        font-weight: 600;
+        text-align: center;
+        max-width: 84px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .orders-market-logo {
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        object-fit: contain;
+        background: #fff;
+        border: 1px solid #dbe7f5;
+        padding: 1px;
+    }
+    .orders-market-fallback {
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 600;
+        display: inline-block;
+        width: 96px;
+        text-align: center;
     }
 </style>
 
@@ -291,7 +344,7 @@
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Sipariş No</th>
 
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Pazaryeri</th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase">Pazaryeri</th>
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">MÃ¼ÅŸteri</th>
 
@@ -317,6 +370,9 @@
                     ?: data_get($firstItem, 'image')
                     ?: data_get($firstItem, 'product_image')
                     ?: data_get($firstItem, 'productImage');
+                $marketplaceName = (string) ($order->marketplace->name ?? '');
+                $marketplaceKey = \Illuminate\Support\Str::of(trim($marketplaceName))->lower()->ascii()->value();
+                $marketplaceLogo = $marketplaceLogoMap[$marketplaceKey] ?? null;
             @endphp
 
             <tr>
@@ -349,7 +405,18 @@
 
                 </td>
 
-                <td class="px-6 py-4 whitespace-nowrap font-semibold">{{ $order->marketplace->name }}</td>
+                <td class="px-6 py-4 whitespace-nowrap font-semibold text-center align-middle">
+                    @if($marketplaceLogo)
+                        <span class="orders-market-cell">
+                            <span class="orders-market-logo-wrap">
+                                <img src="{{ asset($marketplaceLogo) }}" alt="{{ $marketplaceName }}" class="orders-market-logo" title="{{ $marketplaceName }}">
+                            </span>
+                            <span class="orders-market-name">{{ $marketplaceName }}</span>
+                        </span>
+                    @else
+                        <span class="orders-market-fallback">{{ $marketplaceName ?: '-' }}</span>
+                    @endif
+                </td>
 
                 <td class="px-6 py-4">
 
@@ -529,8 +596,8 @@
     const placeOrdersPopover = (event) => {
         if (!ordersImagePopover || !ordersImagePopoverImg) return;
         const offset = 16;
-        const width = 150;
-        const height = 150;
+        const width = 220;
+        const height = 220;
         let left = event.clientX + offset;
         let top = event.clientY + offset;
 

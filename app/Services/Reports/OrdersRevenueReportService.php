@@ -7,7 +7,6 @@ use App\Models\Order;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 class OrdersRevenueReportService
 {
@@ -26,9 +25,8 @@ class OrdersRevenueReportService
         ReportFilters::applyDateRange($query, 'order_date', $filters['date_from'] ?? null, $filters['date_to'] ?? null);
 
         $granularity = $this->determineGranularity($filters['date_from'] ?? null, $filters['date_to'] ?? null);
-        $periodExpr = $granularity === 'monthly'
-            ? "DATE_FORMAT(order_date, '%Y-%m')"
-            : 'DATE(order_date)';
+        $driver = $query->getConnection()->getDriverName();
+        $periodExpr = $this->buildPeriodExpression($driver, $granularity);
 
         $rows = (clone $query)
             ->selectRaw($periodExpr . ' as period')
@@ -61,6 +59,25 @@ $start = Carbon::parse($dateFrom);
         $end = Carbon::parse($dateTo);
 
         return $start->diffInDays($end) > 31 ? 'monthly' : 'daily';
+    }
+
+    private function buildPeriodExpression(string $driver, string $granularity): string
+    {
+        if ($granularity === 'monthly') {
+            return match ($driver) {
+                'sqlite' => "strftime('%Y-%m', order_date)",
+                'pgsql' => "TO_CHAR(order_date, 'YYYY-MM')",
+                'sqlsrv' => "FORMAT(order_date, 'yyyy-MM')",
+                default => "DATE_FORMAT(order_date, '%Y-%m')",
+            };
+        }
+
+        return match ($driver) {
+            'sqlite' => "strftime('%Y-%m-%d', order_date)",
+            'pgsql' => "TO_CHAR(order_date, 'YYYY-MM-DD')",
+            'sqlsrv' => "CONVERT(varchar(10), order_date, 23)",
+            default => 'DATE(order_date)',
+        };
     }
 
     private function pivotRows(Collection $rows, Collection $marketplaces): array

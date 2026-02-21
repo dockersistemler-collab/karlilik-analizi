@@ -17,6 +17,37 @@
     @endphp
 
     <style>
+        .report-filter-panel .rp-quick-wrap .report-filter-quick {
+            border: 1px solid #dbe3ee;
+            border-radius: 12px;
+            background: #f8fafc;
+            padding: 6px;
+            gap: 8px;
+        }
+        .report-filter-panel .rp-quick-wrap .report-filter-chip {
+            min-height: 42px;
+            padding: 8px 18px;
+            border: 1px solid #dbe3ee;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #374151;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+            font-size: 13px;
+            font-weight: 700;
+            transform: none;
+        }
+        .report-filter-panel .rp-quick-wrap .report-filter-chip:hover {
+            border-color: #cbd5e1;
+            background: #ffffff;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+            transform: none;
+        }
+        .report-filter-panel .rp-quick-wrap .report-filter-chip.is-active {
+            border-color: #cbd5e1;
+            background: #ffffff;
+            color: #111827;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+        }
         .rp-check-col {
             width: 40px;
             text-align: center;
@@ -155,6 +186,32 @@
         }
         .rp-inline-content strong.rp-red { color: #ef4444; }
         .rp-inline-content strong.rp-green { color: #0f9a6f; }
+        .rp-detail-btn {
+            appearance: none;
+            -webkit-appearance: none;
+            border: 1px solid #dbe3ee;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #334155;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1;
+            min-width: 72px;
+            height: 24px;
+            padding: 0 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+            transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease, color .15s ease;
+        }
+        .rp-detail-btn:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #1f2937;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+        }
         @media (max-width: 1100px) {
             .rp-inline-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
@@ -194,10 +251,12 @@
 
             <div class="min-w-[220px] report-filter-field">
                 <label class="block text-xs font-medium text-slate-500 mb-1">Hizli Secim</label>
+                <div class="rp-quick-wrap">
                 <div class="report-filter-quick">
                     @foreach($quickRanges as $key => $label)
                         <button type="button" class="report-filter-chip text-xs {{ ($filters['quick_range'] ?? '') === $key ? 'is-active' : '' }}" data-quick-range="{{ $key }}">{{ $label }}</button>
                     @endforeach
+                </div>
                 </div>
                 <input type="hidden" name="quick_range" id="quick-range-input" value="{{ $filters['quick_range'] ?? '' }}">
             </div>
@@ -257,7 +316,7 @@
                             <td class="py-2 pr-2.5 text-center tabular-nums {{ $profitRate < 0 ? 'text-red-500' : 'text-emerald-600' }}">{{ number_format($profitRate, 2, ',', '.') }}</td>
                             <td class="py-2 pr-2.5 text-center tabular-nums {{ $profitMargin < 0 ? 'text-red-500' : 'text-emerald-600' }}">{{ number_format($profitMargin, 2, ',', '.') }}</td>
                             <td class="py-3 text-right">
-                                <button type="button" class="btn btn-solid-accent px-2.5 py-1 text-[10px]" data-rp-toggle-detail
+                                <button type="button" class="rp-detail-btn" data-rp-toggle-detail
                                     data-order-number="{{ $row['order_number'] }}"
                                     data-sale-price="{{ number_format((float) $row['sale_price'], 2, ',', '.') }} TL"
                                     data-profit-amount="{{ number_format((float) $row['profit_amount'], 2, ',', '.') }} TL"

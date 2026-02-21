@@ -5,6 +5,49 @@
 @endsection
 
 @section('content')
+    <style>
+        .profitability-quick-wrap .report-filter-quick {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 6px;
+            border: 1px solid #dbe3ee;
+            border-radius: 12px;
+            background: #f8fafc;
+            justify-content: flex-end;
+            scrollbar-width: thin;
+        }
+        .profitability-quick-wrap .report-filter-quick > * {
+            flex: 0 0 auto;
+        }
+        .profitability-quick-wrap .report-filter-chip {
+            min-height: 42px;
+            padding: 8px 18px;
+            border: 1px solid #dbe3ee;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #374151;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+            font-size: 13px;
+            font-weight: 700;
+            transform: none;
+        }
+        .profitability-quick-wrap .report-filter-chip:hover {
+            border-color: #cbd5e1;
+            background: #ffffff;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+            transform: none;
+        }
+        .profitability-quick-wrap .report-filter-chip.is-active {
+            border-color: #cbd5e1;
+            background: #ffffff;
+            color: #111827;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+        }
+    </style>
+
     <div class="panel-card p-6 mb-6 report-filter-panel">
         <form method="GET" action="{{ route('portal.profitability.index') }}" class="report-filter-form">
             <div class="w-full report-filter-field" style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:10px;flex-wrap:wrap;">
@@ -30,7 +73,8 @@
 
                 <div class="min-w-[260px]" style="text-align:right;flex:0 0 auto;">
                     <label class="block text-xs font-medium text-slate-500 mb-1">Hizli Secim</label>
-                    <div class="flex flex-wrap gap-2" style="justify-content:flex-end;">
+                    <div class="profitability-quick-wrap">
+                    <div class="report-filter-quick">
                         @php
                             $quickRangeOrder = ['today', 'last_7_days', 'last_30_days', 'this_week', 'this_month', 'last_month', 'last_3_months', 'last_1_year'];
                         @endphp
@@ -44,6 +88,7 @@
                                 </button>
                             @endif
                         @endforeach
+                    </div>
                     </div>
                 </div>
             </div>
