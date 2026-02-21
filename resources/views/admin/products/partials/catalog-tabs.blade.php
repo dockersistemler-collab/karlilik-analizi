@@ -136,17 +136,17 @@
         </div>
     @else
         <a href="{{ route('portal.products.index') }}"
-           class="pb-3 text-sm font-medium {{ request()->routeIs('portal.products.*') ? 'text-slate-900 border-b-2 border-[#ff4439]' : 'text-slate-500 hover:text-slate-900' }}">
+           class="catalog-nav-tab pb-3 text-sm font-medium {{ request()->routeIs('portal.products.*') ? 'text-slate-900 border-b-2 border-[#ff4439]' : 'text-slate-500 hover:text-slate-900' }}">
             &Uuml;r&uuml;n Listesi
         </a>
 
         <a href="{{ route('portal.categories.index') }}"
-           class="pb-3 text-sm font-medium {{ request()->routeIs('portal.categories.*') ? 'text-slate-900 border-b-2 border-[#ff4439]' : 'text-slate-500 hover:text-slate-900' }}">
+           class="catalog-nav-tab pb-3 text-sm font-medium {{ request()->routeIs('portal.categories.*') ? 'text-slate-900 border-b-2 border-[#ff4439]' : 'text-slate-500 hover:text-slate-900' }}">
             Kategoriler
         </a>
 
         <a href="{{ route('portal.brands.index') }}"
-           class="pb-3 text-sm font-medium {{ request()->routeIs('portal.brands.*') ? 'text-slate-900 border-b-2 border-[#ff4439]' : 'text-slate-500 hover:text-slate-900' }}">
+           class="catalog-nav-tab pb-3 text-sm font-medium {{ request()->routeIs('portal.brands.*') ? 'text-slate-900 border-b-2 border-[#ff4439]' : 'text-slate-500 hover:text-slate-900' }}">
             Markalar
         </a>
     @endif

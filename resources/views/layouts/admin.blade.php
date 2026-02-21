@@ -1233,14 +1233,26 @@
 
             font-size: 0.7rem !important;
 
-            letter-spacing: 0.08em !important;
+            letter-spacing: 0.05em !important;
 
             text-transform: uppercase !important;
 
-            color: #94a3b8 !important;
+            color: #111111 !important;
 
-            font-weight: 600 !important;
+            font-weight: 900 !important;
+            opacity: 1 !important;
+            -webkit-text-fill-color: #111111 !important;
+            text-rendering: geometricPrecision !important;
 
+        }
+
+        main table thead th a,
+        main table thead th span,
+        main table thead th i {
+            color: #111111 !important;
+            font-weight: 900 !important;
+            opacity: 1 !important;
+            -webkit-text-fill-color: #111111 !important;
         }
 
         .topbar-link {
@@ -1606,8 +1618,21 @@
         }
 
         main table thead th {
-            color: var(--mk-muted) !important;
+            color: #111111 !important;
+            font-weight: 900 !important;
+            opacity: 1 !important;
             border-bottom-color: var(--mk-border) !important;
+            -webkit-text-fill-color: #111111 !important;
+            text-rendering: geometricPrecision !important;
+        }
+
+        main table thead th a,
+        main table thead th span,
+        main table thead th i {
+            color: #111111 !important;
+            font-weight: 900 !important;
+            opacity: 1 !important;
+            -webkit-text-fill-color: #111111 !important;
         }
 
         main table tbody tr {
@@ -1875,6 +1900,29 @@
             body.menu-modern-shell .menu-modern-mini-card {
                 width: calc(50% - 6px);
             }
+        }
+
+        /* Keep menu headings and selection areas visually as strong as table headers. */
+        main .catalog-nav-tab,
+        main [role="tab"],
+        main .period-tab,
+        main [data-period],
+        main [id*="range-label"],
+        main [id*="platform-label"],
+        main .menu-modern-chip,
+        main label:not(.sidebar-label) {
+            color: #111111 !important;
+            font-weight: 900 !important;
+            opacity: 1 !important;
+            -webkit-text-fill-color: #111111 !important;
+        }
+
+        main select,
+        main select option {
+            color: #111111 !important;
+            font-weight: 700 !important;
+            opacity: 1 !important;
+            -webkit-text-fill-color: #111111 !important;
         }
     </style>
 

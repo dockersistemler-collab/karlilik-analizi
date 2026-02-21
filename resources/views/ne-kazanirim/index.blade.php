@@ -312,19 +312,62 @@
 
         .nk-table-wrap {
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 14px;
             background: #ffffff;
             max-height: 520px;
-            overflow-y: scroll;
-            overflow-x: hidden;
+            overflow-y: auto;
+            overflow-x: auto;
             scrollbar-gutter: stable both-edges;
             width: 100%;
         }
 
-        .nk-profit-table {
+        .nk-table-panel {
+            min-height: 520px;
+        }
+
+        .nk-unified-table {
             width: 100%;
             table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0 10px;
             font-size: 13px;
+        }
+
+        .nk-unified-table thead th {
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: .03em;
+            font-size: 11px;
+            padding: 10px 8px;
+            font-weight: 700;
+            white-space: nowrap;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .nk-unified-table tbody td {
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 8px;
+            color: #475569;
+            vertical-align: middle;
+        }
+
+        .nk-unified-table tbody td:first-child {
+            border-left: 1px solid #e2e8f0;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
+
+        .nk-unified-table tbody td:last-child {
+            border-right: 1px solid #e2e8f0;
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        .nk-profit-table {
+            width: 100%;
         }
 
         .nk-profit-table thead th {
@@ -333,16 +376,10 @@
             letter-spacing: .03em;
             font-size: 11px;
             border-bottom: 1px solid #e2e8f0;
-            padding: 10px 2px;
-            font-weight: 600;
-            white-space: normal;
-            text-align: left !important;
-        }
-        .nk-profit-table thead th:first-child {
+            padding: 10px 8px !important;
+            font-weight: 700;
+            white-space: nowrap;
             text-align: center !important;
-        }
-        .nk-profit-table thead th:not(:first-child) {
-            padding-left: 2px !important;
         }
         .nk-profit-table thead th:nth-child(4),
         .nk-profit-table thead th:nth-child(5),
@@ -360,31 +397,31 @@
         }
 
         .nk-profit-table tbody td {
-            border-bottom: 1px solid #f1f5f9;
-            padding: 10px 2px;
+            padding: 12px 8px !important;
             color: #475569;
             vertical-align: middle;
+            text-align: center;
         }
         .nk-profit-table .nk-check-col {
-            width: 44px;
-            min-width: 44px;
-            max-width: 44px;
+            width: 26px;
+            min-width: 26px;
+            max-width: 26px;
         }
         .nk-profit-table thead th:nth-child(1),
         .nk-profit-table tbody td:nth-child(1) {
-            width: 44px;
-            min-width: 44px;
-            max-width: 44px;
-            padding: 10px 6px 10px 14px;
-            text-align: left;
+            width: 34px;
+            min-width: 34px;
+            max-width: 34px;
+            padding: 10px 6px !important;
+            text-align: center;
         }
         .nk-profit-table thead th:nth-child(2),
         .nk-profit-table tbody td:nth-child(2) {
-            width: 72px;
-            min-width: 72px;
-            max-width: 72px;
-            padding: 10px 10px 10px 0;
-            text-align: left;
+            width: 64px;
+            min-width: 64px;
+            max-width: 64px;
+            padding: 10px 8px 10px 4px !important;
+            text-align: center;
         }
         .nk-profit-table .nk-check-col input[type="checkbox"] {
             margin: 0;
@@ -392,11 +429,7 @@
         }
         .nk-profit-table tbody td:nth-child(2) .nk-stock-thumb-wrap,
         .nk-profit-table tbody td:nth-child(2) .nk-stock-thumb-placeholder {
-            margin-left: 0;
-        }
-
-        .nk-profit-table tbody tr:last-child td {
-            border-bottom: 0;
+            margin: 0 auto;
         }
 
         .nk-check-col {
@@ -427,23 +460,22 @@
             vertical-align: bottom;
         }
         .nk-profit-table .nk-detail-col {
-            width: 66px;
-            min-width: 66px;
-            text-align: left;
+            width: 110px;
+            min-width: 110px;
+            text-align: center;
         }
         .nk-profit-table thead th.nk-detail-col {
-            text-align: left;
-            padding-left: 2px !important;
-            padding-right: 4px !important;
+            text-align: center;
+            padding-left: 8px !important;
+            padding-right: 8px !important;
         }
         .nk-profit-table tbody td.nk-detail-col {
-            text-align: left;
-            padding-left: 2px !important;
-            padding-right: 4px !important;
+            text-align: center;
+            padding-left: 8px !important;
+            padding-right: 8px !important;
         }
         .nk-profit-table tbody td.nk-detail-col .nk-detail-btn {
-            position: relative;
-            left: -10px;
+            position: static;
         }
         .nk-profit-table .nk-market-col {
             text-align: center;
@@ -466,39 +498,41 @@
         .nk-table-wrap .nk-detail-col a.nk-detail-btn {
             appearance: none !important;
             -webkit-appearance: none !important;
-            border: 1px solid #dbe3ee !important;
-            border-radius: 8px !important;
+            border: 1px solid #64748b !important;
+            border-radius: 9px !important;
             font-size: 10px !important;
             font-weight: 700 !important;
             width: auto !important;
-            min-width: 66px !important;
-            height: 22px !important;
-            padding: 0 8px !important;
+            min-width: 72px !important;
+            height: 28px !important;
+            padding: 0 10px !important;
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
             line-height: 1 !important;
-            color: #334155 !important;
-            background-color: #ffffff !important;
+            color: #1f2937 !important;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
             background-image: none !important;
-            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08) !important;
+            box-shadow: 0 3px 8px rgba(15, 23, 42, 0.12) !important;
             white-space: nowrap !important;
             text-decoration: none !important;
             cursor: pointer !important;
-            transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease !important;
+            transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease, transform .15s ease !important;
         }
 
         .nk-table-wrap .nk-detail-col .nk-detail-btn:hover {
-            color: #1f2937 !important;
-            background-color: #f8fafc !important;
-            border-color: #cbd5e1 !important;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12) !important;
+            color: #0f172a !important;
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%) !important;
+            border-color: #475569 !important;
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18) !important;
+            transform: translateY(-1px) !important;
         }
 
         .nk-inline-detail-row > td {
             padding: 0 8px 12px;
             border-bottom: 1px solid #e2e8f0 !important;
             background: #f8fafc;
+            text-align: left !important;
         }
 
         .nk-inline-detail-row.is-hidden {
@@ -524,14 +558,25 @@
 
         .nk-inline-detail-title {
             font-size: 13px;
-            font-weight: 800;
+            font-weight: 500;
             color: #0f172a;
+            text-align: left;
         }
 
         .nk-inline-detail-subtitle {
             font-size: 12px;
-            color: #64748b;
+            color: #0f172a;
+            font-weight: 700;
             margin-top: 2px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .nk-inline-detail-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
         }
 
         .nk-inline-summary-grid {
@@ -635,9 +680,7 @@
             }
         }
 
-        .nk-table-panel.is-hidden {
-            display: none;
-        }
+        .nk-table-panel.is-hidden { display: none; }
 
         .nk-table-switch {
             display: inline-flex;
@@ -686,40 +729,44 @@
             width: 100% !important;
             min-width: 100% !important;
             table-layout: auto;
-            border-collapse: separate;
-            border-spacing: 0 8px;
-            font-size: 13px;
         }
 
         .nk-stock-table thead th {
-            color: #6b7280;
+            color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: .08em;
-            font-size: 12px;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 10px 14px;
-            font-weight: 600;
+            letter-spacing: .03em;
+            font-size: 11px;
+            padding: 10px 8px;
+            font-weight: 700;
             white-space: nowrap;
+            text-align: center;
         }
 
         .nk-stock-table tbody td {
-            background: #ffffff;
-            border-top: 1px solid #e2e8f0;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 12px 14px;
+            padding: 12px 8px;
             color: #334155;
             vertical-align: middle;
+            text-align: center;
         }
-
+        .nk-stock-table thead th:first-child,
         .nk-stock-table tbody td:first-child {
-            border-left: 1px solid #e2e8f0;
-            border-top-left-radius: 12px;
-            border-bottom-left-radius: 12px;
+            width: 42px;
+            min-width: 42px;
+            max-width: 42px;
+            padding: 10px 8px 10px 10px !important;
+            text-align: center;
         }
-        .nk-stock-table tbody td:last-child {
-            border-right: 1px solid #e2e8f0;
-            border-top-right-radius: 12px;
-            border-bottom-right-radius: 12px;
+        .nk-stock-table thead th:nth-child(2),
+        .nk-stock-table tbody td:nth-child(2) {
+            width: 84px;
+            min-width: 84px;
+            max-width: 84px;
+            padding: 10px 10px 10px 8px !important;
+            text-align: center;
+        }
+        .nk-stock-table tbody td:nth-child(2) .nk-stock-thumb-wrap,
+        .nk-stock-table tbody td:nth-child(2) .nk-stock-thumb-placeholder {
+            margin: 0 auto 0 4px;
         }
         .nk-stock-table .nk-kstok-col {
             width: 82px;
@@ -736,33 +783,35 @@
             min-width: 104px;
         }
         .nk-stock-table .nk-detail-col {
-            width: 92px;
-            min-width: 92px;
+            width: 110px;
+            min-width: 110px;
             text-align: center;
         }
         .nk-stock-table td.nk-detail-col {
             text-align: center;
             vertical-align: middle;
+            padding-right: 14px;
         }
         .nk-stock-table .nk-detail-col .nk-detail-btn {
-            min-width: 74px !important;
-            height: 24px !important;
-            padding: 0 8px !important;
-            border-radius: 8px !important;
-            border: 1px solid #dbe3ee !important;
-            background: #ffffff !important;
-            color: #334155 !important;
-            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08) !important;
+            min-width: 72px !important;
+            height: 28px !important;
+            padding: 0 10px !important;
+            border-radius: 9px !important;
+            border: 1px solid #64748b !important;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+            color: #1f2937 !important;
+            box-shadow: 0 3px 8px rgba(15, 23, 42, 0.12) !important;
             font-size: 10px !important;
             font-weight: 700 !important;
             line-height: 1 !important;
             white-space: nowrap !important;
         }
         .nk-stock-table .nk-detail-col .nk-detail-btn:hover {
-            background: #f8fafc !important;
-            border-color: #cbd5e1 !important;
-            color: #1f2937 !important;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12) !important;
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%) !important;
+            border-color: #475569 !important;
+            color: #0f172a !important;
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18) !important;
+            transform: translateY(-1px) !important;
         }
 
         .nk-stock-alert-badge {
@@ -1110,10 +1159,10 @@
                     </div>
                     <div class="card-body">
                         <div class="nk-table-wrap nk-table-panel" id="nk-profit-table-panel">
-                            <table class="nk-profit-table">
+                            <table class="nk-profit-table nk-unified-table">
                                 <colgroup>
-                                    <col style="width:44px">
-                                    <col style="width:72px">
+                                    <col style="width:34px">
+                                    <col style="width:64px">
                                     <col style="width:76px">
                                     <col style="width:90px">
                                     <col style="width:72px">
@@ -1121,7 +1170,7 @@
                                     <col style="width:74px">
                                     <col style="width:66px">
                                     <col style="width:66px">
-                                    <col style="width:66px">
+                                    <col style="width:110px">
                                 </colgroup>
                                 <thead>
                                     <tr>
@@ -1150,7 +1199,7 @@
                                             $marketplaceLogoUrl = $marketplaceLogoPath ? asset($marketplaceLogoPath) : null;
                                             $platformFeeAmount = $resolvePlatformServiceAmount((string) $marketplaceName);
                                             $orderNo = $reportRow['order_number'] ?? ($row->marketplace_order_id ?: ($row->order_number ?: ('ORD-'.$row->id)));
-                                            $orderDate = $row->order_date?->locale('tr')->translatedFormat('j M Y') ?: '-';
+                                            $orderDate = $row->order_date?->format('d.m.Y') ?: '-';
                                             $salePriceRaw = (float) (array_key_exists('sale_price', $reportRow)
                                                 ? $reportRow['sale_price']
                                                 : ($row->total_amount ?? 0));
@@ -1257,8 +1306,10 @@
                                         <tr class="nk-inline-detail-row is-hidden" data-nk-inline-row>
                                             <td colspan="10">
                                                 <div class="nk-inline-detail-panel" data-nk-inline-panel>
+                                                <div class="nk-inline-detail-head">
                                                     <div class="nk-inline-detail-title" data-nk-inline-title>Siparis Karlilik Detayi</div>
                                                     <div class="nk-inline-detail-subtitle" data-nk-inline-subtitle>-</div>
+                                                </div>
 
                                                     <div class="nk-inline-summary-grid">
                                                         <div class="nk-inline-summary-box">
@@ -1293,10 +1344,10 @@
                             </table>
                         </div>
                         <div class="nk-table-wrap nk-table-panel is-hidden" id="nk-stock-table-panel">
-                            <table class="nk-stock-table">
+                            <table class="nk-stock-table nk-unified-table">
                                 <colgroup>
-                                    <col style="width:44px">
-                                    <col style="width:72px">
+                                    <col style="width:42px">
+                                    <col style="width:84px">
                                     <col style="width:124px">
                                     <col style="width:136px">
                                     <col style="width:104px">
@@ -1305,7 +1356,6 @@
                                     <col style="width:86px">
                                     <col style="width:82px">
                                     <col style="width:110px">
-                                    <col style="width:92px">
                                 </colgroup>
                                 <thead>
                                     <tr>
@@ -1320,7 +1370,6 @@
                                         <th class="text-left">Fiyat</th>
                                         <th class="text-left">Stok</th>
                                         <th class="text-left nk-kstok-col">K.STOK</th>
-                                        <th class="text-left">Uyari</th>
                                         <th class="nk-detail-col">Detay</th>
                                     </tr>
                                 </thead>
@@ -1362,13 +1411,6 @@
                                             <td>{{ number_format((float) $stockProduct->price, 2, ',', '.') }} {{ $stockProduct->currency ?: 'TRY' }}</td>
                                             <td class="{{ $isCritical ? 'nk-negative fw-semibold' : '' }}">{{ $stockProduct->stock_quantity }}</td>
                                             <td>{{ $stockProduct->critical_stock_level }}</td>
-                                            <td>
-                                                @if($hasAlert)
-                                                    <span class="nk-stock-alert-badge">Kritik Uyari</span>
-                                                @else
-                                                    <span class="text-muted">-</span>
-                                                @endif
-                                            </td>
                                             <td class="nk-detail-col">
                                                 <button
                                                     type="button"
@@ -1388,10 +1430,12 @@
                                             </td>
                                         </tr>
                                         <tr class="nk-inline-detail-row is-hidden" data-nk-inline-row>
-                                            <td colspan="11">
+                                            <td colspan="10">
                                                 <div class="nk-inline-detail-panel" data-nk-inline-panel>
+                                                <div class="nk-inline-detail-head">
                                                     <div class="nk-inline-detail-title" data-nk-inline-title>Urun Stok Detayi</div>
                                                     <div class="nk-inline-detail-subtitle" data-nk-inline-subtitle>-</div>
+                                                </div>
 
                                                     <div class="nk-inline-summary-grid">
                                                         <div class="nk-inline-summary-box">
@@ -1419,7 +1463,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="11" class="text-center text-muted py-4">Stok menusunde gosterilecek urun bulunamadi.</td>
+                                            <td colspan="10" class="text-center text-muted py-4">Stok menusunde gosterilecek urun bulunamadi.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -2358,7 +2402,8 @@
                         setInlineTypeLabels(panel, detailType);
 
                         if (detailType === 'stock') {
-                            setInlineText(panel, '[data-nk-inline-subtitle]', button.getAttribute('data-product-name'));
+                            const stockSku = button.getAttribute('data-sku') || '-';
+                            setInlineText(panel, '[data-nk-inline-subtitle]', `Stok Kodu : ${stockSku}`);
                             setInlineText(panel, '[data-nk-inline-box1]', button.getAttribute('data-product-name'));
                             setInlineText(panel, '[data-nk-inline-box2]', button.getAttribute('data-stock-quantity'));
                             setInlineText(panel, '[data-nk-inline-line-1]', button.getAttribute('data-brand'));
@@ -2370,7 +2415,8 @@
                             setInlineText(panel, '[data-nk-inline-line-7]', button.getAttribute('data-status'));
                             setInlineText(panel, '[data-nk-inline-line-8]', '-');
                         } else {
-                            setInlineText(panel, '[data-nk-inline-subtitle]', button.getAttribute('data-order-number'));
+                            const orderNo = button.getAttribute('data-order-number') || '-';
+                            setInlineText(panel, '[data-nk-inline-subtitle]', `Sipariş Numarası : ${orderNo}`);
                             setInlineText(panel, '[data-nk-inline-box1]', button.getAttribute('data-sale-price'));
                             setInlineText(panel, '[data-nk-inline-box2]', button.getAttribute('data-profit-amount'));
                             setInlineText(panel, '[data-nk-inline-line-1]', button.getAttribute('data-product-cost'));
