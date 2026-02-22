@@ -47,6 +47,36 @@ $daysLeft = $endsAt ? $now->diffInDays($endsAt, false) : null;
                 return $userModule;
             });
 
+        $plan = $user->getActivePlan();
+        $planModuleCodes = collect($plan?->enabledModules() ?? [])
+            ->filter(fn ($code) => is_string($code) && $code !== '*' && str_starts_with($code, 'feature.'))
+            ->values();
+
+        $existingCodes = $userModules
+            ->map(fn ($um) => $um->module?->code)
+            ->filter()
+            ->values()
+            ->all();
+
+        $planOnlyModules = Module::query()
+            ->whereIn('code', $planModuleCodes->all())
+            ->whereNotIn('code', $existingCodes)
+            ->where('is_active', true)
+            ->get()
+            ->map(function (Module $module) {
+                $row = new \stdClass();
+                $row->module = $module;
+                $row->status = 'active';
+                $row->days_left = null;
+                $row->ends_at_local = null;
+                return $row;
+            });
+
+        $userModules = $userModules
+            ->concat($planOnlyModules)
+            ->sortBy(fn ($row) => (string) ($row->module?->name ?? ''))
+            ->values();
+
         return view('admin.modules.my-modules', compact('userModules'));
     }
 

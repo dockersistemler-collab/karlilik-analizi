@@ -10,7 +10,10 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
+        'tenant_id',
         'user_id',
+        'marketplace_integration_id',
+        'marketplace_account_id',
         'marketplace_id',
         'marketplace_order_id',
         'order_number',
@@ -19,6 +22,7 @@ class Order extends Model
         'commission_amount',
         'net_amount',
         'currency',
+        'totals',
         'customer_name',
         'customer_email',
         'customer_phone',
@@ -34,11 +38,14 @@ class Order extends Model
         'delivered_at',
         'items',
         'marketplace_data',
+        'raw_payload',
     ];
 
     protected $casts = [
         'items' => 'array',
         'marketplace_data' => 'array',
+        'totals' => 'array',
+        'raw_payload' => 'array',
         'order_date' => 'datetime',
         'approved_at' => 'datetime',
         'shipped_at' => 'datetime',
@@ -52,6 +59,16 @@ class Order extends Model
     public function marketplace()
     {
         return $this->belongsTo(Marketplace::class);
+    }
+
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(\App\Domains\Settlements\Models\OrderItem::class);
     }
 
     public function user()

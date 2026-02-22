@@ -45,6 +45,7 @@ use App\Http\Controllers\Admin\TrendyolOfferController;
 use App\Http\Controllers\Admin\TrendyolOfferApiController;
 use App\Http\Controllers\Admin\HepsiburadaOfferController;
 use App\Http\Controllers\Admin\HepsiburadaOfferApiController;
+use App\Http\Controllers\Admin\SettlementCenterController;
 use App\Http\Controllers\Customer\TicketController as CustomerTicketController;
 use App\Http\Controllers\SubUser\PasswordController as SubUserPasswordController;
 use App\Http\Controllers\Admin\System\MailLogController as AdminMailLogController;
@@ -244,6 +245,15 @@ Route::middleware(['client_or_subuser', 'verified', 'subscription', 'subuser.per
                 Route::put('accounts/{account}', [AdminProfitabilityAccountController::class, 'update'])->name('accounts.update');
                 Route::delete('accounts/{account}', [AdminProfitabilityAccountController::class, 'destroy'])->name('accounts.destroy');
                 Route::post('accounts/{account}/test', [AdminProfitabilityAccountController::class, 'test'])->name('accounts.test');
+            });
+
+        Route::prefix('settlements')
+            ->name('settlements.')
+            ->middleware('module:feature.hakedis')
+            ->group(function () {
+                Route::get('/', [SettlementCenterController::class, 'index'])->name('index');
+                Route::get('payouts/{payout}', [SettlementCenterController::class, 'show'])->name('show');
+                Route::get('disputes', [SettlementCenterController::class, 'disputes'])->name('disputes');
             });
 
         Route::middleware('module:feature.reports.commission_tariffs')->group(function () {

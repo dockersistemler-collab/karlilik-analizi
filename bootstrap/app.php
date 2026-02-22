@@ -23,6 +23,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'support.readonly' => \App\Http\Middleware\EnsureSupportViewReadOnly::class,
             'feature' => \App\Http\Middleware\EnsureFeatureEnabled::class,
             'correlation' => \App\Http\Middleware\CorrelationIdMiddleware::class,
+            'tenant.resolve' => \App\Http\Middleware\ResolveTenantContext::class,
+            'tenant.scope' => \App\Http\Middleware\EnsureTenantScope::class,
+            'tenant.feature' => \App\Http\Middleware\EnsureFeatureFlagEnabled::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
 
         $middleware->prependToGroup('web', \App\Http\Middleware\SetSessionCookieForSubdomain::class);

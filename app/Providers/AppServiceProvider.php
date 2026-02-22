@@ -15,6 +15,9 @@ use App\Policies\EInvoicePolicy;
 use App\Policies\InvoicePolicy;
 use App\Policies\NotificationPolicy;
 use App\Policies\NotificationPreferencePolicy;
+use App\Policies\PayoutPolicy;
+use App\Policies\DisputePolicy;
+use App\Policies\MarketplaceAccountPolicy;
 use App\Support\SupportUser;
 use App\Support\CorrelationId;
 use App\Domain\Profitability\ProfitabilityCalculator;
@@ -47,6 +50,14 @@ use Illuminate\Support\ServiceProvider;
 use App\Services\SystemSettings\SettingsRepository;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use App\Domains\Tenancy\TenantContext;
+use App\Domains\Settlements\Rules\RuleEvaluator;
+use App\Domains\Marketplaces\Services\MarketplaceConnectorRegistry;
+use App\Domains\Settlements\Repositories\EloquentPayoutRepository;
+use App\Domains\Settlements\Repositories\PayoutRepositoryInterface;
+use App\Domains\Settlements\Models\Payout;
+use App\Domains\Settlements\Models\Dispute;
+use App\Models\MarketplaceAccount;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -56,6 +67,10 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         require_once app_path('Support/helpers.php');
+        $this->app->singleton(TenantContext::class);
+        $this->app->singleton(RuleEvaluator::class);
+        $this->app->singleton(MarketplaceConnectorRegistry::class);
+        $this->app->bind(PayoutRepositoryInterface::class, EloquentPayoutRepository::class);
 
         $this->app->bind(ProductCostResolver::class, EloquentProductCostResolver::class);
         $this->app->bind(ShippingFeeResolver::class, MarketplaceDataShippingFeeResolver::class);
@@ -105,6 +120,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Invoice::class, InvoicePolicy::class);
         Gate::policy(Notification::class, NotificationPolicy::class);
         Gate::policy(NotificationPreference::class, NotificationPreferencePolicy::class);
+        Gate::policy(Payout::class, PayoutPolicy::class);
+        Gate::policy(Dispute::class, DisputePolicy::class);
+        Gate::policy(MarketplaceAccount::class, MarketplaceAccountPolicy::class);
         Order::observe(OrderObserver::class);
 
         Gate::before(function (User $user): ?bool {

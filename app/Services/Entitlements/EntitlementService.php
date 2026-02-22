@@ -29,7 +29,7 @@ class EntitlementService
 
 $plan = $user->getActivePlan();
         if (!$plan) {
-            return false;
+            return $this->hasActiveUserModule($user, $code);
         }
 
         if ($plan->hasModule($code)) {

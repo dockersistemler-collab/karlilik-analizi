@@ -22,6 +22,8 @@ public function run(): void
         ModuleCatalogSeeder::class,
         SuperAdminSeeder::class,  // BUNU EKLE
         MailTemplateSeeder::class,
+        HakedisKontrolMerkeziSeeder::class,
+        RbacPermissionSeeder::class,
     ]);
 }
 }

@@ -12,6 +12,7 @@ class MarketplaceAccount extends Model
 
     protected $fillable = [
         'tenant_id',
+        'marketplace_integration_id',
         'marketplace',
         'connector_key',
         'store_name',
@@ -39,6 +40,11 @@ class MarketplaceAccount extends Model
     public function tenant()
     {
         return $this->belongsTo(User::class, 'tenant_id');
+    }
+
+    public function integration()
+    {
+        return $this->belongsTo(\App\Domains\Settlements\Models\MarketplaceIntegration::class, 'marketplace_integration_id');
     }
 
     public function scopeForTenant(Builder $query, int $tenantId): Builder

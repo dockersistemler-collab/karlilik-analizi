@@ -2029,6 +2029,17 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 $hasCargoTracking = $ownerUser && app(\App\Services\Entitlements\EntitlementService::class)->hasModule($ownerUser, 'feature.cargo_tracking');
                 $inventoryModuleEnabled = $ownerUser && app(\App\Services\Modules\ModuleGate::class)->isEnabledForUser($ownerUser, 'feature.inventory');
+                $settlementTenantId = $ownerUser ? (int) ($ownerUser->tenant_id ?: $ownerUser->id) : 0;
+                $settlementFeatureEnabled = $settlementTenantId > 0
+                    && \Illuminate\Support\Facades\Schema::hasTable('feature_flags')
+                    && $hasModule('feature.hakedis')
+                    ? \App\Domains\Settlements\Models\FeatureFlag::query()
+                        ->withoutGlobalScope('tenant_scope')
+                        ->where('tenant_id', $settlementTenantId)
+                        ->where('key', 'hakedis_module')
+                        ->where('enabled', true)
+                        ->exists()
+                    : false;
 
             @endphp
 
@@ -2363,6 +2374,13 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                     </div>
 
+                @endif
+
+                @if($settlementFeatureEnabled)
+                    <a href="{{ route('portal.settlements.index') }}" class="sidebar-link {{ request()->routeIs('portal.settlements.*') ? 'is-active' : '' }}">
+                        <i class="fa-solid fa-scale-balanced w-6"></i>
+                        <span class="sidebar-label">Hakediş Kontrol Merkezi</span>
+                    </a>
                 @endif
 
                 @if($canReportsAny)

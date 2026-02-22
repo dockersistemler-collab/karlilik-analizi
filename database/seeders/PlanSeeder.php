@@ -44,6 +44,7 @@ class PlanSeeder extends Seeder
                     'modules' => [
                         'feature.tickets',
                         'feature.inventory',
+                        'feature.hakedis',
                         'ne_kazanirim',
                     ],
                 ],
@@ -79,6 +80,7 @@ class PlanSeeder extends Seeder
                         'feature.einvoice_api',
                         'feature.reports',
                         'feature.reports.profitability',
+                        'feature.hakedis',
                         'feature.reports.commission_tariffs',
                         'feature.exports',
                         'feature.integrations',
@@ -127,6 +129,7 @@ class PlanSeeder extends Seeder
                         'feature.einvoice_webhooks',
                         'feature.reports',
                         'feature.reports.profitability',
+                        'feature.hakedis',
                         'feature.reports.commission_tariffs',
                         'feature.exports',
                         'feature.integrations',

@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('header')
     Trendyol Teklifler
@@ -102,8 +102,8 @@
         </div>
     </div>
 
-    <div id="commission-upload-modal" class="fixed inset-0 bg-slate-900/30 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-xl shadow-lg w-full max-w-2xl p-6">
+    <div id="commission-upload-modal" class="commission-modal fixed inset-0 hidden items-center justify-center">
+        <div class="commission-modal-dialog bg-white rounded-xl shadow-lg w-full max-w-2xl p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-sm font-semibold text-slate-800">Excel Yükle</h3>
                 <button id="commission-upload-close" type="button" class="text-slate-400 hover:text-slate-600">
@@ -132,8 +132,8 @@
         </div>
     </div>
 
-    <div id="commission-map-modal" class="fixed inset-0 bg-slate-900/30 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-xl shadow-lg w-full max-w-3xl p-6">
+    <div id="commission-map-modal" class="commission-modal fixed inset-0 hidden items-center justify-center">
+        <div class="commission-modal-dialog bg-white rounded-xl shadow-lg w-full max-w-3xl p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-sm font-semibold text-slate-800">Kolon Eşleştirme</h3>
                 <button id="commission-map-close" type="button" class="text-slate-400 hover:text-slate-600">
@@ -151,8 +151,8 @@
         </div>
     </div>
 
-    <div id="commission-errors-modal" class="fixed inset-0 bg-slate-900/30 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-xl shadow-lg w-full max-w-3xl p-6">
+    <div id="commission-errors-modal" class="commission-modal fixed inset-0 hidden items-center justify-center">
+        <div class="commission-modal-dialog bg-white rounded-xl shadow-lg w-full max-w-3xl p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-sm font-semibold text-slate-800">Excel Hataları</h3>
                 <button id="commission-errors-close" type="button" class="text-slate-400 hover:text-slate-600">
@@ -554,6 +554,16 @@
         border-color: #e2e8f0;
         color: #0f172a;
     }
+    .commission-modal {
+        z-index: 120;
+        background: rgba(15, 23, 42, 0.45);
+        padding: 16px;
+    }
+    .commission-modal-dialog {
+        max-height: calc(100vh - 32px);
+        overflow: auto;
+    }
+
     @media (max-width: 1024px) {
         .commission-sticky-shell {
             top: 0;
@@ -822,10 +832,39 @@
         { key: 'commission4Percent', label: '4. Komisyon %' },
     ];
 
+    function syncModalState() {
+        const isAnyOpen = [uploadModal, mapModal, errorsModal].some(modal => modal && !modal.classList.contains('hidden'));
+        document.body.classList.toggle('overflow-hidden', isAnyOpen);
+    }
+
     function toggleModal(modal, show) {
+        if (!modal) {
+            return;
+        }
         modal.classList.toggle('hidden', !show);
         modal.classList.toggle('flex', show);
+        syncModalState();
     }
+
+    const modalList = [uploadModal, mapModal, errorsModal].filter(Boolean);
+    modalList.forEach((modal) => {
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                toggleModal(modal, false);
+            }
+        });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') {
+            return;
+        }
+        modalList.forEach((modal) => {
+            if (!modal.classList.contains('hidden')) {
+                toggleModal(modal, false);
+            }
+        });
+    });
 
     uploadBtn?.addEventListener('click', () => toggleModal(uploadModal, true));
     uploadClose?.addEventListener('click', () => toggleModal(uploadModal, false));
@@ -1125,6 +1164,8 @@
     loadTable(1);
 </script>
 @endpush
+
+
 
 
 

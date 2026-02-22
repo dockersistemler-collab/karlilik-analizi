@@ -84,3 +84,160 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - Run: php artisan test
 
 - Session domain: SESSION_DOMAIN=null (host-only cookie). This avoids session leakage between app.* and sa.* subdomains.
+
+## Hakedis Kontrol Merkezi (API v1)
+
+Bu repoya multi-tenant hakediş/payout kontrol modulu eklendi.
+
+### Kurulum
+
+```bash
+php artisan migrate
+php artisan db:seed --class=HakedisKontrolMerkeziSeeder
+php artisan queue:work --queue=integrations,default
+php artisan horizon
+```
+
+### Ornek cURL
+
+```bash
+curl -X POST http://localhost:8200/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"tenantadmin@local.test","password":"password","device_name":"cli"}'
+
+curl -X POST http://localhost:8200/api/v1/marketplace-accounts/1/sync \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"from":"2026-02-01","to":"2026-02-28","sync_mode":"sync"}'
+
+curl -X GET "http://localhost:8200/api/v1/payouts?status=EXPECTED" \
+  -H "Authorization: Bearer <TOKEN>"
+```
+
+### TODO
+
+- Marketplace connectorlari su anda mock adapterdir; gercek API endpointleri sonradan entegre edilmelidir.
+- Role endpointi fallback sabit dizi doner; `spatie/laravel-permission` baglantisi TODO.
+- Export endpointi CSV'dir; XLSX placeholder olarak birakilmistir.
+
+## RBAC (Spatie) ve Tenant Yetkileri
+
+### Kurulum / Hazirlama
+
+```bash
+composer require spatie/laravel-permission
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+php artisan migrate
+php artisan db:seed --class=RbacPermissionSeeder
+```
+
+### Roller
+
+- `SuperAdmin`
+- `TenantAdmin`
+- `Finance`
+- `Viewer`
+
+### Permission Listesi
+
+- `tenants.manage`
+- `features.manage`
+- `users.manage`
+- `roles.manage`
+- `marketplace_accounts.manage`
+- `settlement_rules.manage`
+- `sync.run`
+- `payouts.view`
+- `payouts.reconcile`
+- `disputes.view`
+- `disputes.manage`
+- `exports.create`
+- `dashboard.view`
+
+### Ornek cURL (RBAC)
+
+```bash
+# SuperAdmin tenant olusturma (token user: SuperAdmin + tenants.manage)
+curl -X POST http://localhost:8200/api/v1/tenants \
+  -H "Authorization: Bearer <SUPERADMIN_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Acme Tenant","status":"active","plan":"pro"}'
+
+# Tenant payout listeleme (token user: payouts.view + hakediş_module acik)
+curl -X GET http://localhost:8200/api/v1/payouts \
+  -H "Authorization: Bearer <TENANT_TOKEN>"
+
+# Reconcile (token user: payouts.reconcile)
+curl -X POST http://localhost:8200/api/v1/payouts/1/reconcile \
+  -H "Authorization: Bearer <TENANT_TOKEN>"
+
+# SuperAdmin tenant context ile tenant kaynaklarinda gezinme
+curl -X GET http://localhost:8200/api/v1/payouts \
+  -H "Authorization: Bearer <SUPERADMIN_TOKEN>" \
+  -H "X-Tenant-Id: 12"
+```
+
+## Real Connector Iskeleti
+
+- Connector registry artik defaultta real connector siniflarini kullanir (`config/marketplaces.php`).
+- Mock fallback acmak icin:
+  - `MARKETPLACES_USE_MOCK_CONNECTORS=true`
+- Trendyol `fetchOrders` real HTTP akisi ornegi:
+  - `Http::baseUrl(...)->withHeaders(...)->retry(...)->get(...)->json()`
+- Tum connector request/response metasi `sync_logs` tablosuna sensitive alanlar maskelenerek yazilir.
+
+### Trendyol credentials ornegi
+
+`marketplace_accounts.credentials` icinde su alanlar beklenir:
+
+```json
+{
+  "api_key": "xxxxx",
+  "api_secret": "yyyyy",
+  "seller_id": "123456",
+  "store_front_code": "STORE_FRONT_CODE"
+}
+```
+
+Not: Trendyol finance/order cagrilarinda `storeFrontCode` header zorunludur.
+
+### Trendyol sync cURL
+
+```bash
+curl -X POST http://localhost:8200/api/v1/marketplace-accounts/1/sync \
+  -H "Authorization: Bearer <TENANT_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"from":"2026-02-01","to":"2026-02-28","sync_mode":"sync"}'
+```
+
+Bu akista Trendyol icin:
+1. settlements (Sale + Return)
+2. otherfinancials (PaymentOrder)
+3. paymentOrderId bazli payout/payout_transactions normalizasyonu
+calistirilir.
+
+## Trendyol Orders Connector Notes
+
+- Endpoint: `GET /integration/order/sellers/{sellerId}/orders`
+- Required header: `storeFrontCode` (read from `marketplace_accounts.credentials.store_front_code`)
+- Connector always sends `startDate` and `endDate` (milliseconds).
+- If requested interval is larger than 14 days, connector auto-chunks into 14-day windows and paginates each chunk.
+- Default order sync sort: `orderByField=PackageLastModifiedDate`, `orderByDirection=ASC`.
+- `size` is clamped to max `200`.
+- `shipmentPackageIds` max `50` and connector throws validation exception if exceeded.
+
+## Hakediş Modülü Tek Komut
+
+Hakediş modülünü (module + flag + entitlement) tek satırla açmak için:
+
+```bash
+php artisan settlements:enable --user-id=3
+```
+
+Alternatif:
+
+```bash
+php artisan settlements:enable --email=tenantadmin@local.test
+php artisan settlements:enable --tenant-id=3 --no-grant
+php artisan settlements:enable --tenant-id=3 --grant-tenant-users
+```

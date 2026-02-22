@@ -13,16 +13,19 @@ use App\Models\WebhookEndpoint;
 use App\Models\Referral;
 use App\Models\ReferralProgram;
 use App\Models\Shipment;
+use App\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     protected $fillable = [
+        'tenant_id',
         'name',
         'email',
         'billing_name',
@@ -50,6 +53,8 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected string $guard_name = 'sanctum';
+
     protected function casts(): array
     {
         return [
@@ -59,7 +64,13 @@ class User extends Authenticatable
             'invoice_number_tracking' => 'boolean',
             'plan_started_at' => 'datetime',
             'plan_expires_at' => 'datetime',
+            'tenant_id' => 'integer',
         ];
+    }
+
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
     }
 
     // İlişkiler

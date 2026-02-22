@@ -1,6 +1,45 @@
 ﻿# Session Memory
 
-**Last updated:** 2026-02-21
+**Last updated:** 2026-02-22
+
+## Current Work (2026-02-22)
+- Goal: Build "Hakediş Kontrol Merkezi" backend foundation (tenant-scoped API + sync + expected payout + reconciliation + disputes).
+- Status: Core module scaffold completed and targeted tests passing.
+
+## Changes Made (2026-02-22)
+- Added migrations for:
+  - `tenants`, `marketplace_integrations`, `feature_flags`, `settlement_rules`
+  - `order_items`, `returns`, `payouts`, `payout_transactions`, `reconciliations`, `disputes`, `sync_jobs`, `sync_logs`
+  - Expanded `users`, `orders`, `marketplace_accounts` with settlement/tenant fields.
+- Added tenant context stack:
+  - `app/Domains/Tenancy/TenantContext.php`
+  - `app/Domains/Tenancy/Concerns/BelongsToTenant.php`
+  - `app/Http/Middleware/ResolveTenantContext.php`
+  - middleware alias: `tenant.resolve`.
+- Added domain layers:
+  - mock marketplace connectors (Trendyol/HB/N11/Amazon),
+  - payload mapper + sync log service + sync job,
+  - rule evaluator (Net KDV + Kar formulas),
+  - actions: `BuildExpectedPayoutsAction`, `ReconcilePayoutsAction`, `DetectAnomaliesAction`.
+- Added API endpoints under `/api/v1`:
+  - `auth/login`, tenants/features (super admin), users/roles, marketplace accounts, settlement rules,
+    sync trigger, payouts (+transactions/reconcile/export), disputes, dashboard.
+- Added seed/factory/test artifacts:
+  - `HakedisKontrolMerkeziSeeder`, `TenantFactory`, `MarketplaceAccountFactory`
+  - tests:
+    - `tests/Unit/SettlementRuleEvaluatorTest.php`
+    - `tests/Feature/Api/TenantIsolationPayoutsTest.php`
+    - `tests/Feature/Api/BuildExpectedPayoutsActionTest.php`
+    - `tests/Feature/Api/ReconcileCreatesDisputeTest.php`
+- Validation:
+  - `php artisan test --filter="SettlementRuleEvaluatorTest|TenantIsolationPayoutsTest|BuildExpectedPayoutsActionTest|ReconcileCreatesDisputeTest"` => PASS.
+
+## Next Steps (2026-02-22)
+1) Replace mock connectors with real marketplace HTTP clients + retry/backoff + pagination cursors.
+2) Wire `spatie/laravel-permission` for persisted RBAC (current roles endpoint is fallback).
+3) Add structured activity/audit logging for payout/dispute state transitions.
+4) Expand reconciliation heuristics (reference clusters/date+amount scoring/manual override).
+5) Add XLSX export and richer settlement dashboard aggregations.
 
 ## Current Work (2026-02-21)
 - Goal: Continue prior session by validating pending billing/commission targets and fixing newly detected mojibake.
@@ -578,3 +617,33 @@ Not:
 
 
 
+
+## Current Work (2026-02-22 - Hakediş Visibility Hotfix)
+- Goal: Make Hakediş module truly visible/activatable across SuperAdmin + Client + user flows.
+- Status: Root causes fixed and activation command hardened.
+
+## Changes Made (2026-02-22 - Hakediş Visibility Hotfix)
+- Added portal UI for settlements:
+  - `portal.settlements.index|show|disputes` routes + controller + blade screens.
+  - Sidebar entry: "Hakediş Kontrol Merkezi".
+- Fixed feature key normalization and route gating:
+  - API feature key standardized to `hakedis_module`.
+  - `EnsureFeatureFlagEnabled` normalized with `Str::ascii`.
+- Added module catalog + plan integration:
+  - `feature.hakedis` added to `ModuleCatalogSeeder`.
+  - `feature.hakedis` added to Starter/Professional/Enterprise plan module lists.
+- Fixed entitlement behavior:
+  - `EntitlementService::hasModule()` now falls back to active `user_modules` when no active plan exists.
+- Added one-shot activation command:
+  - `php artisan settlements:enable`
+  - options: `--user-id`, `--email`, `--tenant-id`, `--grant-tenant-users`, `--no-grant`, `--module-only`, `--flag-only`.
+  - command now auto-creates tenant row if missing (for FK-safe `feature_flags` insert).
+- Added guards to prevent 500 when tables are missing:
+  - sidebar/menu and middleware/controller checks for `feature_flags` table existence.
+
+## Known Runtime Notes (2026-02-22)
+- If module still not visible:
+  1) run migrations,
+  2) run `php artisan settlements:enable --user-id=<id> --grant-tenant-users`,
+  3) `php artisan optimize:clear`,
+  4) re-login + hard refresh.

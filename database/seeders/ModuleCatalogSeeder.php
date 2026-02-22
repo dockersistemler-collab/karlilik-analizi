@@ -32,6 +32,17 @@ class ModuleCatalogSeeder extends Seeder
             ]
         );
         Module::query()->updateOrCreate(
+            ['code' => 'feature.hakedis'],
+            [
+                'name' => 'Hakediş Kontrol Merkezi',
+                'description' => 'Payout, mutabakat ve sapma merkezi.',
+                'type' => 'feature',
+                'billing_type' => 'recurring',
+                'is_active' => true,
+                'sort_order' => 0,
+            ]
+        );
+        Module::query()->updateOrCreate(
             ['code' => 'ne_kazanirim'],
             [
                 'name' => 'Ne Kazanirim',
