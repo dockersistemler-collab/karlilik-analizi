@@ -101,6 +101,56 @@ class TrendyolOrderSyncTest extends TestCase
         );
     }
 
+    public function test_fetch_returns_maps_claim_items_to_settlement_return_payload(): void
+    {
+        [, $account] = $this->seedTenantAndAccount();
+
+        $requests = [];
+        Http::fake(function ($request) use (&$requests) {
+            $requests[] = [
+                'url' => $request->url(),
+                'headers' => $request->headers(),
+            ];
+
+            return Http::response([
+                'content' => [[
+                    'id' => 10001,
+                    'orderNumber' => 'ORD-RET-1',
+                    'status' => 'Approved',
+                    'currencyCode' => 'TRY',
+                    'claimItems' => [
+                        ['id' => 20001, 'status' => 'Approved', 'amount' => 123.45, 'currencyCode' => 'TRY'],
+                    ],
+                ]],
+                'totalPages' => 1,
+                'totalElements' => 1,
+            ], 200);
+        });
+
+        $connector = new TrendyolConnector(
+            $account,
+            app(MarketplaceHttpClient::class),
+            app(SyncLogService::class),
+            app(SensitiveValueMasker::class),
+            null
+        );
+
+        $result = $connector->fetchReturns('2026-01-01 00:00:00', '2026-01-01 23:59:59');
+
+        $this->assertCount(1, $requests);
+        $this->assertCount(1, $result['items']);
+        $this->assertSame('ORD-RET-1', $result['items'][0]['marketplace_order_id']);
+        $this->assertSame('20001', $result['items'][0]['marketplace_return_id']);
+        $this->assertSame('Approved', $result['items'][0]['status']);
+        $this->assertSame(123.45, $result['items'][0]['amounts']['refund_total']);
+        $this->assertSame('TRY', $result['items'][0]['amounts']['currency']);
+
+        parse_str((string) parse_url($requests[0]['url'], PHP_URL_QUERY), $query);
+        $this->assertNotEmpty($query['startDate'] ?? null);
+        $this->assertNotEmpty($query['endDate'] ?? null);
+        $this->assertArrayHasKey('storefrontcode', array_change_key_case($requests[0]['headers'], CASE_LOWER));
+    }
+
     public function test_mapper_upserts_orders_and_order_items_from_shipment_packages_payload(): void
     {
         [$tenant, $account] = $this->seedTenantAndAccount();

@@ -7,6 +7,7 @@ use App\Domains\Marketplaces\Contracts\MarketplaceConnectorInterface;
 use Carbon\Carbon;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
+use RuntimeException;
 use InvalidArgumentException;
 
 class TrendyolConnector extends BaseRealConnector implements MarketplaceConnectorInterface
@@ -123,8 +124,52 @@ class TrendyolConnector extends BaseRealConnector implements MarketplaceConnecto
 
     public function fetchReturns(string $from, string $to, ?string $pageToken = null): array
     {
-        // TODO: implement Trendyol returns endpoint mapping.
-        return ['items' => [], 'next_page_token' => null];
+        $credentials = $this->credentials();
+        $headers = (new TrendyolAuthHeaderBuilder())->headers($credentials);
+        $sellerId = (string) ($credentials['seller_id'] ?? '');
+        if ($sellerId === '') {
+            throw new RuntimeException('Trendyol seller_id zorunludur.');
+        }
+
+        $baseUrl = (string) config('marketplaces.trendyol.base_url');
+        $http = new TrendyolHttpClient($this->httpClient, $this->syncLogService, $this->masker, $this->syncJobId);
+        $size = min(max((int) config('marketplaces.trendyol.order_page_size', 200), 1), 200);
+        $items = [];
+
+        foreach ($this->splitTo14DayChunks(Carbon::parse($from), Carbon::parse($to)) as [$chunkFrom, $chunkTo]) {
+            $currentPage = 0;
+            do {
+                $response = $http->get(
+                    $baseUrl,
+                    "/integration/order/sellers/{$sellerId}/claims",
+                    $credentials,
+                    $headers,
+                    [
+                        'startDate' => $chunkFrom->getTimestampMs(),
+                        'endDate' => $chunkTo->getTimestampMs(),
+                        'page' => $currentPage,
+                        'size' => $size,
+                    ],
+                    (int) config('marketplaces.trendyol.timeout', 20)
+                );
+
+                $json = (array) $response->json();
+                $content = Arr::get($json, 'content', Arr::get($json, 'claims', []));
+                $content = is_array($content) ? $content : [];
+                $items = array_merge($items, $this->normalizeReturnRows($content));
+
+                $totalPages = Arr::get($json, 'totalPages');
+                if (is_numeric($totalPages)) {
+                    $currentPage++;
+                    $hasMore = $currentPage < (int) $totalPages;
+                } else {
+                    $currentPage++;
+                    $hasMore = count($content) >= $size;
+                }
+            } while ($hasMore);
+        }
+
+        return ['items' => $items, 'next_page_token' => null];
     }
 
     public function fetchPayouts(string $from, string $to, ?string $pageToken = null): array
@@ -171,5 +216,74 @@ class TrendyolConnector extends BaseRealConnector implements MarketplaceConnecto
         }
 
         return $chunks;
+    }
+
+    /**
+     * @param array<int, mixed> $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private function normalizeReturnRows(array $rows): array
+    {
+        $items = [];
+
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $orderId = (string) ($row['orderNumber'] ?? $row['orderId'] ?? '');
+            if ($orderId === '') {
+                continue;
+            }
+
+            $claimItems = is_array($row['items'] ?? null)
+                ? $row['items']
+                : (is_array($row['claimItems'] ?? null) ? $row['claimItems'] : []);
+
+            if ($claimItems === []) {
+                $claimId = (string) ($row['id'] ?? $row['claimId'] ?? '');
+                if ($claimId !== '') {
+                    $items[] = [
+                        'marketplace_order_id' => $orderId,
+                        'marketplace_return_id' => $claimId,
+                        'status' => (string) ($row['status'] ?? 'OPEN'),
+                        'amounts' => [
+                            'refund_total' => (float) ($row['claimAmount'] ?? $row['amount'] ?? 0),
+                            'currency' => (string) ($row['currencyCode'] ?? 'TRY'),
+                        ],
+                        'raw_payload' => $row,
+                    ];
+                }
+
+                continue;
+            }
+
+            foreach ($claimItems as $claimItem) {
+                if (!is_array($claimItem)) {
+                    continue;
+                }
+
+                $returnId = (string) ($claimItem['id'] ?? $claimItem['claimItemId'] ?? $row['id'] ?? $row['claimId'] ?? '');
+                if ($returnId === '') {
+                    continue;
+                }
+
+                $items[] = [
+                    'marketplace_order_id' => $orderId,
+                    'marketplace_return_id' => $returnId,
+                    'status' => (string) ($claimItem['status'] ?? $row['status'] ?? 'OPEN'),
+                    'amounts' => [
+                        'refund_total' => (float) ($claimItem['amount'] ?? $claimItem['price'] ?? $row['claimAmount'] ?? 0),
+                        'currency' => (string) ($claimItem['currencyCode'] ?? $row['currencyCode'] ?? 'TRY'),
+                    ],
+                    'raw_payload' => [
+                        'claim' => $row,
+                        'claim_item' => $claimItem,
+                    ],
+                ];
+            }
+        }
+
+        return $items;
     }
 }
