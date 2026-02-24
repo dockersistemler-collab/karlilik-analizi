@@ -71,6 +71,11 @@ class Order extends Model
         return $this->hasMany(\App\Domains\Settlements\Models\OrderItem::class);
     }
 
+    public function financialItems()
+    {
+        return $this->hasMany(\App\Domains\Settlements\Models\OrderFinancialItem::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

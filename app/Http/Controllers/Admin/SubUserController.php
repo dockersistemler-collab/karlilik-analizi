@@ -29,6 +29,8 @@ class SubUserController extends Controller
         'reports.commission_tariffs' => 'Raporlar: Ürün Komisyon Tarifeleri',
         'reports.stock_value' => 'Raporlar: Stoktaki Ürün Tutarları',
         'reports.profitability' => 'Raporlar: Sipariş Kârlılık Analizi',
+        'settlements.view' => 'Hakediş: Görüntüleme',
+        'settlements.manage' => 'Hakediş: Yönetim',
         'integrations' => 'Entegrasyonlar',
         'addons' => 'Ek Modüller',
         'subscription' => 'Paketim',

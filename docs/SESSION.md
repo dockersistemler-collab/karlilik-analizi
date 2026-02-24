@@ -647,3 +647,113 @@ Not:
   2) run `php artisan settlements:enable --user-id=<id> --grant-tenant-users`,
   3) `php artisan optimize:clear`,
   4) re-login + hard refresh.
+
+## Current Work (2026-02-24 - Hakediş Kontrol Merkezi 6 Madde Tamamlandı)
+- Goal: Complete all 6 pending items for Hakediş Kontrol Merkezi and prepare clean continuation point for next session.
+- Status: Completed; targeted tests are passing.
+
+## Changes Made (2026-02-24 - 6 Madde)
+- Portal actions added:
+  - Reconcile action from payout detail.
+  - CSV export for payout transactions.
+  - Dispute status update action in disputes list.
+- Reconciliation behavior split:
+  - `executeOne(payoutId)` for single payout reconciliation.
+  - `executeByAccount(accountId)` for batch/account reconciliation.
+  - API payout reconcile endpoint now uses single payout flow.
+- Sub-user permissions split for settlements:
+  - `settlements.view`
+  - `settlements.manage`
+  - Route permission map updated accordingly.
+- Dispute type classification expanded:
+  - `MISSING_PAYMENT`, `COMMISSION_DIFF`, `SHIPPING_DIFF`, `VAT_DIFF`, `UNKNOWN_DEDUCTION`.
+- Settlement dashboard summary cards added on portal index:
+  - total expected, total paid, discrepancy count, open disputes, last reconciliation timestamp.
+- Settlement portal views refreshed:
+  - index/show/disputes pages updated for new actions and KPI summary.
+
+## Tests/Validation (2026-02-24)
+- Targeted run:
+  - `php artisan test --filter="PortalSettlementCenterTest|DisputeTypeClassificationTest|ReconcileCreatesDisputeTest|PermissionEnforcementTest|BuildExpectedPayoutsActionTest|TenantIsolationPayoutsTest"`
+- Result:
+  - `10 passed`.
+
+## Next Session Start Note (2026-02-24)
+- We continue from this point in the evening.
+- Context to recall at start:
+  - "Hakediş Kontrol Merkezi için 6 madde tamamlandı; kaldığımız yerden devam ediyoruz."
+
+## Current Work (2026-02-24 - Marketplace Connector Completion + Login Asset Fix)
+- Goal: Complete real connector foundation for non-Trendyol marketplaces and stabilize login page rendering on local 8200.
+- Status: Completed and committed; targeted tests are passing.
+
+## Changes Made (2026-02-24 - Connector Completion)
+- Extended Trendyol connector:
+  - Implemented real `fetchReturns()` claims flow with chunking/pagination and normalized return payload mapping.
+- Implemented real HTTP flow skeletons for:
+  - `HepsiburadaConnector` (`orders`, `returns`, `payouts`, `payout-transactions`)
+  - `N11Connector` (`orders`, `returns`, `payouts`, `payout-transactions`)
+  - `AmazonConnector` (`orders`, `returns`, `payouts`, `payout-transactions`)
+- Added configurable endpoint/page-size settings:
+  - `config/marketplaces.php` expanded with per-marketplace endpoints and page sizes.
+- Added/updated tests:
+  - `tests/Feature/Marketplaces/TrendyolOrderSyncTest.php` (returns mapping test)
+  - `tests/Feature/Marketplaces/OtherMarketplaceConnectorsTest.php` (HB/N11/Amazon normalize flows)
+- Commit created:
+  - `071b50b` - `Implement real connector flows for HB/N11/Amazon and extend Trendyol returns`
+
+## Tests/Validation (2026-02-24 - Connector Completion)
+- `php artisan test --filter="OtherMarketplaceConnectorsTest|TrendyolOrderSyncTest"` => `7 passed`
+- `php artisan test --filter="PortalSettlementCenterTest|DisputeTypeClassificationTest|ReconcileCreatesDisputeTest|BuildExpectedPayoutsActionTest|TenantIsolationPayoutsTest"` => `9 passed`
+
+## Runtime Hotfix (2026-02-24 - Login Page)
+- Symptom:
+  - Login page was unstyled (large Laravel logo only).
+- Root cause:
+  - `public/hot` existed and forced assets to `http://127.0.0.1:5174` while Vite dev server was not running.
+- Fix:
+  - Removed `public/hot` so Blade `@vite` resolves to `public/build/assets/*`.
+  - Verified login HTML now points to `http://pazar.test:8200/build/assets/...`.
+
+## Next Steps (2026-02-24)
+1) Run manual marketplace sync smoke with real sandbox credentials for HB/N11/Amazon.
+2) Replace placeholder auth builders with official signature/token flows per provider.
+3) Decide whether connector skeleton commit (`071b50b`) should be pushed now or after integrated QA.
+
+## Current Work (2026-02-24 - Hakediş Loss Finder v1.1 In Progress)
+- Goal: Add confidence score, recurring patterns, one-click evidence pack, tenant rule override, regression guard.
+- Status: Analysis and baseline scan completed; implementation started but not finalized in this session.
+
+## Progress Snapshot (2026-02-24 - v1.1)
+- Reviewed and confirmed v1.0 baseline files:
+  - `ReconciliationService`, `LossFinderEngine`, `DisputeService`
+  - `SettlementLossFinderController`, `DisputesController`, `routes/api.php`
+  - Existing settlement schema migration (`2026_02_24_210000_add_loss_finder_settlement_schema.php`).
+- Verified latest regression fixes from previous step are green:
+  - `LossFinderWorkflowTest` and `ReconcileCreatesDisputeTest` passing.
+  - Extended suite also passing (20 tests / 49 assertions).
+
+## Next Session Plan (Start Here)
+1) Add v1.1 migration set:
+   - `reconciliations`: `findings_summary_json`, `run_hash`, `run_version` (+ index)
+   - new `loss_findings` table
+   - new `loss_patterns` table
+   - `disputes`: evidence pack columns
+   - `reconciliation_rules`: tenant override columns
+   - `payouts`: regression flag/note
+2) Add models/services/jobs:
+   - `LossFinding`, `LossPattern`
+   - `ConfidenceScoringService`, `LossPatternAggregatorService`, `EvidencePackService`, `TenantRuleResolver`, `ReconcileRegressionGuardService`
+   - `GenerateEvidencePackJob`, `AggregateLossPatternsJob`, `RunRegressionGuardJob`
+3) Wire reconcile flow updates:
+   - dual-write findings (JSON + `loss_findings`)
+   - summary JSON + run hash/version + idempotency check
+   - dispatch post-reconcile event/jobs
+4) Add API v1.1 endpoints:
+   - patterns, findings filters, evidence pack create/get, regression, tenant rules upsert
+5) Add tests:
+   - unit tests for scoring/resolver/aggregator/regression
+   - feature tests for patterns/findings filter/evidence pack/regression/rule override.
+
+## Resume Prompt
+- "Hakediş Loss Finder v1.1'de migration + service + endpoint + test implementasyonuna kaldığımız yerden devam et."

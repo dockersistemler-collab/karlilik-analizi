@@ -15,15 +15,22 @@ class Payout extends Model
 
     protected $fillable = [
         'tenant_id',
+        'marketplace',
         'marketplace_integration_id',
         'marketplace_account_id',
+        'account_id',
         'payout_reference',
+        'payout_no',
         'period_start',
         'period_end',
         'expected_date',
         'expected_amount',
         'paid_amount',
         'paid_date',
+        'paid_at',
+        'imported_at',
+        'file_name',
+        'file_hash',
         'currency',
         'status',
         'totals',
@@ -35,6 +42,8 @@ class Payout extends Model
         'period_end' => 'date',
         'expected_date' => 'date',
         'paid_date' => 'date',
+        'paid_at' => 'datetime',
+        'imported_at' => 'datetime',
         'expected_amount' => 'decimal:4',
         'paid_amount' => 'decimal:4',
         'totals' => 'array',
@@ -61,9 +70,19 @@ class Payout extends Model
         return $this->hasMany(PayoutTransaction::class);
     }
 
+    public function rows()
+    {
+        return $this->hasMany(PayoutRow::class);
+    }
+
     public function reconciliation()
     {
-        return $this->hasOne(Reconciliation::class);
+        return $this->hasOne(Reconciliation::class)->latestOfMany('reconciled_at');
+    }
+
+    public function reconciliations()
+    {
+        return $this->hasMany(Reconciliation::class);
     }
 
     public function disputes()
@@ -71,4 +90,3 @@ class Payout extends Model
         return $this->hasMany(Dispute::class);
     }
 }
-

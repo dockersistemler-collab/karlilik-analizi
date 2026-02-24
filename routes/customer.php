@@ -253,7 +253,14 @@ Route::middleware(['client_or_subuser', 'verified', 'subscription', 'subuser.per
             ->group(function () {
                 Route::get('/', [SettlementCenterController::class, 'index'])->name('index');
                 Route::get('payouts/{payout}', [SettlementCenterController::class, 'show'])->name('show');
+                Route::post('payouts/{payout}/reconcile', [SettlementCenterController::class, 'reconcile'])->name('reconcile');
+                Route::get('payouts/{payout}/export', [SettlementCenterController::class, 'export'])->name('export');
+                Route::post('payouts/{payout}/disputes/from-findings', [SettlementCenterController::class, 'createDisputesFromFindings'])->name('disputes.from-findings');
+                Route::get('exports/{token}', [SettlementCenterController::class, 'exportStatus'])->name('exports.show');
+                Route::get('exports/{token}/download', [SettlementCenterController::class, 'exportDownload'])->name('exports.download');
                 Route::get('disputes', [SettlementCenterController::class, 'disputes'])->name('disputes');
+                Route::patch('disputes/{dispute}', [SettlementCenterController::class, 'updateDispute'])->name('disputes.update');
+                Route::post('disputes/bulk-status', [SettlementCenterController::class, 'bulkUpdateDisputes'])->name('disputes.bulk-status');
             });
 
         Route::middleware('module:feature.reports.commission_tariffs')->group(function () {

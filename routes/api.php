@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\PayoutsController;
 use App\Http\Controllers\Api\V1\RolesController;
 use App\Http\Controllers\Api\V1\SettlementRulesController;
 use App\Http\Controllers\Api\V1\SettlementsDashboardController;
+use App\Http\Controllers\Api\V1\SettlementLossFinderController;
 use App\Http\Controllers\Api\V1\SyncController;
 use App\Http\Controllers\Api\V1\TenantFeaturesController;
 use App\Http\Controllers\Api\V1\TenantsController;
@@ -57,6 +58,9 @@ Route::prefix('v1')
                 ->middleware('permission:settlement_rules.manage');
 
             Route::middleware('tenant.feature:hakedis_module')->group(function () {
+                Route::post('payouts/import', [SettlementLossFinderController::class, 'import'])
+                    ->middleware('permission:payouts.reconcile')
+                    ->name('payouts.import');
                 Route::get('payouts', [PayoutsController::class, 'index'])
                     ->middleware('permission:payouts.view')
                     ->name('payouts.index');
@@ -66,12 +70,27 @@ Route::prefix('v1')
                 Route::get('payouts/{id}/transactions', [PayoutsController::class, 'transactions'])
                     ->middleware('permission:payouts.view')
                     ->name('payouts.transactions');
-                Route::post('payouts/{id}/reconcile', [PayoutsController::class, 'reconcile'])
+                Route::post('payouts/{payout}/reconcile', [SettlementLossFinderController::class, 'reconcilePayout'])
                     ->middleware('permission:payouts.reconcile')
                     ->name('payouts.reconcile');
-                Route::post('payouts/{id}/export', [PayoutsController::class, 'export'])
+                Route::post('accounts/{account}/reconcile', [SettlementLossFinderController::class, 'reconcileAccount'])
+                    ->middleware('permission:payouts.reconcile')
+                    ->name('accounts.reconcile');
+                Route::get('payouts/{payout}/summary', [SettlementLossFinderController::class, 'summary'])
+                    ->middleware('permission:payouts.view')
+                    ->name('payouts.summary');
+                Route::get('payouts/{payout}/reconciliations', [SettlementLossFinderController::class, 'reconciliations'])
+                    ->middleware('permission:payouts.view')
+                    ->name('payouts.reconciliations');
+                Route::get('reconciliations/{id}', [SettlementLossFinderController::class, 'reconciliationDetail'])
+                    ->middleware('permission:payouts.view')
+                    ->name('reconciliations.show');
+                Route::post('payouts/{payout}/export', [SettlementLossFinderController::class, 'export'])
                     ->middleware('permission:exports.create')
                     ->name('payouts.export');
+                Route::post('disputes/from-findings', [SettlementLossFinderController::class, 'disputesFromFindings'])
+                    ->middleware('permission:disputes.manage')
+                    ->name('disputes.from-findings');
 
                 Route::get('disputes', [DisputesController::class, 'index'])
                     ->middleware('permission:disputes.view')

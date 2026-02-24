@@ -82,7 +82,7 @@ class PermissionEnforcementTest extends TestCase
 
         Sanctum::actingAs($finance);
         $this->postJson("/api/v1/payouts/{$payout->id}/reconcile")
-            ->assertOk();
+            ->assertOk()
+            ->assertJsonPath('data.queued', true);
     }
 }
-

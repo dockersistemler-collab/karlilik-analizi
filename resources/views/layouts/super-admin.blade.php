@@ -890,6 +890,13 @@
 
 
 
+                <a href="{{ route('super-admin.settlements.index') }}" class="sidebar-link {{ request()->routeIs('super-admin.settlements.*') ? 'is-active' : '' }}">
+
+                    <i class="fa-solid fa-scale-balanced w-6"></i>
+
+                    <span class="sidebar-label">Hakedi&#351; Y&#246;netimi</span>
+
+                </a>
                 <p class="sidebar-section">Entegrasyonlar</p>
 
 

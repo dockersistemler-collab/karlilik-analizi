@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Domains\Reconciliation\Actions\ReconcilePayoutsAction;
 use App\Domains\Settlements\Models\Payout;
 use App\Domains\Settlements\Repositories\PayoutRepositoryInterface;
 use App\Domains\Settlements\Resources\PayoutResource;
 use App\Domains\Settlements\Resources\PayoutTransactionResource;
 use App\Http\Controllers\Api\V1\Concerns\ResolvesTenant;
 use App\Http\Controllers\Controller;
+use App\Jobs\ReconcileSinglePayoutJob;
 use App\Support\ApiResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -60,7 +60,7 @@ class PayoutsController extends Controller
         return ApiResponse::success(PayoutTransactionResource::collection($row->transactions));
     }
 
-    public function reconcile(int $id, ReconcilePayoutsAction $action)
+    public function reconcile(int $id)
     {
         $tenantId = $this->currentTenantId();
         $row = Payout::query()
@@ -69,9 +69,12 @@ class PayoutsController extends Controller
             ->findOrFail($id);
         $this->authorize('reconcile', $row);
 
-        $action->execute((int) $row->marketplace_account_id);
+        ReconcileSinglePayoutJob::dispatch((int) $tenantId, (int) $row->id);
 
-        return ApiResponse::success(['reconciled' => true]);
+        return ApiResponse::success([
+            'queued' => true,
+            'payout_id' => (int) $row->id,
+        ]);
     }
 
     public function export(int $id): StreamedResponse

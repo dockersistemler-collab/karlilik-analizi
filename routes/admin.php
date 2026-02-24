@@ -25,6 +25,7 @@ use App\Http\Controllers\SuperAdmin\SystemController as SuperAdminSystemControll
 use App\Http\Controllers\SuperAdmin\Plans\PlanMailRulesController as SuperAdminPlanMailRulesController;
 use App\Http\Controllers\Admin\Notifications\MailTemplateController as SuperAdminMailTemplateController;
 use App\Http\Controllers\SuperAdmin\NotificationController as SuperAdminNotificationController;
+use App\Http\Controllers\SuperAdmin\SettlementModuleController as SuperAdminSettlementModuleController;
 use App\Http\Controllers\Admin\BillingEventController as AdminBillingEventController;
 
 Route::middleware(['auth', 'verified', 'role:super_admin'])
@@ -114,6 +115,13 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
             ->name('module-purchases.mark-cancelled');
         Route::post('module-purchases/{modulePurchase}/mark-refunded', [SuperAdminModulePurchaseController::class, 'markRefunded'])
             ->name('module-purchases.mark-refunded');
+
+        Route::prefix('settlements')->name('settlements.')->group(function () {
+            Route::get('/', [SuperAdminSettlementModuleController::class, 'index'])
+                ->name('index');
+            Route::post('clients/{user}/visibility', [SuperAdminSettlementModuleController::class, 'setVisibility'])
+                ->name('visibility');
+        });
 
         Route::prefix('cargo')->name('cargo.')->group(function () {
             Route::get('providers', [SuperAdminCargoProviderController::class, 'index'])->name('providers.index');

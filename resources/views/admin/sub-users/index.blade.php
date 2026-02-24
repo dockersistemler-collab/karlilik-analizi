@@ -226,6 +226,8 @@
 
                             'reports.stock_value' => 'Raporlar: Stoktaki Ürün Tutarları',
                             'reports.profitability' => 'Raporlar: Sipariş Kârlılık Analizi',
+                            'settlements.view' => 'Hakediş: Görüntüleme',
+                            'settlements.manage' => 'Hakediş: Yönetim',
 
                             'integrations' => 'Entegrasyonlar',
 
@@ -325,6 +327,8 @@
 
         'reports.stock_value': 'Raporlar: Stoktaki Ürün Tutarları',
         'reports.profitability': 'Raporlar: Sipariş Kârlılık Analizi',
+        'settlements.view': 'Hakediş: Görüntüleme',
+        'settlements.manage': 'Hakediş: Yönetim',
 
         integrations: 'Entegrasyonlar',
 

@@ -1,10 +1,10 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 
 
 @section('header')
 
-    SatÃ½lan ÃœrÃ¼nler Raporu
+    Satýlan Ürünler Raporu
 
 @endsection
 
@@ -18,7 +18,7 @@
 
             <div class="min-w-[160px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">BaÃ¾langÃ½Ã§</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Baþlangýç</label>
 
                 <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="report-filter-control">
 
@@ -26,7 +26,7 @@
 
             <div class="min-w-[160px] report-filter-field">
 
-                <label class="block text-xs font-medium text-slate-500 mb-1">BitiÃ¾</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Bitiþ</label>
 
                 <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="report-filter-control">
 
@@ -38,7 +38,7 @@
 
                 <a href="{{ route('portal.reports.sold-products') }}" class="report-filter-btn report-filter-btn-secondary">Temizle</a>
 
-                <a href="{{ route('portal.reports.sold-products.print', request()->query()) }}" target="_blank" class="report-filter-btn report-filter-btn-secondary">YazdÃ½r</a>
+                <a href="{{ route('portal.reports.sold-products.print', request()->query()) }}" target="_blank" class="report-filter-btn report-filter-btn-secondary">Yazdýr</a>
 
             </div>
 
@@ -60,11 +60,11 @@
 
                         <th class="text-left py-2 pr-4">Stok Kodu</th>
 
-                        <th class="text-left py-2 pr-4">ÃœrÃ¼n AdÃ½</th>
+                        <th class="text-left py-2 pr-4">Ürün Adý</th>
 
-                        <th class="text-left py-2 pr-4">SeÃ§enek</th>
+                        <th class="text-left py-2 pr-4">Seçenek</th>
 
-                        <th class="text-right py-2">SatÃ½Ã¾ Adedi</th>
+                        <th class="text-right py-2">Satýþ Adedi</th>
 
                     </tr>
 
@@ -90,7 +90,7 @@
 
                         <tr>
 
-                            <td colspan="4" class="py-4 text-center text-slate-500">KayÃ½t bulunamadÃ½.</td>
+                            <td colspan="4" class="py-4 text-center text-slate-500">Kayýt bulunamadý.</td>
 
                         </tr>
 
