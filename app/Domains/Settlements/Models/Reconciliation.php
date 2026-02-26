@@ -23,6 +23,9 @@ class Reconciliation extends Model
         'diff_total_net',
         'diff_breakdown_json',
         'loss_findings_json',
+        'findings_summary_json',
+        'run_hash',
+        'run_version',
         'status',
         'reconciled_at',
         'matched_payment_reference',
@@ -35,6 +38,7 @@ class Reconciliation extends Model
 
     protected $casts = [
         'matched_date' => 'date',
+        'run_version' => 'integer',
         'matched_amount' => 'decimal:4',
         'tolerance_used' => 'decimal:4',
         'expected_total_net' => 'decimal:2',
@@ -42,6 +46,7 @@ class Reconciliation extends Model
         'diff_total_net' => 'decimal:2',
         'diff_breakdown_json' => 'array',
         'loss_findings_json' => 'array',
+        'findings_summary_json' => 'array',
         'reconciled_at' => 'datetime',
     ];
 
@@ -58,5 +63,10 @@ class Reconciliation extends Model
     public function order()
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function findings()
+    {
+        return $this->hasMany(LossFinding::class);
     }
 }

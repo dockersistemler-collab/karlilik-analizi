@@ -1924,6 +1924,53 @@
             opacity: 1 !important;
             -webkit-text-fill-color: #111111 !important;
         }
+
+        /* Global modern period/range tabs across admin panel */
+        main .period-tabs {
+            padding: 6px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        }
+
+        main .period-tab,
+        main .range-pill,
+        main .map-range-pill,
+        main .map-table-range-pill,
+        main .net-kar-range-pill {
+            min-height: 34px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b !important;
+            background: transparent;
+            transition: all .18s ease;
+        }
+
+        main .period-tab:hover,
+        main .range-pill:hover,
+        main .map-range-pill:hover,
+        main .map-table-range-pill:hover,
+        main .net-kar-range-pill:hover {
+            color: #0f172a !important;
+            border-color: #e2e8f0;
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        main .period-tab.is-active,
+        main .range-pill.is-active,
+        main .map-range-pill.is-active,
+        main .map-table-range-pill.is-active,
+        main .net-kar-range-pill.is-active {
+            background: linear-gradient(180deg, #ffffff 0%, #fef2f2 100%) !important;
+            border-color: #fecdd3 !important;
+            color: #0f172a !important;
+            box-shadow: 0 10px 18px rgba(244, 63, 94, 0.16) !important;
+            transform: translateY(-1px);
+        }
     </style>
 
     @stack('styles')
@@ -2008,6 +2055,26 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                 $canReportsAny = $hasModule('feature.reports') && $canReportsAnyPermission;
                 $canProfitability = $hasModule('feature.reports.profitability')
                     && (!$subUser || $subPermissions->has('reports') || $subPermissions->has('reports.profitability'));
+                $canProfitEngine = $hasModule('profit_engine')
+                    && (!$subUser || $subPermissions->has('reports') || $subPermissions->has('reports.profit_engine'));
+                $canMarketplaceRisk = $hasModule('marketplace_risk')
+                    && (!$subUser || $subPermissions->has('reports') || $subPermissions->has('reports.marketplace_risk'));
+                $canActionEngine = $hasModule('action_engine')
+                    && (!$subUser || $subPermissions->has('reports') || $subPermissions->has('reports.action_engine'));
+                $canBuyBoxEngine = $hasModule('buybox_engine')
+                    && (!$subUser || $subPermissions->has('reports') || $subPermissions->has('reports.buybox_engine'));
+                $canControlTower = $hasModule('feature.control_tower')
+                    && (!$subUser || $subPermissions->has('control_tower'));
+                $canSeeProfitEngine = $canProfitEngine;
+                $canSeeMarketplaceRisk = $canMarketplaceRisk;
+                $canSeeActionEngine = $canActionEngine;
+                $canSeeBuyBoxEngine = $canBuyBoxEngine;
+                $canSeeControlTower = $canControlTower;
+                $canDecisionCenter = $canProfitEngine || $canMarketplaceRisk || $canActionEngine;
+                $canSeeDecisionCenter = $canSeeProfitEngine || $canSeeMarketplaceRisk || $canSeeActionEngine;
+                $decisionUpsellCode = $canSeeProfitEngine
+                    ? 'profit_engine'
+                    : ($canSeeMarketplaceRisk ? 'marketplace_risk' : 'action_engine');
                 $canCommissionTariffs = $hasModule('feature.reports.commission_tariffs')
                     && (!$subUser || $subPermissions->has('reports') || $subPermissions->has('reports.commission_tariffs'));
 
@@ -2169,6 +2236,46 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                     @endif
 
+                @endif
+                @if($canSeeDecisionCenter)
+                    <a href="{{ $canDecisionCenter ? route('portal.decision-center.index') : route('portal.modules.upsell', ['code' => $decisionUpsellCode]) }}" class="sidebar-link {{ request()->routeIs('portal.decision-center.*') ? 'is-active' : '' }}">
+                        <i class="fa-solid fa-compass-drafting w-6"></i>
+                        <span class="sidebar-label">Decision Center</span>
+                    </a>
+                @endif
+                @if($canSeeProfitEngine)
+                    <a href="{{ $canProfitEngine ? route('portal.profit-engine.index') : route('portal.modules.upsell', ['code' => 'profit_engine']) }}" class="sidebar-link {{ request()->routeIs('portal.profit-engine.*') ? 'is-active' : '' }}">
+                        <i class="fa-solid fa-coins w-6"></i>
+                        <span class="sidebar-label">Profit Engine</span>
+                    </a>
+                @endif
+                @if($canSeeMarketplaceRisk)
+                    <a href="{{ $canMarketplaceRisk ? route('portal.marketplace-risk.index') : route('portal.modules.upsell', ['code' => 'marketplace_risk']) }}" class="sidebar-link {{ request()->routeIs('portal.marketplace-risk.*') ? 'is-active' : '' }}">
+                        <i class="fa-solid fa-triangle-exclamation w-6"></i>
+                        <span class="sidebar-label">Marketplace Risk</span>
+                    </a>
+                @endif
+                @if($canSeeActionEngine)
+                    <a href="{{ $canActionEngine ? route('portal.action-engine.index') : route('portal.modules.upsell', ['code' => 'action_engine']) }}" class="sidebar-link {{ request()->routeIs('portal.action-engine.*') ? 'is-active' : '' }}">
+                        <i class="fa-solid fa-wand-magic-sparkles w-6"></i>
+                        <span class="sidebar-label">Action Engine (FAZ 3-4)</span>
+                    </a>
+                @endif
+                @if($canSeeBuyBoxEngine)
+                    <a href="{{ $canBuyBoxEngine ? route('portal.buybox.index') : route('portal.modules.upsell', ['code' => 'buybox_engine']) }}" class="sidebar-link {{ request()->routeIs('portal.buybox.*') ? 'is-active' : '' }}">
+                        <i class="fa-solid fa-trophy w-6"></i>
+                        <span class="sidebar-label">BuyBox Engine (FAZ 1-2)</span>
+                    </a>
+                @endif
+                @if($canSeeControlTower)
+                    <a href="{{ $canControlTower ? route('portal.control-tower.index', ['view' => 'cfo']) : route('portal.modules.upsell', ['code' => 'feature.control_tower']) }}" class="sidebar-link {{ request()->routeIs('portal.control-tower.*') && request('view', 'cfo') === 'cfo' ? 'is-active' : '' }}">
+                        <i class="fa-solid fa-tower-observation w-6"></i>
+                        <span class="sidebar-label">Control Tower (CFO)</span>
+                    </a>
+                    <a href="{{ $canControlTower ? route('portal.control-tower.index', ['view' => 'ops']) : route('portal.modules.upsell', ['code' => 'feature.control_tower']) }}" class="sidebar-link {{ request()->routeIs('portal.control-tower.*') && request('view') === 'ops' ? 'is-active' : '' }}">
+                        <i class="fa-solid fa-sitemap w-6"></i>
+                        <span class="sidebar-label">Control Tower (Operasyon)</span>
+                    </a>
                 @endif
                 @if($can('invoices'))
 
@@ -3562,6 +3669,7 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 </body>
 
 </html>
+
 
 
 

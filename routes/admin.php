@@ -26,6 +26,7 @@ use App\Http\Controllers\SuperAdmin\Plans\PlanMailRulesController as SuperAdminP
 use App\Http\Controllers\Admin\Notifications\MailTemplateController as SuperAdminMailTemplateController;
 use App\Http\Controllers\SuperAdmin\NotificationController as SuperAdminNotificationController;
 use App\Http\Controllers\SuperAdmin\SettlementModuleController as SuperAdminSettlementModuleController;
+use App\Http\Controllers\SuperAdmin\IntelligenceModuleController as SuperAdminIntelligenceModuleController;
 use App\Http\Controllers\Admin\BillingEventController as AdminBillingEventController;
 
 Route::middleware(['auth', 'verified', 'role:super_admin'])
@@ -115,6 +116,15 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
             ->name('module-purchases.mark-cancelled');
         Route::post('module-purchases/{modulePurchase}/mark-refunded', [SuperAdminModulePurchaseController::class, 'markRefunded'])
             ->name('module-purchases.mark-refunded');
+
+        Route::prefix('intelligence')->name('intelligence.')->group(function () {
+            Route::get('profit-settings', [SuperAdminIntelligenceModuleController::class, 'profitSettings'])->name('profit-settings');
+            Route::get('risk-profiles', [SuperAdminIntelligenceModuleController::class, 'riskProfiles'])->name('risk-profiles');
+            Route::get('action-rules', [SuperAdminIntelligenceModuleController::class, 'actionRules'])->name('action-rules');
+            Route::get('buybox-engine', [SuperAdminIntelligenceModuleController::class, 'buyboxEngine'])->name('buybox-engine');
+            Route::get('control-tower', [SuperAdminIntelligenceModuleController::class, 'controlTower'])->name('control-tower');
+            Route::post('modules/{code}/toggle', [SuperAdminIntelligenceModuleController::class, 'toggle'])->name('modules.toggle');
+        });
 
         Route::prefix('settlements')->name('settlements.')->group(function () {
             Route::get('/', [SuperAdminSettlementModuleController::class, 'index'])

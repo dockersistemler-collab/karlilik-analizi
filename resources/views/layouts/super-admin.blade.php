@@ -968,6 +968,41 @@
                     <span class="sidebar-label">Gelir Raporları</span>
 
                 </a>
+                <a href="{{ route('super-admin.intelligence.profit-settings') }}" class="sidebar-link {{ request()->routeIs('super-admin.intelligence.profit-settings') ? 'is-active' : '' }}">
+
+                    <i class="fa-solid fa-coins w-6"></i>
+
+                    <span class="sidebar-label">Profit Engine</span>
+
+                </a>
+                <a href="{{ route('super-admin.intelligence.risk-profiles') }}" class="sidebar-link {{ request()->routeIs('super-admin.intelligence.risk-profiles') ? 'is-active' : '' }}">
+
+                    <i class="fa-solid fa-triangle-exclamation w-6"></i>
+
+                    <span class="sidebar-label">Marketplace Risk</span>
+
+                </a>
+                <a href="{{ route('super-admin.intelligence.action-rules') }}" class="sidebar-link {{ request()->routeIs('super-admin.intelligence.action-rules') ? 'is-active' : '' }}">
+
+                    <i class="fa-solid fa-wand-magic-sparkles w-6"></i>
+
+                    <span class="sidebar-label">Action Engine (FAZ 3-4)</span>
+
+                </a>
+                <a href="{{ route('super-admin.intelligence.buybox-engine') }}" class="sidebar-link {{ request()->routeIs('super-admin.intelligence.buybox-engine') ? 'is-active' : '' }}">
+
+                    <i class="fa-solid fa-ranking-star w-6"></i>
+
+                    <span class="sidebar-label">BuyBox Engine (FAZ 1-2)</span>
+
+                </a>
+                <a href="{{ route('super-admin.intelligence.control-tower') }}" class="sidebar-link {{ request()->routeIs('super-admin.intelligence.control-tower') ? 'is-active' : '' }}">
+
+                    <i class="fa-solid fa-tower-observation w-6"></i>
+
+                    <span class="sidebar-label">Control Tower (CFO + OPS)</span>
+
+                </a>
 
 
 
@@ -1258,8 +1293,3 @@
 </body>
 
 </html>
-
-
-
-
-

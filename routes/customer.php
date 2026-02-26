@@ -46,6 +46,12 @@ use App\Http\Controllers\Admin\TrendyolOfferApiController;
 use App\Http\Controllers\Admin\HepsiburadaOfferController;
 use App\Http\Controllers\Admin\HepsiburadaOfferApiController;
 use App\Http\Controllers\Admin\SettlementCenterController;
+use App\Http\Controllers\Admin\ProfitEngineController;
+use App\Http\Controllers\Admin\MarketplaceRiskController;
+use App\Http\Controllers\Admin\ActionEngineController;
+use App\Http\Controllers\Admin\DecisionCenterController;
+use App\Http\Controllers\Admin\BuyBoxController;
+use App\Http\Controllers\Admin\ControlTowerController;
 use App\Http\Controllers\Customer\TicketController as CustomerTicketController;
 use App\Http\Controllers\SubUser\PasswordController as SubUserPasswordController;
 use App\Http\Controllers\Admin\System\MailLogController as AdminMailLogController;
@@ -173,6 +179,83 @@ Route::middleware(['client_or_subuser', 'verified', 'subscription', 'subuser.per
         Route::get('orders-export', [OrderController::class, 'export'])
             ->middleware('module:feature.exports')
             ->name('orders.export');
+        Route::prefix('admin/profit-engine')
+            ->name('profit-engine.')
+            ->middleware('module:profit_engine')
+            ->group(function () {
+                Route::get('/', [ProfitEngineController::class, 'index'])->name('index');
+                Route::get('snapshots/{snapshot}', [ProfitEngineController::class, 'show'])->name('show');
+                Route::post('orders/{order}/recalculate', [ProfitEngineController::class, 'recalculate'])->name('recalculate');
+
+                Route::post('profiles', [ProfitEngineController::class, 'storeProfile'])->name('profiles.store');
+                Route::put('profiles/{profile}', [ProfitEngineController::class, 'updateProfile'])->name('profiles.update');
+                Route::delete('profiles/{profile}', [ProfitEngineController::class, 'destroyProfile'])->name('profiles.destroy');
+
+                Route::post('fee-rules', [ProfitEngineController::class, 'storeFeeRule'])->name('fee-rules.store');
+                Route::put('fee-rules/{rule}', [ProfitEngineController::class, 'updateFeeRule'])->name('fee-rules.update');
+                Route::delete('fee-rules/{rule}', [ProfitEngineController::class, 'destroyFeeRule'])->name('fee-rules.destroy');
+            });
+        Route::get('admin/decision-center', [DecisionCenterController::class, 'index'])->name('decision-center.index');
+        Route::prefix('admin/marketplace-risk')
+            ->name('marketplace-risk.')
+            ->middleware('module:marketplace_risk')
+            ->group(function () {
+                Route::get('/', [MarketplaceRiskController::class, 'index'])->name('index');
+                Route::post('kpi', [MarketplaceRiskController::class, 'storeKpi'])->name('kpi.store');
+                Route::put('kpi/{kpi}', [MarketplaceRiskController::class, 'updateKpi'])->name('kpi.update');
+                Route::post('kpi/import-csv', [MarketplaceRiskController::class, 'importCsv'])->name('kpi.import-csv');
+
+                Route::post('profiles', [MarketplaceRiskController::class, 'storeProfile'])->name('profiles.store');
+                Route::put('profiles/{profile}', [MarketplaceRiskController::class, 'updateProfile'])->name('profiles.update');
+                Route::delete('profiles/{profile}', [MarketplaceRiskController::class, 'destroyProfile'])->name('profiles.destroy');
+            });
+        Route::prefix('admin/action-engine')
+            ->name('action-engine.')
+            ->middleware('module:action_engine')
+            ->group(function () {
+                Route::get('/', [ActionEngineController::class, 'index'])->name('index');
+                Route::get('recommendations/{recommendation}', [ActionEngineController::class, 'show'])->name('show');
+                Route::post('recommendations/{recommendation}/apply', [ActionEngineController::class, 'apply'])->name('apply');
+                Route::post('recommendations/{recommendation}/dismiss', [ActionEngineController::class, 'dismiss'])->name('dismiss');
+                Route::post('recommendations/{recommendation}/impact-refresh', [ActionEngineController::class, 'refreshImpact'])->name('impact.refresh');
+                Route::post('run', [ActionEngineController::class, 'run'])->name('run');
+                Route::get('calibration', [ActionEngineController::class, 'calibration'])->name('calibration');
+                Route::post('calibration/run', [ActionEngineController::class, 'runCalibration'])->name('calibration.run');
+                Route::get('shocks', [ActionEngineController::class, 'shocks'])->name('shocks');
+                Route::post('shocks/run', [ActionEngineController::class, 'runShockDetect'])->name('shocks.run');
+                Route::get('campaigns', [ActionEngineController::class, 'campaigns'])->name('campaigns');
+                Route::post('campaigns/import', [ActionEngineController::class, 'campaignsImport'])->name('campaigns.import');
+                Route::post('campaigns/apply', [ActionEngineController::class, 'campaignsApply'])->name('campaigns.apply');
+            });
+        Route::prefix('admin/buybox')
+            ->name('buybox.')
+            ->middleware('module:buybox_engine,404')
+            ->group(function () {
+                Route::get('/', [BuyBoxController::class, 'index'])->name('index');
+                Route::post('import-csv', [BuyBoxController::class, 'importCsv'])->name('import-csv');
+                Route::get('export-csv', [BuyBoxController::class, 'exportCsv'])->name('export-csv');
+                Route::post('collect', [BuyBoxController::class, 'collect'])->name('collect');
+                Route::get('scores', [BuyBoxController::class, 'scores'])->name('scores');
+                Route::post('scores/calculate', [BuyBoxController::class, 'calculateScores'])->name('calculate-scores');
+                Route::get('profiles', [BuyBoxController::class, 'scoreProfiles'])->name('profiles');
+                Route::post('profiles', [BuyBoxController::class, 'storeScoreProfile'])->name('profiles.store');
+                Route::put('profiles/{profile}', [BuyBoxController::class, 'updateScoreProfile'])->name('profiles.update');
+                Route::post('suggest-actions', [BuyBoxController::class, 'suggestActions'])->name('suggest-actions');
+                Route::get('detail', [BuyBoxController::class, 'detail'])->name('detail');
+            });
+        Route::prefix('admin/control-tower')
+            ->name('control-tower.')
+            ->middleware('module:feature.control_tower,404')
+            ->group(function () {
+                Route::get('/', [ControlTowerController::class, 'index'])->name('index');
+                Route::get('signals', [ControlTowerController::class, 'signals'])->name('signals');
+                Route::post('signals/{signal}/resolve', [ControlTowerController::class, 'resolveSignal'])->name('signals.resolve');
+                Route::get('drill/profit-leak', [ControlTowerController::class, 'drillProfitLeak'])->name('drill.profit-leak');
+                Route::get('drill/buybox', [ControlTowerController::class, 'drillBuybox'])->name('drill.buybox');
+                Route::get('drill/risk', [ControlTowerController::class, 'drillRisk'])->name('drill.risk');
+                Route::get('drill/campaigns', [ControlTowerController::class, 'drillCampaigns'])->name('drill.campaigns');
+                Route::get('drill/actions', [ControlTowerController::class, 'drillActions'])->name('drill.actions');
+            });
         Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
 

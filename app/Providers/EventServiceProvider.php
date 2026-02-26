@@ -24,6 +24,7 @@ use App\Events\SubscriptionRenewed;
 use App\Events\SubscriptionCancelled;
 use App\Events\TrialEnded;
 use App\Events\ProductStockUpdated;
+use App\Events\PayoutReconciled;
 use App\Listeners\SendSupportViewStartedMail;
 use App\Listeners\SendMarketplaceConnectionLostMail;
 use App\Listeners\SendPaymentFailedMail;
@@ -38,6 +39,8 @@ use App\Listeners\SendSubscriptionRenewedMail;
 use App\Listeners\SendSubscriptionCancelledMail;
 use App\Listeners\SendTrialEndedMail;
 use App\Listeners\QueueStockSync;
+use App\Listeners\QueueAggregateLossPatterns;
+use App\Listeners\QueueRegressionGuard;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -99,6 +102,10 @@ class EventServiceProvider extends ServiceProvider
         ],
         ProductStockUpdated::class => [
             QueueStockSync::class,
+        ],
+        PayoutReconciled::class => [
+            QueueAggregateLossPatterns::class,
+            QueueRegressionGuard::class,
         ],
     ];
 }

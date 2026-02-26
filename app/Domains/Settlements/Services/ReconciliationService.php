@@ -5,10 +5,12 @@ namespace App\Domains\Settlements\Services;
 use App\Domains\Settlements\Models\Payout;
 use App\Domains\Settlements\Models\PayoutRow;
 use App\Domains\Settlements\Models\Reconciliation;
-use App\Domains\Settlements\Models\ReconciliationRule;
+use App\Domains\Settlements\Models\LossFinding;
+use App\Events\PayoutReconciled;
 use App\Domains\Settlements\Support\SettlementDashboardCache;
 use App\Models\Order;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class ReconciliationService
 {
@@ -17,6 +19,8 @@ class ReconciliationService
     public function __construct(
         private readonly ExpectedFinancialBuilder $expectedBuilder,
         private readonly LossFinderEngine $lossFinder,
+        private readonly ConfidenceScoringService $confidenceScoringService,
+        private readonly TenantRuleResolver $tenantRuleResolver,
         private readonly DisputeService $disputeService,
         private readonly SettlementDashboardCache $dashboardCache
     ) {
@@ -30,7 +34,25 @@ class ReconciliationService
             ->findOrFail($payoutId);
 
         $marketplace = (string) ($payout->marketplace ?: 'trendyol');
-        $tol = $this->resolveTolerance($marketplace, $tolerance);
+        $tol = $this->resolveTolerance((int) $payout->tenant_id, $marketplace, $tolerance);
+        $runVersion = 2;
+        $runHash = $this->buildRunHash($payout, $tol, $runVersion);
+
+        $existingRunCount = Reconciliation::query()
+            ->withoutGlobalScope('tenant_scope')
+            ->where('tenant_id', $payout->tenant_id)
+            ->where('payout_id', $payout->id)
+            ->where('run_hash', $runHash)
+            ->count();
+        if ($existingRunCount > 0) {
+            return [
+                'payout_id' => $payout->id,
+                'reconciled_rows' => $existingRunCount,
+                'run_hash' => $runHash,
+                'run_version' => $runVersion,
+                'idempotent' => true,
+            ];
+        }
 
         $groupedRows = PayoutRow::query()
             ->where('payout_id', $payout->id)
@@ -59,7 +81,9 @@ class ReconciliationService
                 ];
             }
 
-            Reconciliation::query()->withoutGlobalScope('tenant_scope')->updateOrCreate(
+            $findings = $this->applyConfidenceScores($findings);
+            $summary = $this->summarizeFindings($findings);
+            $reconciliation = Reconciliation::query()->withoutGlobalScope('tenant_scope')->updateOrCreate(
                 [
                     'tenant_id' => $payout->tenant_id,
                     'payout_id' => $payout->id,
@@ -78,6 +102,9 @@ class ReconciliationService
                         ],
                     ],
                     'loss_findings_json' => $findings,
+                    'findings_summary_json' => $summary,
+                    'run_hash' => $runHash,
+                    'run_version' => $runVersion,
                     'status' => $this->resolveStatus($diff, $tol, false, false),
                     'tolerance_used' => $tol,
                     'reconciled_at' => now(),
@@ -88,6 +115,8 @@ class ReconciliationService
                     'notes' => 'Fallback reconciliation without payout rows',
                 ]
             );
+
+            $this->storeFindings((int) $payout->tenant_id, $reconciliation, $findings);
 
             if (!empty($findings)) {
                 $this->disputeService->createFromFindings(
@@ -122,10 +151,14 @@ class ReconciliationService
                 $expectedItems->map(fn ($item) => $item->toArray())->all(),
                 $order !== null,
                 $rows->isNotEmpty(),
-                $tol
+                $tol,
+                (int) $payout->tenant_id,
+                $marketplace
             );
+            $findings = $this->applyConfidenceScores($findings);
 
             $status = $this->resolveStatus($diff, $tol, $order !== null, $rows->isNotEmpty());
+            $summary = $this->summarizeFindings($findings);
 
             $reconciliation = Reconciliation::query()
                 ->withoutGlobalScope('tenant_scope')
@@ -142,6 +175,9 @@ class ReconciliationService
                         'diff_total_net' => $diff,
                         'diff_breakdown_json' => $this->buildDiffBreakdown($expectedByType, $actualByType),
                         'loss_findings_json' => $findings,
+                        'findings_summary_json' => $summary,
+                        'run_hash' => $runHash,
+                        'run_version' => $runVersion,
                         'status' => $status,
                         'tolerance_used' => $tol,
                         'reconciled_at' => now(),
@@ -152,6 +188,8 @@ class ReconciliationService
                         'notes' => 'Loss Finder reconciliation',
                     ]
                 );
+
+            $this->storeFindings((int) $payout->tenant_id, $reconciliation, $findings);
 
             if (!empty($findings)) {
                 $this->disputeService->createFromFindings(
@@ -165,14 +203,17 @@ class ReconciliationService
             $results[] = $reconciliation;
         }
 
-        $this->createMissingInPayoutReconciliations($payout, $matchedOrderIds, $tol, $marketplace);
+        $this->createMissingInPayoutReconciliations($payout, $matchedOrderIds, $tol, $marketplace, $runHash, $runVersion);
 
         $this->refreshPayoutStatus($payout, $tol);
+        event(new PayoutReconciled((int) $payout->id, (int) $payout->tenant_id, $runHash, (int) $runVersion));
         $this->dashboardCache->forgetAll((int) $payout->tenant_id);
 
         return [
             'payout_id' => $payout->id,
             'reconciled_rows' => count($results),
+            'run_hash' => $runHash,
+            'run_version' => $runVersion,
         ];
     }
 
@@ -195,20 +236,13 @@ class ReconciliationService
         return ['processed_payouts' => $count];
     }
 
-    private function resolveTolerance(string $marketplace, ?float $provided): float
+    private function resolveTolerance(int $tenantId, string $marketplace, ?float $provided): float
     {
         if ($provided !== null && $provided >= 0) {
             return round($provided, 4);
         }
 
-        $rule = ReconciliationRule::query()
-            ->where('marketplace', $marketplace)
-            ->where('rule_type', 'tolerance')
-            ->where('is_active', true)
-            ->orderByDesc('priority')
-            ->first();
-
-        return round((float) data_get($rule?->value, 'amount', 0.01), 4);
+        return $this->tenantRuleResolver->tolerance($tenantId, $marketplace, 0.01);
     }
 
     private function matchKey(PayoutRow $row): string
@@ -311,7 +345,14 @@ class ReconciliationService
     /**
      * @param  array<int,int>  $matchedOrderIds
      */
-    private function createMissingInPayoutReconciliations(Payout $payout, array $matchedOrderIds, float $tolerance, string $marketplace): void
+    private function createMissingInPayoutReconciliations(
+        Payout $payout,
+        array $matchedOrderIds,
+        float $tolerance,
+        string $marketplace,
+        string $runHash,
+        int $runVersion
+    ): void
     {
         $orders = Order::query()
             ->where('tenant_id', $payout->tenant_id)
@@ -334,10 +375,14 @@ class ReconciliationService
                 $order->financialItems()->get()->toArray(),
                 true,
                 false,
-                $tolerance
+                $tolerance,
+                (int) $payout->tenant_id,
+                $marketplace
             );
+            $findings = $this->applyConfidenceScores($findings);
+            $summary = $this->summarizeFindings($findings);
 
-            Reconciliation::query()->withoutGlobalScope('tenant_scope')->updateOrCreate(
+            $reconciliation = Reconciliation::query()->withoutGlobalScope('tenant_scope')->updateOrCreate(
                 [
                     'tenant_id' => $payout->tenant_id,
                     'payout_id' => $payout->id,
@@ -350,6 +395,9 @@ class ReconciliationService
                     'diff_total_net' => round(0 - $expectedTotal, 2),
                     'diff_breakdown_json' => $this->buildDiffBreakdown($expectedByType, []),
                     'loss_findings_json' => $findings,
+                    'findings_summary_json' => $summary,
+                    'run_hash' => $runHash,
+                    'run_version' => $runVersion,
                     'status' => 'missing_in_payout',
                     'tolerance_used' => $tolerance,
                     'reconciled_at' => now(),
@@ -357,6 +405,7 @@ class ReconciliationService
                     'notes' => 'Order exists in period but payout row not found',
                 ]
             );
+            $this->storeFindings((int) $payout->tenant_id, $reconciliation, $findings);
 
             $this->disputeService->createFromFindings(
                 (int) $payout->tenant_id,
@@ -365,6 +414,97 @@ class ReconciliationService
                 $findings
             );
         }
+    }
+
+    /**
+     * @param  array<int,array<string,mixed>>  $findings
+     * @return array<int,array<string,mixed>>
+     */
+    private function applyConfidenceScores(array $findings): array
+    {
+        return array_map(function (array $finding): array {
+            $finding['confidence_score'] = $this->confidenceScoringService->score($finding);
+            return $finding;
+        }, $findings);
+    }
+
+    /**
+     * @param  array<int,array<string,mixed>>  $findings
+     * @return array<string,mixed>
+     */
+    private function summarizeFindings(array $findings): array
+    {
+        $countsBySeverity = [];
+        $countsByType = [];
+        $totalAmount = 0.0;
+        $confidenceSum = 0.0;
+
+        foreach ($findings as $finding) {
+            $severity = strtolower((string) ($finding['severity'] ?? 'low'));
+            $type = strtolower((string) ($finding['type'] ?? 'other'));
+            $amount = abs((float) ($finding['amount'] ?? 0));
+            $confidence = (float) ($finding['confidence_score'] ?? 0);
+            $totalAmount += $amount;
+            $confidenceSum += $confidence;
+            $countsBySeverity[$severity] = (int) ($countsBySeverity[$severity] ?? 0) + 1;
+            $countsByType[$type] = (int) ($countsByType[$type] ?? 0) + 1;
+        }
+
+        return [
+            'count' => count($findings),
+            'counts_by_severity' => $countsBySeverity,
+            'counts_by_type' => $countsByType,
+            'total_amount' => round($totalAmount, 2),
+            'avg_confidence' => count($findings) > 0 ? round($confidenceSum / count($findings), 2) : 0,
+        ];
+    }
+
+    /**
+     * @param  array<int,array<string,mixed>>  $findings
+     */
+    private function storeFindings(int $tenantId, Reconciliation $reconciliation, array $findings): void
+    {
+        LossFinding::query()
+            ->withoutGlobalScope('tenant_scope')
+            ->where('tenant_id', $tenantId)
+            ->where('reconciliation_id', $reconciliation->id)
+            ->delete();
+
+        foreach ($findings as $finding) {
+            LossFinding::query()->withoutGlobalScope('tenant_scope')->create([
+                'tenant_id' => $tenantId,
+                'reconciliation_id' => $reconciliation->id,
+                'payout_id' => (int) $reconciliation->payout_id,
+                'order_id' => $reconciliation->order_id ? (int) $reconciliation->order_id : null,
+                'code' => (string) ($finding['code'] ?? 'UNKNOWN'),
+                'title' => (string) ($finding['title'] ?? ''),
+                'detail' => (string) ($finding['detail'] ?? ''),
+                'severity' => (string) ($finding['severity'] ?? 'low'),
+                'amount' => round(abs((float) ($finding['amount'] ?? 0)), 2),
+                'type' => (string) ($finding['type'] ?? 'other'),
+                'suggested_dispute_type' => (string) ($finding['suggested_dispute_type'] ?? 'UNKNOWN_DEDUCTION'),
+                'confidence_score' => round((float) ($finding['confidence_score'] ?? 0), 2),
+                'confidence' => (int) round((float) ($finding['confidence_score'] ?? 50)),
+                'meta' => is_array($finding['meta'] ?? null) ? $finding['meta'] : [],
+                'meta_json' => [
+                    'run_hash' => $reconciliation->run_hash,
+                    'run_version' => $reconciliation->run_version,
+                ],
+                'occurred_at' => now(),
+            ]);
+        }
+    }
+
+    private function buildRunHash(Payout $payout, float $tolerance, int $runVersion): string
+    {
+        return hash('sha256', implode('|', [
+            (string) $payout->id,
+            (string) $payout->tenant_id,
+            (string) $payout->updated_at,
+            (string) $tolerance,
+            $runVersion,
+            Str::lower((string) ($payout->marketplace ?? 'trendyol')),
+        ]));
     }
 
     private function refreshPayoutStatus(Payout $payout, float $tolerance): void

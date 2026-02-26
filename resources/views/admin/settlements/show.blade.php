@@ -23,43 +23,58 @@
         });
     @endphp
 
-    <div class="mb-4 flex flex-wrap gap-2">
-        <a href="{{ route('portal.settlements.index') }}" class="btn btn-outline">Listeye D&ouml;n</a>
-        <form method="POST" action="{{ route('portal.settlements.reconcile', $payout->id) }}">
-            @csrf
-            <button type="submit" class="btn btn-outline-accent">Reconcile</button>
-        </form>
-        <a href="{{ route('portal.settlements.export', ['payout' => $payout->id, 'format' => 'csv']) }}" class="btn btn-outline">CSV Export</a>
-        <a href="{{ route('portal.settlements.export', ['payout' => $payout->id, 'format' => 'xlsx']) }}" class="btn btn-outline">XLSX Export</a>
+    <div class="panel-card p-5 mb-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+                <div class="text-xs text-slate-500 uppercase tracking-wide">Payout Referans&#305;</div>
+                <div class="text-xl font-black text-slate-900">{{ $payout->payout_reference ?: '-' }}</div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('portal.settlements.index') }}" class="btn btn-outline">Listeye D&ouml;n</a>
+                <form method="POST" action="{{ route('portal.settlements.reconcile', $payout->id) }}">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-accent">Reconcile &Ccedil;al&#305;&#351;t&#305;r</button>
+                </form>
+                <a href="{{ route('portal.settlements.export', ['payout' => $payout->id, 'format' => 'csv']) }}" class="btn btn-outline">CSV</a>
+                <a href="{{ route('portal.settlements.export', ['payout' => $payout->id, 'format' => 'xlsx']) }}" class="btn btn-outline">XLSX</a>
+            </div>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
         <div class="panel-card p-4">
-            <div class="text-xs text-slate-500">&Ouml;deme Referans&#305;</div>
-            <div class="text-base font-semibold">{{ $payout->payout_reference ?: '-' }}</div>
+            <div class="text-xs text-slate-500">Beklenen</div>
+            <div class="text-lg font-bold text-slate-900">{{ number_format((float) $payout->expected_amount, 2, ',', '.') }} {{ $payout->currency }}</div>
         </div>
         <div class="panel-card p-4">
-            <div class="text-xs text-slate-500">Beklenen / &Ouml;denen</div>
-            <div class="text-base font-semibold">
-                {{ number_format((float) $payout->expected_amount, 2, ',', '.') }} / {{ number_format((float) $payout->paid_amount, 2, ',', '.') }} {{ $payout->currency }}
-            </div>
+            <div class="text-xs text-slate-500">&Ouml;denen</div>
+            <div class="text-lg font-bold text-slate-900">{{ number_format((float) $payout->paid_amount, 2, ',', '.') }} {{ $payout->currency }}</div>
         </div>
         <div class="panel-card p-4">
             <div class="text-xs text-slate-500">Dispute Say&#305;s&#305;</div>
-            <div class="text-base font-semibold">{{ $payout->disputes->count() }}</div>
+            <div class="text-lg font-bold text-slate-900">{{ $payout->disputes->count() }}</div>
         </div>
         <div class="panel-card p-4">
             <div class="text-xs text-slate-500">Son Reconcile</div>
-            <div class="text-base font-semibold">{{ $payout->reconciliation?->reconciled_at?->format('d.m.Y H:i') ?: '-' }}</div>
+            <div class="text-base font-bold text-slate-900">{{ $payout->reconciliation?->reconciled_at?->format('d.m.Y H:i') ?: '-' }}</div>
         </div>
     </div>
 
     <div class="panel-card p-4 mb-4">
-        <h3 class="font-semibold mb-3">Loss Findings</h3>
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h3 class="font-semibold text-slate-900">Loss Findings</h3>
+            <div class="text-xs text-slate-500">Uygun bulgular&#305; se&ccedil;ip tek t&#305;kla dispute olu&#351;turabilirsiniz.</div>
+        </div>
 
         @if($findings->isNotEmpty())
             <form method="POST" action="{{ route('portal.settlements.disputes.from-findings', $payout->id) }}">
                 @csrf
+                <div class="mb-2">
+                    <label class="inline-flex items-center gap-2 text-xs text-slate-600">
+                        <input type="checkbox" id="select-all-findings">
+                        T&uuml;m bulgular&#305; se&ccedil;
+                    </label>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead class="bg-slate-50 text-slate-600">
@@ -76,7 +91,7 @@
                             @foreach($findings as $finding)
                                 <tr class="border-t border-slate-100">
                                     <td class="px-3 py-2">
-                                        <input type="checkbox" name="reconciliation_ids[]" value="{{ $finding['reconciliation_id'] }}">
+                                        <input type="checkbox" class="finding-check" name="reconciliation_ids[]" value="{{ $finding['reconciliation_id'] }}">
                                     </td>
                                     <td class="px-3 py-2 font-mono text-xs">{{ $finding['code'] ?? '-' }}</td>
                                     <td class="px-3 py-2">{{ $finding['detail'] ?? '-' }}</td>
@@ -122,5 +137,17 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var selectAll = document.getElementById('select-all-findings');
+            if (!selectAll) return;
+            selectAll.addEventListener('change', function () {
+                document.querySelectorAll('.finding-check').forEach(function (el) {
+                    el.checked = selectAll.checked;
+                });
+            });
+        });
+    </script>
 @endsection
 

@@ -10,6 +10,14 @@ use RuntimeException;
 
 class EntitlementService
 {
+    private const EXPLICIT_ASSIGNMENT_MODULES = [
+        'feature.sub_users',
+        'feature.control_tower',
+        'profit_engine',
+        'action_engine',
+        'marketplace_risk',
+        'buybox_engine',
+    ];
     public function hasModule(User $user, string $code): bool
     {
         $code = trim($code);
@@ -21,9 +29,9 @@ class EntitlementService
             return true;
         }
 
-        // Security rule: sub-users module must be explicitly assigned per client by super-admin.
-        // Plan-level grants are ignored for this module.
-        if ($code === 'feature.sub_users') {
+        // Security rule: selected modules must be explicitly assigned per client by super-admin.
+        // Plan-level grants are ignored for these modules.
+        if (in_array($code, self::EXPLICIT_ASSIGNMENT_MODULES, true)) {
             return $this->hasActiveUserModule($user, $code);
         }
 
@@ -203,5 +211,7 @@ $userModule->meta = $mergedMeta;
             ->exists();
     }
 }
+
+
 
 

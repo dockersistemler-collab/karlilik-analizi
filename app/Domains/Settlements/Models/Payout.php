@@ -33,6 +33,9 @@ class Payout extends Model
         'file_hash',
         'currency',
         'status',
+        'regression_flag',
+        'regression_note',
+        'regression_checked_at',
         'totals',
         'raw_payload',
     ];
@@ -44,6 +47,8 @@ class Payout extends Model
         'paid_date' => 'date',
         'paid_at' => 'datetime',
         'imported_at' => 'datetime',
+        'regression_flag' => 'boolean',
+        'regression_checked_at' => 'datetime',
         'expected_amount' => 'decimal:4',
         'paid_amount' => 'decimal:4',
         'totals' => 'array',
@@ -88,5 +93,10 @@ class Payout extends Model
     public function disputes()
     {
         return $this->hasMany(Dispute::class);
+    }
+
+    public function lossPatterns()
+    {
+        return $this->hasMany(LossPattern::class);
     }
 }

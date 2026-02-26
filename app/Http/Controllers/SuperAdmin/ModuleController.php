@@ -12,14 +12,17 @@ use Illuminate\View\View;
 
 class ModuleController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $code = trim((string) $request->query('code', ''));
+
         $modules = Module::query()
+            ->when($code !== '', fn ($q) => $q->where('code', $code))
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
 
-        return view('super-admin.modules.index', compact('modules'));
+        return view('super-admin.modules.index', compact('modules', 'code'));
     }
 
     public function create(): View

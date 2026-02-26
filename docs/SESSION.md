@@ -1,6 +1,315 @@
 ﻿# Session Memory
 
-**Last updated:** 2026-02-22
+**Last updated:** 2026-02-26
+
+## Current Work (2026-02-26 - Control Tower v1)
+- Goal: Add Marketplace Intelligence Control Tower (CFO + OPS) as a gated top module with snapshot + signal engine.
+- Status: Implemented end-to-end (migration, services, cache, job, schedule, routes, controller, UI, tests).
+
+## Changes Made (2026-02-26 - Control Tower v1)
+- Added module data layer:
+  - `database/migrations/2026_02_26_160000_create_control_tower_tables.php`
+  - `app/Models/ControlTowerDailySnapshot.php`
+  - `app/Models/ControlTowerSignal.php`
+- Added control tower service layer:
+  - `app/Services/ControlTower/ControlTowerDataSources.php`
+  - `app/Services/ControlTower/ControlTowerAggregator.php`
+  - `app/Services/ControlTower/SignalEngine.php`
+  - `app/Services/ControlTower/ControlTowerCache.php`
+- Added snapshot build job:
+  - `app/Jobs/BuildControlTowerDailySnapshotJob.php`
+  - writes daily payload snapshot, upserts signals, emits critical control tower notifications with dedupe key.
+- Added scheduler:
+  - `routes/console.php` daily `04:00` (`control_tower_daily_snapshot`) for active tenants with enabled `feature.control_tower`.
+- Added admin routes/controller:
+  - `routes/customer.php` -> `portal.control-tower.*` under `/admin/control-tower` with `module:feature.control_tower,404`.
+  - `app/Http/Controllers/Admin/ControlTowerController.php`:
+    - `index`, `signals`, `resolveSignal`
+    - drilldowns: `profit-leak`, `buybox`, `risk`, `campaigns`, `actions`
+- Added UI pages/components:
+  - `resources/views/admin/control-tower/index.blade.php`
+  - `resources/views/admin/control-tower/signals.blade.php`
+  - `resources/views/admin/control-tower/drilldown.blade.php`
+  - components:
+    - `ct-kpi-card.blade.php`
+    - `ct-alert-card.blade.php`
+    - `ct-signal-list.blade.php` (Why modal + Run Action + Resolve)
+    - `ct-mini-trend.blade.php` (SVG sparkline)
+- Added module/menu/permission wiring:
+  - `database/seeders/ModuleCatalogSeeder.php`: `feature.control_tower`
+  - `database/seeders/PlanSeeder.php`: module included in Starter/Professional/Enterprise.
+  - `app/Http/Middleware/EnsureSubUserPermission.php`: `portal.control-tower.* -> reports.control_tower`
+  - `app/Http/Controllers/Admin/SubUserController.php`: added label `reports.control_tower`
+  - `resources/views/layouts/admin.blade.php`: menu links:
+    - `Control Tower (CFO)`
+    - `Control Tower (Operasyon)`
+- Added tests:
+  - `tests/Feature/ControlTower/ControlTowerModuleTest.php`
+  - `tests/Unit/ControlTower/SignalEngineTest.php`
+
+## Tests/Validation (2026-02-26 - Control Tower v1)
+- `php artisan test --filter="ControlTowerModuleTest|SignalEngineTest"` => PASS (`5 passed`).
+- `php -l` checks passed for new/edited controller, services, routes, seeders, middleware.
+
+## Next Session Start Note (2026-02-26 - Control Tower v1)
+1) Run migration + seed in dev env to expose module in real UI:
+   - `php artisan migrate`
+   - `php artisan db:seed --class=ModuleCatalogSeeder`
+   - `php artisan db:seed --class=PlanSeeder`
+2) Manual smoke:
+   - `/admin/control-tower?view=cfo`
+   - `/admin/control-tower?view=ops`
+3) Optional v1.1:
+   - richer cashflow model via payout schedule,
+   - stronger ALGO_SHIFT detector with traffic/order proxy source.
+
+## Current Work (2026-02-26 - BuyBox FAZ 4 UI Devam)
+- Goal: Add explicit impact simulation summary cards for BuyBox pages (scores + SKU detail).
+- Status: Implemented in controller/views; syntax check passed.
+
+## Changes Made (2026-02-26 - BuyBox FAZ 4 UI Devam)
+- Added BuyBox impact summary aggregation in:
+  - `app/Http/Controllers/Admin/BuyBoxController.php`
+  - New helper: `buildBuyBoxImpactSummary(...)`
+  - Scope: BuyBox action types (`PRICE_ADJUST`, `SHIPPING_SLA_FIX`, `STOCK_FIX`, `LISTING_OPTIMIZE`)
+  - Metrics: recommendation/open count, avg win-probability delta (pp), sum/avg net-profit delta, avg confidence.
+- Updated BuyBox pages:
+  - `resources/views/admin/buybox/scores.blade.php`
+    - Added FAZ 4 summary cards (impact count, win delta, net profit delta, confidence).
+  - `resources/views/admin/buybox/detail.blade.php`
+    - Added SKU-level FAZ 4 summary cards.
+    - Added per-recommendation columns: `Win Delta`, `Net Kar Delta`.
+
+## Tests/Validation (2026-02-26 - BuyBox FAZ 4 UI Devam)
+- `php -l app/Http/Controllers/Admin/BuyBoxController.php` => PASS.
+
+## Next Session Start Note (2026-02-26 - BuyBox FAZ 4 UI Devam)
+1) Run targeted feature tests for BuyBox/Action Engine views if needed.
+2) Optional: add formatting unit (currency symbol / locale) for net-profit delta cards.
+3) Optional: expose same FAZ 4 cards on snapshots page (`admin.buybox.index`) if requested.
+
+## Current Work (2026-02-26)
+- Goal: Complete BuyBox phases (FAZ 1-2), integrate Action Engine BuyBox rules (FAZ 3), and fix module visibility/naming on client + super-admin.
+- Status: Implemented and validated with targeted tests passing.
+
+## Changes Made (2026-02-26)
+- BuyBox FAZ 1 implemented:
+  - snapshot/competitor tables, models, adapters, collection job, admin BuyBox snapshot UI, CSV import/export, routes, module/plan wiring.
+- BuyBox FAZ 2 implemented:
+  - score/profile tables, calculator service, score job, scores/profiles UI, routes, tests.
+- BuyBox FAZ 3 implemented:
+  - Action Engine BuyBox rules:
+    - `PRICE_ADJUST` (min margin guard)
+    - `SHIPPING_SLA_FIX` (store_score/shipping_speed driver)
+    - `STOCK_FIX` (low stock)
+    - risk `critical` blocks `PRICE_ADJUST` and emits `LISTING_OPTIMIZE` note.
+  - Scoped recommendation run from BuyBox UI (`Aksiyon Oner`).
+  - BuyBox SKU detail page with score/store/price-gap trends and recommendation list.
+  - Impact simulator extended for `PRICE_ADJUST`.
+- Visibility/name fixes:
+  - Client sidebar labels updated:
+    - `BuyBox Engine (FAZ 1-2)`
+    - `Action Engine (FAZ 3-4)`
+  - Super-admin intelligence updated:
+    - new route/page: `super-admin.intelligence.buybox-engine`
+    - new sidebar entry: `BuyBox Engine (FAZ 1-2)`
+    - label: `Action Engine (FAZ 3-4)`
+  - Super-admin module toggle now supports `buybox_engine`.
+- Cache refresh:
+  - `php artisan view:clear`
+  - `php artisan route:clear`
+
+## Tests/Validation (2026-02-26)
+- `php artisan test --filter="BuyBoxActionRulesTest|ActionEngineWorkflowTest|BuyBoxEngineTest|BuyBoxScoreCalculatorTest"` => PASS (`12 passed`).
+- `php artisan route:list --name=super-admin.intelligence` => includes `super-admin.intelligence.buybox-engine`.
+
+## Next Session Start Note (2026-02-26)
+- Continue from BuyBox/Action integration.
+- Optional next step:
+  1) Add FAZ 4 explicit impact simulation UI cards for BuyBox recommendations (win probability delta + profit delta summary on BuyBox pages).
+
+## Current Work (2026-02-25)
+- Goal: Build Action Engine Phase 4 (impact simulation, calibration, shock detection, campaign import/calendar application).
+- Status: Core implementation completed with targeted tests passing.
+
+## Changes Made (2026-02-25)
+- Added Phase 4 schema:
+  - `action_recommendation_impacts`
+  - `marketplace_price_history`
+  - `action_engine_calibrations`
+  - `marketplace_external_shocks`
+  - `marketplace_campaigns`, `marketplace_campaign_items`
+- Added models:
+  - `ActionRecommendationImpact`
+  - `MarketplacePriceHistory`
+  - `ActionEngineCalibration`
+  - `MarketplaceExternalShock`
+  - `MarketplaceCampaign`, `MarketplaceCampaignItem`
+- Added services:
+  - `ImpactSimulator`
+  - `PriceHistoryBuilder`
+  - `ShockDetector`
+  - `CampaignCsvImporter`
+  - `CampaignCalendarApplier`
+  - `CalibrationEngine`
+- Added jobs:
+  - `DetectMarketplaceShocksJob`
+  - `RunActionEngineCalibrationJob`
+- Integrated ActionEngine:
+  - New recommendation creation now triggers impact simulation auto-run.
+  - Recommendation detail page includes Expected Impact card + refresh endpoint.
+- Added admin UI/flows:
+  - `/admin/action-engine/calibration`
+  - `/admin/action-engine/shocks`
+  - `/admin/action-engine/campaigns` (CSV import + apply)
+  - manual trigger endpoints for shock detect/calibration
+- Added schedules:
+  - `03:10` daily => detect marketplace shocks (45-day window)
+  - `03:20` daily => run action engine calibration
+- Validation:
+  - `php artisan test --filter="ActionEnginePhase4Test|ActionEngineWorkflowTest"` => PASS
+  - `php artisan test --filter="CalculateOrderProfitJobTest|MarketplaceRiskEngineTest|ActionEngineWorkflowTest|ActionEnginePhase4Test"` => PASS
+
+## Current Work (2026-02-25)
+- Goal: Build Action Engine Phase 3 (risk + net profitability fusion, actionable recommendations, lifecycle, notifications, admin console).
+- Status: Core implementation completed and targeted tests passing.
+
+## Changes Made (2026-02-25)
+- Added Action Engine schema:
+  - `action_recommendations`
+  - `action_engine_runs`
+- Added Action Engine services + job:
+  - `app/Services/ActionEngine/ActionEngine.php`
+  - `app/Services/ActionEngine/RecommendationWriter.php`
+  - `app/Services/ActionEngine/NotificationPublisher.php`
+  - `app/Jobs/RunActionEngineDailyJob.php`
+- Rule outputs implemented:
+  - `CRITICAL risk + negative net_profit` => `PRICE_INCREASE` or `LISTING_SUSPEND`
+  - `late_shipment_rate` driver => `SHIPPING_SLA_FIX`
+  - `return_rate` driver + low margin => `RULE_REVIEW` / `CUSTOMER_SUPPORT`
+  - `amazon + odr` driver => `CUSTOMER_SUPPORT`
+- Lifecycle + dedupe:
+  - Recommendation status: `open / applied / dismissed`
+  - Dedupe key dimensions: `tenant + date + action_type + marketplace + sku`
+  - Applied/dismissed recommendations are not reopened by writer.
+- Notification:
+  - New `open` recommendation creates in-app notification (`source=action_engine`).
+- Added admin module:
+  - Controller: `app/Http/Controllers/Admin/ActionEngineController.php`
+  - UI:
+    - `resources/views/admin/action-engine/index.blade.php`
+    - `resources/views/admin/action-engine/show.blade.php`
+  - Routes under `/admin/action-engine` with `module:action_engine`
+  - Actions: list/filter, detail, apply, dismiss, manual run by date range.
+- Added schedule:
+  - `routes/console.php` daily `03:00` action engine run for yesterday with module gate check.
+- Added module/permission wiring:
+  - `action_engine` in `ModuleCatalogSeeder` and plan module lists.
+  - sub-user permission mapping `reports.action_engine`.
+  - sidebar link in `layouts/admin.blade.php`.
+- Added tests:
+  - `tests/Feature/ActionEngine/ActionEngineWorkflowTest.php`
+    - critical risk + negative profit => recommendation
+    - dedupe behavior
+    - apply/dismiss lifecycle
+- Validation:
+  - `php artisan test --filter="ActionEngineWorkflowTest"` => PASS
+  - `php artisan route:list --name=portal.action-engine` => 5 routes listed
+  - `php artisan test --filter="CalculateOrderProfitJobTest|MarketplaceRiskEngineTest|ActionEngineWorkflowTest"` => PASS
+
+## Current Work (2026-02-25)
+- Goal: Build Marketplace Risk Phase 2 (KPI snapshots, risk scoring, drivers/trends, warning-critical notifications, admin management UI).
+- Status: Core implementation completed with targeted tests passing.
+
+## Changes Made (2026-02-25)
+- Added Marketplace Risk schema:
+  - `marketplace_kpi_snapshots`
+  - `marketplace_risk_profiles`
+  - `marketplace_risk_scores`
+- Added Marketplace Risk domain/service/job:
+  - `app/Models/MarketplaceKpiSnapshot.php`
+  - `app/Models/MarketplaceRiskProfile.php`
+  - `app/Models/MarketplaceRiskScore.php`
+  - `app/Services/MarketplaceRisk/ProfileResolver.php`
+  - `app/Services/MarketplaceRisk/RiskCalculator.php`
+  - `app/Services/MarketplaceRisk/NotificationPublisher.php`
+  - `app/Jobs/CalculateMarketplaceRiskJob.php`
+- Added admin module:
+  - routes: `portal.marketplace-risk.*` under `/admin/marketplace-risk` with `module:marketplace_risk`
+  - controller: `app/Http/Controllers/Admin/MarketplaceRiskController.php`
+  - UI: `resources/views/admin/marketplace-risk/index.blade.php`
+  - features:
+    - KPI manual create/update
+    - KPI CSV import
+    - risk profile CRUD
+    - risk score overview and alert list
+- Added schedule:
+  - `routes/console.php` daily `02:15` job dispatch for yesterday (`marketplace_risk_daily`) with module gate check.
+- Added module/permission/sidebar wiring:
+  - `marketplace_risk` in `ModuleCatalogSeeder` and plan module lists
+  - sub-user permission map + label (`reports.marketplace_risk`)
+  - sidebar link in `layouts/admin.blade.php`
+- Added default profile seeder:
+  - `database/seeders/MarketplaceRiskDefaultsSeeder.php`
+  - included in `DatabaseSeeder`
+- Validation:
+  - `php artisan test --filter="MarketplaceRiskEngineTest"` => PASS
+  - `php artisan route:list --name=portal.marketplace-risk` => 7 routes listed
+
+## Current Work (2026-02-25)
+- Goal: Build Profit Engine Phase 1 (order-level net profitability snapshots + auto calculation + admin CRUD/list screens).
+- Status: Core backend/service/job/UI wiring completed and targeted tests passing.
+
+## Changes Made (2026-02-25)
+- Added Profit Engine schema:
+  - `profit_cost_profiles`
+  - `marketplace_fee_rules`
+  - `order_profit_snapshots`
+- Added models/services/job:
+  - `app/Models/ProfitCostProfile.php`
+  - `app/Models/MarketplaceFeeRule.php`
+  - `app/Models/OrderProfitSnapshot.php`
+  - `app/Services/ProfitEngine/FeeRuleResolver.php`
+  - `app/Services/ProfitEngine/ProfitCalculator.php`
+  - `app/Jobs/CalculateOrderProfitJob.php`
+- Added auto-dispatch integration points:
+  - `app/Observers/OrderObserver.php` (on order create)
+  - `app/Domains/Marketplaces/Mappers/MarketplacePayloadMapper.php` (on upserted imports)
+  - Dispatch guarded by module key: `profit_engine`.
+- Added admin module screens/routes:
+  - `routes/customer.php` under `/admin/profit-engine` (`portal.profit-engine.*`)
+  - `app/Http/Controllers/Admin/ProfitEngineController.php`
+  - `resources/views/admin/profit-engine/index.blade.php`
+  - `resources/views/admin/profit-engine/show.blade.php`
+  - Sidebar link in `resources/views/layouts/admin.blade.php`
+- Added module/entitlement seed wiring:
+  - `profit_engine` added to `ModuleCatalogSeeder` and plan module lists.
+  - default profile + default fee rules seeder: `database/seeders/ProfitEngineDefaultsSeeder.php`
+- Added tests:
+  - `tests/Feature/ProfitEngine/CalculateOrderProfitJobTest.php`
+- Validation:
+  - `php artisan test --filter="CalculateOrderProfitJobTest"` => PASS
+  - `php artisan test --filter="TrendyolOrderSyncTest"` => PASS
+
+## Current Work (2026-02-25)
+- Goal: Continue Loss Finder v11 implementation and verify new services + API workflow are stable.
+- Status: Targeted v11 tests passing on current working tree; no failing tests detected in covered scope.
+
+## Changes Made (2026-02-25)
+- Validated v11 service layer and workflow tests:
+  - `php artisan test --filter="LossFinderWorkflowTest|LossFinderV11ServicesTest"` => PASS
+  - Covered:
+    - confidence scoring
+    - tenant rule resolution
+    - loss pattern aggregation
+    - regression guard checks
+    - module gate, import/reconcile queue flow
+    - export, bulk dispute actions, status updates, evidence/regression endpoints
+
+## Next Steps (2026-02-25)
+1) Manual API smoke on Loss Finder endpoints with realistic payload sizes (import -> reconcile -> findings -> disputes).
+2) Replace current export placeholder with true XLSX generation if strict XLSX output is required.
+3) Run broader settlement regression tests before merge.
 
 ## Current Work (2026-02-22)
 - Goal: Build "Hakediş Kontrol Merkezi" backend foundation (tenant-scoped API + sync + expected payout + reconciliation + disputes).

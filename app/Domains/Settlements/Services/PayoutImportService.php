@@ -4,7 +4,6 @@ namespace App\Domains\Settlements\Services;
 
 use App\Domains\Settlements\Models\Payout;
 use App\Domains\Settlements\Models\PayoutRow;
-use App\Domains\Settlements\Models\ReconciliationRule;
 use App\Models\MarketplaceAccount;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
@@ -14,6 +13,11 @@ use RuntimeException;
 
 class PayoutImportService
 {
+    public function __construct(
+        private readonly TenantRuleResolver $tenantRuleResolver
+    ) {
+    }
+
     /**
      * @return array{payout:Payout,rows:int}
      */
@@ -51,7 +55,7 @@ class PayoutImportService
         ]);
 
         $rows = $this->readRows($absolute, $file->getClientOriginalExtension());
-        $mapped = $this->mapRows($rows, $marketplace);
+        $mapped = $this->mapRows($rows, $tenantId, $marketplace);
 
         foreach ($mapped as $row) {
             PayoutRow::query()->create([
@@ -124,19 +128,9 @@ class PayoutImportService
      * @param  array<int,array<string,mixed>>  $rows
      * @return array<int,array<string,mixed>>
      */
-    private function mapRows(array $rows, string $marketplace): array
+    private function mapRows(array $rows, int $tenantId, string $marketplace): array
     {
-        $mappingRules = ReconciliationRule::query()
-            ->where('marketplace', $marketplace)
-            ->where('rule_type', 'map_row_type')
-            ->where('is_active', true)
-            ->orderByDesc('priority')
-            ->get()
-            ->mapWithKeys(function (ReconciliationRule $rule) {
-                $from = strtoupper((string) data_get($rule->value, 'from', $rule->key));
-                $to = strtolower((string) data_get($rule->value, 'to', 'other'));
-                return [$from => $to];
-            });
+        $mappingRules = collect($this->tenantRuleResolver->mapRowTypeRules($tenantId, $marketplace));
 
         $defaultMap = collect([
             'SALE' => 'sale',

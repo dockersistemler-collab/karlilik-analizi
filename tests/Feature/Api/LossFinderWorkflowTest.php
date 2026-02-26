@@ -3,9 +3,13 @@
 namespace Tests\Feature\Api;
 
 use App\Domains\Settlements\Models\FeatureFlag;
+use App\Domains\Settlements\Models\Dispute;
+use App\Domains\Settlements\Models\LossFinding;
+use App\Domains\Settlements\Models\LossPattern;
 use App\Domains\Settlements\Models\MarketplaceIntegration;
 use App\Domains\Settlements\Models\Payout;
 use App\Domains\Settlements\Models\Reconciliation;
+use App\Domains\Settlements\Models\ReconciliationRule;
 use App\Jobs\ReconcileSinglePayoutJob;
 use App\Models\MarketplaceAccount;
 use App\Models\Order;
@@ -120,6 +124,111 @@ class LossFinderWorkflowTest extends TestCase
         ])->assertOk()->assertJsonPath('data.status', 'resolved');
     }
 
+    public function test_v11_patterns_findings_evidence_pack_regression_and_tenant_rule_endpoints(): void
+    {
+        [$user, $payout] = $this->bootstrapContext();
+        Sanctum::actingAs($user);
+
+        $reconciliation = Reconciliation::query()->withoutGlobalScope('tenant_scope')->create([
+            'tenant_id' => $user->id,
+            'payout_id' => $payout->id,
+            'match_key' => 'order_no:ORD-API-V11',
+            'expected_total_net' => 150,
+            'actual_total_net' => 100,
+            'diff_total_net' => -50,
+            'loss_findings_json' => [[
+                'code' => 'LOSS_COMMISSION_HIGH',
+                'severity' => 'high',
+                'amount' => 50,
+                'confidence_score' => 92,
+            ]],
+            'findings_summary_json' => ['count' => 1],
+            'run_hash' => 'run-v11-api',
+            'run_version' => 2,
+            'status' => 'mismatch',
+            'tolerance_used' => 0.01,
+            'reconciled_at' => now(),
+        ]);
+
+        LossFinding::query()->withoutGlobalScope('tenant_scope')->create([
+            'tenant_id' => $user->id,
+            'reconciliation_id' => $reconciliation->id,
+            'payout_id' => $payout->id,
+            'code' => 'LOSS_COMMISSION_HIGH',
+            'severity' => 'high',
+            'amount' => 50,
+            'type' => 'commission',
+            'confidence' => 92,
+            'confidence_score' => 92,
+        ]);
+
+        LossPattern::query()->withoutGlobalScope('tenant_scope')->create([
+            'tenant_id' => $user->id,
+            'payout_id' => $payout->id,
+            'run_hash' => 'run-v11-api',
+            'run_version' => 2,
+            'pattern_key' => sha1($user->id.'|trendyol|LOSS_COMMISSION_HIGH|commission|'),
+            'finding_code' => 'LOSS_COMMISSION_HIGH',
+            'code' => 'LOSS_COMMISSION_HIGH',
+            'type' => 'commission',
+            'severity' => 'high',
+            'occurrence_count' => 1,
+            'occurrences' => 1,
+            'total_amount' => 50,
+            'avg_confidence' => 92,
+        ]);
+
+        $this->getJson("/api/v1/payouts/{$payout->id}/findings?min_confidence=80")
+            ->assertOk()
+            ->assertJsonPath('data.data.0.code', 'LOSS_COMMISSION_HIGH');
+
+        $this->getJson("/api/v1/payouts/{$payout->id}/patterns")
+            ->assertOk()
+            ->assertJsonPath('data.0.code', 'LOSS_COMMISSION_HIGH');
+
+        $this->putJson('/api/v1/reconciliation-rules/tenant-override', [
+            'marketplace' => 'trendyol',
+            'rule_type' => 'tolerance',
+            'key' => 'default',
+            'value' => ['amount' => 0.07],
+            'priority' => 50,
+            'is_active' => true,
+        ])->assertOk();
+
+        $this->assertDatabaseHas('reconciliation_rules', [
+            'tenant_id' => $user->id,
+            'scope_type' => 'tenant',
+            'marketplace' => 'trendyol',
+            'rule_type' => 'tolerance',
+            'key' => 'default',
+        ]);
+
+        $dispute = Dispute::query()->withoutGlobalScope('tenant_scope')->create([
+            'tenant_id' => $user->id,
+            'payout_id' => $payout->id,
+            'dispute_type' => 'COMMISSION_DIFF',
+            'status' => 'OPEN',
+            'amount' => 50,
+            'expected_amount' => 150,
+            'actual_amount' => 100,
+            'diff_amount' => 50,
+            'evidence_json' => ['code' => 'LOSS_COMMISSION_HIGH'],
+        ]);
+
+        $this->postJson("/api/v1/disputes/{$dispute->id}/evidence-pack")
+            ->assertStatus(202)
+            ->assertJsonPath('data.status', 'queued');
+
+        $this->getJson("/api/v1/disputes/{$dispute->id}/evidence-pack")
+            ->assertOk()
+            ->assertJsonPath('data.dispute_id', $dispute->id)
+            ->assertJsonStructure(['data' => ['path', 'meta']]);
+
+        $this->getJson("/api/v1/payouts/{$payout->id}/regression")
+            ->assertOk()
+            ->assertJsonStructure(['data' => ['regression_flag', 'regression_note']]);
+    }
+
     private function bootstrapContext(bool $enableModule = true): array
     {
         $user = User::factory()->create([
@@ -145,10 +254,10 @@ class LossFinderWorkflowTest extends TestCase
             ]);
         }
 
-        foreach (['payouts.view', 'payouts.reconcile', 'exports.create', 'disputes.manage', 'dashboard.view'] as $permission) {
+        foreach (['payouts.view', 'payouts.reconcile', 'exports.create', 'disputes.manage', 'disputes.view', 'dashboard.view', 'settlement_rules.manage'] as $permission) {
             Permission::findOrCreate($permission, 'sanctum');
         }
-        $user->syncPermissions(['payouts.view', 'payouts.reconcile', 'exports.create', 'disputes.manage', 'dashboard.view']);
+        $user->syncPermissions(['payouts.view', 'payouts.reconcile', 'exports.create', 'disputes.manage', 'disputes.view', 'dashboard.view', 'settlement_rules.manage']);
 
         $integration = MarketplaceIntegration::query()->create([
             'code' => 'trendyol',

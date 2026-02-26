@@ -27,6 +27,10 @@ class Dispute extends Model
         'assigned_user_id',
         'evidence',
         'evidence_json',
+        'evidence_pack_status',
+        'evidence_pack_path',
+        'evidence_pack_generated_at',
+        'evidence_pack_meta_json',
         'notes',
         'created_by',
         'updated_by',
@@ -39,6 +43,8 @@ class Dispute extends Model
         'amount' => 'decimal:2',
         'evidence' => 'array',
         'evidence_json' => 'array',
+        'evidence_pack_generated_at' => 'datetime',
+        'evidence_pack_meta_json' => 'array',
     ];
 
     public function tenant()

@@ -10,6 +10,12 @@ class ReconciliationRule extends Model
     use HasFactory;
 
     protected $fillable = [
+        'tenant_id',
+        'scope',
+        'scope_type',
+        'scope_key',
+        'valid_from',
+        'valid_to',
         'marketplace',
         'rule_type',
         'key',
@@ -22,6 +28,8 @@ class ReconciliationRule extends Model
         'value' => 'array',
         'is_active' => 'boolean',
         'priority' => 'integer',
+        'tenant_id' => 'integer',
+        'valid_from' => 'datetime',
+        'valid_to' => 'datetime',
     ];
 }
-

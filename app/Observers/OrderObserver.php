@@ -4,13 +4,16 @@ namespace App\Observers;
 
 use App\Events\OrderStatusChanged;
 use App\Events\QuotaWarningReached;
+use App\Jobs\CalculateOrderProfitJob;
 use App\Models\Order;
+use App\Services\Modules\ModuleGate;
 
 class OrderObserver
 {
     public function created(Order $order): void
     {
         $this->maybeAutoCreateShipment($order);
+        $this->dispatchProfitCalculation($order);
 
         $user = $order->user;
         if (!$user || $user->isSuperAdmin()) {
@@ -83,5 +86,18 @@ $old = (string) $order->getOriginal('status');
         }
 
         app(\App\Services\Cargo\CargoShipmentService::class)->maybeCreateShipmentFromOrder($order);
+    }
+
+    private function dispatchProfitCalculation(Order $order): void
+    {
+        if (!$order->user) {
+            return;
+        }
+
+        if (!app(ModuleGate::class)->isEnabledForUser($order->user, 'profit_engine')) {
+            return;
+        }
+
+        CalculateOrderProfitJob::dispatch($order->id);
     }
 }

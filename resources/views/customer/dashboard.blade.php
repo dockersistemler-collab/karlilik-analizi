@@ -1,45 +1,68 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
-@section('header', 'Genel Bakış')
+@section('header', 'Genel BakÄ±ÅŸ')
 
 @section('content')
-    <style>
-    .period-tab.is-active {
-        background: #fda4af;
-        border-color: #fb7185;
-        color: #7f1d1d; font-weight: 600;
-        box-shadow: 0 6px 16px rgba(251, 113, 133, 0.35);
-    }
-</style>
 <div class="space-y-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-            <div class="rounded-2xl border border-slate-100 bg-emerald-50/80 p-6 shadow-sm">
-                <div class="text-sm font-semibold text-slate-900">G&uuml;nl&uuml;k Gelen Sipariş</div>
-                <div class="mt-3 text-5xl font-bold text-slate-900" id="kpi-daily-orders-customer">-</div>
-                <div class="mt-3 text-sm text-slate-700">Bugün gelen sipariş sayısı</div>
+            <div class="relative overflow-hidden rounded-3xl border border-emerald-100/80 bg-gradient-to-br from-emerald-50 via-white to-emerald-100/60 p-6 shadow-[0_16px_40px_-28px_rgba(16,185,129,0.55)]">
+                <div class="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-emerald-200/35 blur-2xl"></div>
+                <div class="relative flex items-start justify-between gap-4">
+                    <div class="text-sm font-semibold text-slate-700">G&uuml;nl&uuml;k Gelen SipariÅŸ</div>
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-emerald-200/80 bg-white/90 text-emerald-600 shadow-sm">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M4 6h16M7 10h10M9 14h6M10 18h4" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </div>
+                <div class="relative mt-5 text-6xl font-black tracking-tight text-slate-900" id="kpi-daily-orders-customer">-</div>
+                <div class="relative mt-2 text-sm text-slate-600">BugÃ¼n gelen sipariÅŸ sayÄ±sÄ±</div>
             </div>
-            <div class="rounded-2xl border border-slate-100 bg-yellow-50/80 p-6 shadow-sm">
-                <div class="text-sm font-semibold text-slate-900">G&uuml;nl&uuml;k Ürün Satışı</div>
-                <div class="mt-3 text-5xl font-bold text-slate-900" id="kpi-daily-items-customer">-</div>
-                <div class="mt-3 text-sm text-slate-700">Bugün satılan toplam ürün sayısı</div>
+            <div class="relative overflow-hidden rounded-3xl border border-amber-100/80 bg-gradient-to-br from-amber-50 via-white to-yellow-100/70 p-6 shadow-[0_16px_40px_-28px_rgba(245,158,11,0.5)]">
+                <div class="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-amber-200/35 blur-2xl"></div>
+                <div class="relative flex items-start justify-between gap-4">
+                    <div class="text-sm font-semibold text-slate-700">G&uuml;nl&uuml;k ÃœrÃ¼n SatÄ±ÅŸÄ±</div>
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-200/80 bg-white/90 text-amber-600 shadow-sm">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M5 7h14l-1.4 8.1a2 2 0 0 1-2 1.7H8.4a2 2 0 0 1-2-1.7L5 7Zm2-3h10" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                </div>
+                <div class="relative mt-5 text-6xl font-black tracking-tight text-slate-900" id="kpi-daily-items-customer">-</div>
+                <div class="relative mt-2 text-sm text-slate-600">BugÃ¼n satÄ±lan toplam Ã¼rÃ¼n sayÄ±sÄ±</div>
             </div>
-            <div class="rounded-2xl border border-slate-100 bg-sky-50/80 p-6 shadow-sm">
-                <div class="text-sm font-semibold text-slate-900">Bu Ay Gelen Sipariş</div>
-                <div class="mt-3 text-5xl font-bold text-slate-900" id="kpi-monthly-orders-customer">-</div>
-                <div class="mt-3 text-sm text-slate-700">Bu ay gelen sipariş sayısı</div>
+            <div class="relative overflow-hidden rounded-3xl border border-sky-100/90 bg-gradient-to-br from-sky-50 via-white to-blue-100/65 p-6 shadow-[0_16px_40px_-28px_rgba(56,189,248,0.5)]">
+                <div class="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-sky-200/35 blur-2xl"></div>
+                <div class="relative flex items-start justify-between gap-4">
+                    <div class="text-sm font-semibold text-slate-700">Bu Ay Gelen SipariÅŸ</div>
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-200/80 bg-white/90 text-sky-600 shadow-sm">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M8 3v3M16 3v3M4 9h16M6 6h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                </div>
+                <div class="relative mt-5 text-6xl font-black tracking-tight text-slate-900" id="kpi-monthly-orders-customer">-</div>
+                <div class="relative mt-2 text-sm text-slate-600">Bu ay gelen sipariÅŸ sayÄ±sÄ±</div>
             </div>
-            <div class="rounded-2xl border border-slate-100 bg-rose-50/80 p-6 shadow-sm">
-                <div class="text-sm font-semibold text-slate-900">Toplam Ürün Satışı</div>
-                <div class="mt-3 text-5xl font-bold text-slate-900" id="kpi-monthly-items-customer">-</div>
-                <div class="mt-3 text-sm text-slate-700">Bu ay gelen toplam ürün sayısı</div>
+            <div class="relative overflow-hidden rounded-3xl border border-rose-100/90 bg-gradient-to-br from-rose-50 via-white to-pink-100/65 p-6 shadow-[0_16px_40px_-28px_rgba(244,114,182,0.45)]">
+                <div class="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-rose-200/35 blur-2xl"></div>
+                <div class="relative flex items-start justify-between gap-4">
+                    <div class="text-sm font-semibold text-slate-700">Toplam ÃœrÃ¼n SatÄ±ÅŸÄ±</div>
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-rose-200/80 bg-white/90 text-rose-500 shadow-sm">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </div>
+                <div class="relative mt-5 text-6xl font-black tracking-tight text-slate-900" id="kpi-monthly-items-customer">-</div>
+                <div class="relative mt-2 text-sm text-slate-600">Bu ay gelen toplam Ã¼rÃ¼n sayÄ±sÄ±</div>
             </div>
         </div>
-
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
             <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col h-[408px] min-h-0">
                                 <div class="flex flex-col gap-3">
                     <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-slate-900">Bugünkü Net Kar</h2>
+                        <h2 class="text-xl font-semibold text-slate-900">BugÃ¼nkÃ¼ Net Kar</h2>
                     </div>
                     <div class="flex flex-wrap gap-2 text-xs">
                         <button type="button" data-range="day" class="net-kar-range-pill range-pill shrink-0 whitespace-nowrap rounded-full border border-slate-200 px-3 py-1 text-[11px] text-slate-600">G&uuml;nl&uuml;k</button>
@@ -59,7 +82,7 @@
 
             <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col h-[408px] min-h-0">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-xl font-semibold text-slate-900">G&uuml;nl&uuml;k Pazaryeri Satış</h2>
+                    <h2 class="text-xl font-semibold text-slate-900">G&uuml;nl&uuml;k Pazaryeri SatÄ±ÅŸ</h2>
                     <div class="relative">
                         <button id="platform-toggle-customer" type="button" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600">
                             <span id="platform-label-customer">PLATFORM</span>
@@ -68,7 +91,7 @@
                             </svg>
                         </button>
                         <div id="platform-menu-customer" class="absolute right-0 z-10 mt-2 hidden w-40 rounded-xl border border-slate-200 bg-white p-2 text-xs shadow-lg">
-                            <button type="button" data-platform="all" class="w-full rounded-lg px-3 py-2 text-left text-slate-600 hover:bg-slate-100">Tümü</button>
+                            <button type="button" data-platform="all" class="w-full rounded-lg px-3 py-2 text-left text-slate-600 hover:bg-slate-100">TÃ¼mÃ¼</button>
                             @foreach(($marketplaces ?? []) as $marketplace)
                                 <button type="button" data-platform="{{ $marketplace->code ?? $marketplace->name }}" class="w-full rounded-lg px-3 py-2 text-left text-slate-600 hover:bg-slate-100">{{ $marketplace->name }}</button>
                             @endforeach
@@ -77,21 +100,21 @@
                 </div>
 
                 <div class="mt-6 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-200/60 text-rose-700">
-                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M5 12h14M7 7h10M7 17h6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <div class="inline-flex items-center gap-4">
+                        <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-rose-50 text-rose-500">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M5 6h14M7 12h10M9 18h6" stroke-linecap="round"/>
                             </svg>
-                        </div>
-                        <div class="text-sm font-semibold text-slate-900">GÜNLÜK CİRO</div>
+                        </span>
+                        <div class="text-3xl font-semibold text-slate-800 leading-none">GÃœNLÃœK CÄ°RO</div>
                     </div>
-                    <div class="rounded-2xl border border-rose-200/40 bg-transparent px-6 py-3 text-center text-sm font-semibold text-slate-900 shadow-lg shadow-rose-200/60 min-w-[120px]" id="daily-sales-total-customer">
+                    <div id="daily-sales-total-customer" class="min-w-[120px] text-right rounded-xl border border-rose-100 px-4 py-3 text-3xl font-bold text-slate-800 shadow-[0_10px_22px_-18px_rgba(251,113,133,0.65)]">
                         0 TL
                     </div>
                 </div>
 
-                <div class="mt-8 flex-1 min-h-0">
-                    <div class="space-y-3 pr-2 pb-3" id="daily-sales-marketplaces-customer"></div>
+                <div class="mt-5 flex-1 min-h-0 overflow-hidden">
+                    <div class="space-y-1.5 pr-1 pb-1" id="daily-sales-marketplaces-customer"></div>
                 </div>
             </div>
         </div>
@@ -99,7 +122,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 items-stretch">
             <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col w-full min-w-0 mini-metric-card">
                 <div class="flex items-center justify-between gap-3">
-                    <h3 class="text-base font-semibold text-slate-900">En Çok Satılan 10 Ürün</h3>
+                    <h3 class="text-base font-semibold text-slate-900">En Ã‡ok SatÄ±lan 10 ÃœrÃ¼n</h3>
                 </div>
                 <div class="mt-3 period-tabs grid grid-cols-3 gap-x-3 gap-y-0.5 items-center w-full">
     <button type="button" data-period="day" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">G&uuml;nl&uuml;k</button>
@@ -111,7 +134,7 @@
 </div>
                 <div class="mt-4 space-y-3">
                     @foreach([
-                        ['Ayakkabı', 42, 'bg-amber-400'],
+                        ['AyakkabÄ±', 42, 'bg-amber-400'],
                         ['Palto', 56, 'bg-orange-400'],
                         ['Bluz', 85, 'bg-violet-300'],
                         ['Etek', 45, 'bg-emerald-200'],
@@ -133,7 +156,7 @@
 
             <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col w-full min-w-0 mini-metric-card">
                 <div class="flex items-center justify-between gap-3">
-                    <h3 class="text-base font-semibold text-slate-900">En Çok Satılan Marka</h3>
+                    <h3 class="text-base font-semibold text-slate-900">En Ã‡ok SatÄ±lan Marka</h3>
                 </div>
                 <div class="mt-3 period-tabs grid grid-cols-3 gap-x-3 gap-y-0.5 items-center w-full">
     <button type="button" data-period="day" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">G&uuml;nl&uuml;k</button>
@@ -167,7 +190,7 @@
 
             <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col w-full min-w-0 mini-metric-card">
                 <div class="flex items-center justify-between gap-3">
-                    <h3 class="text-base font-semibold text-slate-900">En Çok Satış Yapılan Kategoriler</h3>
+                    <h3 class="text-base font-semibold text-slate-900">En Ã‡ok SatÄ±ÅŸ YapÄ±lan Kategoriler</h3>
                 </div>
                 <div class="mt-3 period-tabs grid grid-cols-3 gap-x-3 gap-y-0.5 items-center w-full">
     <button type="button" data-period="day" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">G&uuml;nl&uuml;k</button>
@@ -179,10 +202,10 @@
 </div>
                 <div class="mt-4 space-y-3">
                     @foreach([
-                        ['Ayakkabı', 58, 'bg-amber-400'],
+                        ['AyakkabÄ±', 58, 'bg-amber-400'],
                         ['Giyim', 62, 'bg-orange-400'],
                         ['Aksesuar', 44, 'bg-violet-300'],
-                        ['Çanta', 36, 'bg-emerald-200'],
+                        ['Ã‡anta', 36, 'bg-emerald-200'],
                         ['Ev', 28, 'bg-slate-900 text-white'],
                     ] as $row)
                         <div class="flex items-center gap-3 text-xs">
@@ -201,7 +224,7 @@
 
             <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col w-full min-w-0 mini-metric-card">
                 <div class="flex items-center justify-between gap-3">
-                    <h3 class="text-base font-semibold text-slate-900">Pazaryeri Satış Adedi Dağılımı</h3>
+                    <h3 class="text-base font-semibold text-slate-900">Pazaryeri SatÄ±ÅŸ Adedi DaÄŸÄ±lÄ±mÄ±</h3>
                 </div>
                 <div class="mt-3 period-tabs grid grid-cols-3 gap-x-3 gap-y-0.5 items-center w-full">
     <button type="button" data-period="day" class="period-tab inline-flex items-center justify-center px-1 py-0.5 text-xs rounded-md transition text-gray-500 hover:text-gray-800 hover:bg-gray-50">G&uuml;nl&uuml;k</button>
@@ -216,7 +239,7 @@
                         ['Trendyol', 42, 'bg-amber-400'],
                         ['Hepsiburada', 56, 'bg-orange-400'],
                         ['N11', 85, 'bg-violet-300'],
-                        ['Çiçek Sepeti', 45, 'bg-emerald-200'],
+                        ['Ã‡iÃ§ek Sepeti', 45, 'bg-emerald-200'],
                         ['Amazon', 35, 'bg-sky-400 text-slate-900'],
                     ] as $row)
                         <div class="flex items-center gap-3 text-xs">
@@ -238,7 +261,7 @@
             <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col w-full lg:w-[65%]">
                 <div class="flex flex-col gap-3">
                     <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-slate-900 whitespace-nowrap">Türkiye Sipariş Dağılımı</h2>
+                        <h2 class="text-xl font-semibold text-slate-900 whitespace-nowrap">TÃ¼rkiye SipariÅŸ DaÄŸÄ±lÄ±mÄ±</h2>
                         <div class="relative">
                             <button id="map-range-toggle-customer" type="button" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600">
                                 <span id="map-range-label-customer">Haftal&#305;k</span>
@@ -271,25 +294,25 @@
             </div>
             <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col w-full lg:w-[35%]">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-base font-semibold text-slate-900">Dağılım Tablosu</h3>
+                    <h3 class="text-base font-semibold text-slate-900">DaÄŸÄ±lÄ±m Tablosu</h3>
                 </div>
                 <div class="mt-3 flex flex-wrap gap-2 text-[11px]">
-                    <button type="button" data-range="day" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">Günlük</button>
-                    <button type="button" data-range="week" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">Haftalık</button>
-                    <button type="button" data-range="month" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">Aylık</button>
-                    <button type="button" data-range="quarter" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">3 Aylık</button>
-                    <button type="button" data-range="half" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">6 Aylık</button>
-                    <button type="button" data-range="year" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">Yıllık</button>
+                    <button type="button" data-range="day" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">GÃ¼nlÃ¼k</button>
+                    <button type="button" data-range="week" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">HaftalÄ±k</button>
+                    <button type="button" data-range="month" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">AylÄ±k</button>
+                    <button type="button" data-range="quarter" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">3 AylÄ±k</button>
+                    <button type="button" data-range="half" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">6 AylÄ±k</button>
+                    <button type="button" data-range="year" class="map-table-range-pill range-pill rounded-full border border-slate-200 px-3 py-1 text-slate-600">YÄ±llÄ±k</button>
                 </div>
                 <div class="mt-3">
-                    <input id="map-table-search-customer" type="text" placeholder="İl ara..." class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-200">
+                    <input id="map-table-search-customer" type="text" placeholder="Ä°l ara..." class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-200">
                 </div>
                 <div class="mt-3">
                     <div class="max-h-[420px] overflow-auto pr-1">
                         <table class="w-full text-xs">
                             <thead>
                                 <tr class="text-left text-slate-500">
-                                    <th class="pb-2">Şehir</th>
+                                    <th class="pb-2">Åehir</th>
                                     <th class="pb-2 text-right">Adet</th>
                                 </tr>
                             </thead>
@@ -569,7 +592,7 @@ scales: {
             if (code.includes('trendyol')) return 'T';
             if (code.includes('hepsi')) return 'H';
             if (code.includes('n11')) return 'N';
-            if (code.includes('cicek') || code.includes('çiçek')) return 'Ç';
+            if (code.includes('cicek') || code.includes('Ã§iÃ§ek')) return 'Ã‡';
             if (code.includes('amazon')) return 'A';
             return (row.name || '?').toString().charAt(0).toUpperCase();
         };
@@ -579,26 +602,35 @@ scales: {
             if (!container) return;
             container.innerHTML = '';
 
+            if (!rows.length) {
+                const empty = document.createElement('div');
+                empty.className = 'rounded-2xl border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-400';
+                empty.textContent = 'Veri yok';
+                container.appendChild(empty);
+                return;
+            }
+
+            const palette = ['#f6c338', '#f4d463', '#b8aceb', '#9edfc2', '#0f172a'];
+            const textPalette = ['#1f2937', '#1f2937', '#1f2937', '#1f2937', '#f8fafc'];
+            const maxValue = Math.max(...rows.map((row) => Number(row.total || 0)), 1);
+
             rows.forEach((row, index) => {
-                const colorClass = palette[index % palette.length];
-                const textClass = textPalette[index % textPalette.length];
+                const icon = marketplaceIconCustomer(row);
+                const ratio = Number(row.total || 0) / maxValue;
+                const width = Math.max(28, Math.round(60 + (ratio * 40)));
+                const tone = palette[index % palette.length];
+                const textColor = textPalette[index % textPalette.length];
+
                 const item = document.createElement('div');
-                item.className = 'flex items-center gap-3';
+                item.className = 'flex items-center gap-2';
                 item.innerHTML = `
-                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-white/80 text-sm font-semibold text-slate-700 shadow-sm border border-slate-200/60">
-                        ${marketplaceIconCustomer(row)}
-                    </div>
-                    <div class="flex-1">
-                        <div class="rounded-lg ${colorClass} px-3 py-2 text-sm font-semibold ${textClass}">
-                            ${row.name}
-                        </div>
-                    </div>
-                    <div class="text-sm font-semibold text-slate-700">${formatCurrency(row.total)}</div>
+                    <div class="h-8 w-8 shrink-0 rounded-lg border border-slate-200 bg-white text-slate-700 flex items-center justify-center font-bold text-sm">${icon}</div>
+                    <div class="h-8 rounded-lg px-3 font-semibold text-sm flex items-center" style="width:${width}%; background:${tone}; color:${textColor};">${row.name}</div>
+                    <div class="ml-auto text-xl font-bold text-slate-700 whitespace-nowrap">${formatCurrency(row.total)}</div>
                 `;
                 container.appendChild(item);
             });
         };
-
         const applyMetricsCustomer = (data) => {
             if (!data) return;
             document.getElementById('kpi-daily-orders-customer').textContent = formatNumber(data.kpis?.daily_orders ?? 0);
@@ -629,7 +661,7 @@ scales: {
                     timestamps: chart.timestamps ?? [],
                 };
                 const labelMap = {
-                    day: 'GÜNLÜK (GMT+3)',
+                    day: 'GÃœNLÃœK (GMT+3)',
                     week: 'Haftal&#305;k',
                     month: 'Ayl&#305;k',
                     quarter: '3 Ayl&#305;k',
@@ -663,12 +695,12 @@ scales: {
 
         const normalizeMapKeyCustomer = (value = '') => {
             let normalized = value.toString().toLowerCase();
-            normalized = normalized.replace(/ç/g, 'c')
-                .replace(/ğ/g, 'g')
-                .replace(/ı/g, 'i')
-                .replace(/ö/g, 'o')
-                .replace(/ş/g, 's')
-                .replace(/ü/g, 'u');
+            normalized = normalized.replace(/Ã§/g, 'c')
+                .replace(/ÄŸ/g, 'g')
+                .replace(/Ä±/g, 'i')
+                .replace(/Ã¶/g, 'o')
+                .replace(/ÅŸ/g, 's')
+                .replace(/Ã¼/g, 'u');
             normalized = normalized.replace(/[^a-z0-9\s]/g, ' ');
             normalized = normalized.replace(/\s+/g, ' ').trim();
             return normalized;
@@ -1034,7 +1066,7 @@ scales: {
                 rangeMenuCustomer.classList.toggle('hidden');
             });
             const netKarLabelMapCustomer = {
-                day: 'GÜNLÜK (GMT+3)',
+                day: 'GÃœNLÃœK (GMT+3)',
                 week: 'Haftal&#305;k',
                 month: 'Ayl&#305;k',
                 quarter: '3 Ayl&#305;k',
@@ -1074,6 +1106,10 @@ scales: {
     });
 </script>
 @endpush
+
+
+
+
 
 
 

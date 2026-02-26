@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Domains\Settlements\Models\Payout;
+use App\Domains\Settlements\Models\LossFinding;
+use App\Domains\Settlements\Models\LossPattern;
 use App\Domains\Settlements\Models\Reconciliation;
+use App\Domains\Settlements\Models\ReconciliationRule;
 use App\Domains\Settlements\Support\SettlementDashboardCache;
 use App\Domains\Settlements\Services\DisputeService;
 use App\Domains\Settlements\Services\PayoutImportService;
+use App\Domains\Settlements\Services\ReconcileRegressionGuardService;
 use App\Http\Controllers\Api\V1\Concerns\ResolvesTenant;
 use App\Http\Controllers\Controller;
 use App\Jobs\GenerateSettlementExportJob;
@@ -161,6 +165,158 @@ class SettlementLossFinderController extends Controller
             ->orderByDesc('id');
 
         return ApiResponse::success($query->paginate(25));
+    }
+
+    public function findings(Request $request, int $payout)
+    {
+        $tenantId = $this->currentTenantId();
+        $validated = $request->validate([
+            'code' => ['nullable', 'string'],
+            'severity' => ['nullable', 'string', 'in:low,medium,high'],
+            'min_confidence' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'min_amount' => ['nullable', 'numeric', 'min:0'],
+            'type' => ['nullable', 'string'],
+            'suggested_dispute_type' => ['nullable', 'string'],
+        ]);
+
+        $query = LossFinding::query()
+            ->withoutGlobalScope('tenant_scope')
+            ->where('tenant_id', $tenantId)
+            ->where('payout_id', $payout)
+            ->when(!empty($validated['code']), fn ($q) => $q->where('code', (string) $validated['code']))
+            ->when(!empty($validated['severity']), fn ($q) => $q->where('severity', (string) $validated['severity']))
+            ->when(!empty($validated['type']), fn ($q) => $q->where('type', (string) $validated['type']))
+            ->when(!empty($validated['suggested_dispute_type']), fn ($q) => $q->where('suggested_dispute_type', (string) $validated['suggested_dispute_type']))
+            ->when(isset($validated['min_confidence']), fn ($q) => $q->where('confidence', '>=', (int) $validated['min_confidence']))
+            ->when(isset($validated['min_amount']), fn ($q) => $q->where('amount', '>=', (float) $validated['min_amount']))
+            ->orderByDesc('confidence')
+            ->orderByDesc('id');
+
+        return ApiResponse::success($query->paginate(25));
+    }
+
+    public function patterns(Request $request, int $payout)
+    {
+        $tenantId = $this->currentTenantId();
+        $sort = (string) $request->query('sort', 'total_amount');
+        $limit = min(max((int) $request->query('limit', 50), 1), 200);
+        if (!in_array($sort, ['total_amount', 'occurrences', 'last_seen_at'], true)) {
+            $sort = 'total_amount';
+        }
+
+        $rows = LossPattern::query()
+            ->withoutGlobalScope('tenant_scope')
+            ->where('tenant_id', $tenantId)
+            ->where(function ($q) use ($payout): void {
+                $q->where('payout_id', $payout)->orWhereNull('payout_id');
+            })
+            ->orderByDesc($sort)
+            ->limit($limit)
+            ->get();
+
+        return ApiResponse::success($rows);
+    }
+
+    public function regression(int $payout, ReconcileRegressionGuardService $service)
+    {
+        $tenantId = $this->currentTenantId();
+        $payoutModel = Payout::query()
+            ->withoutGlobalScope('tenant_scope')
+            ->where('tenant_id', $tenantId)
+            ->findOrFail($payout);
+
+        $runHash = Reconciliation::query()
+            ->withoutGlobalScope('tenant_scope')
+            ->where('tenant_id', $tenantId)
+            ->where('payout_id', $payoutModel->id)
+            ->orderByDesc('id')
+            ->value('run_hash');
+
+        $result = $service->evaluateAndPersist($payoutModel, $runHash);
+
+        return ApiResponse::success([
+            'payout_id' => (int) $payoutModel->id,
+            'run_hash' => $runHash,
+            'regression_flag' => (bool) $result['regression_flag'],
+            'regression_note' => (string) $result['regression_note'],
+            'regression_checked_at' => optional($payoutModel->fresh()->regression_checked_at)->toISOString(),
+            'comparison' => $result['comparison'] ?? [],
+        ]);
+    }
+
+    public function upsertTenantRule(Request $request)
+    {
+        $tenantId = $this->currentTenantId();
+        $validated = $request->validate([
+            'marketplace' => ['required', 'string', 'max:50'],
+            'rule_type' => ['required', 'string', 'max:50'],
+            'key' => ['required', 'string', 'max:120'],
+            'value' => ['required', 'array'],
+            'priority' => ['nullable', 'integer'],
+            'is_active' => ['nullable', 'boolean'],
+            'valid_from' => ['nullable', 'date'],
+            'valid_to' => ['nullable', 'date', 'after_or_equal:valid_from'],
+        ]);
+
+        $rule = ReconciliationRule::query()
+            ->withoutGlobalScope('tenant_scope')
+            ->updateOrCreate(
+                [
+                    'tenant_id' => $tenantId,
+                    'scope_type' => 'tenant',
+                    'marketplace' => $validated['marketplace'],
+                    'rule_type' => $validated['rule_type'],
+                    'key' => $validated['key'],
+                ],
+                [
+                    'scope_key' => "tenant:{$tenantId}",
+                    'scope' => 'tenant',
+                    'value' => $validated['value'],
+                    'priority' => (int) ($validated['priority'] ?? 0),
+                    'is_active' => (bool) ($validated['is_active'] ?? true),
+                    'valid_from' => $validated['valid_from'] ?? null,
+                    'valid_to' => $validated['valid_to'] ?? null,
+                ]
+            );
+
+        return ApiResponse::success($rule);
+    }
+
+    public function upsertTenantScopedRule(Request $request, int $tenant)
+    {
+        $validated = $request->validate([
+            'marketplace' => ['required', 'string', 'max:50'],
+            'rule_type' => ['required', 'in:map_row_type,tolerance,loss_rule'],
+            'key' => ['required', 'string', 'max:120'],
+            'value' => ['required', 'array'],
+            'priority' => ['nullable', 'integer'],
+            'is_active' => ['nullable', 'boolean'],
+            'valid_from' => ['nullable', 'date'],
+            'valid_to' => ['nullable', 'date', 'after_or_equal:valid_from'],
+        ]);
+
+        $rule = ReconciliationRule::query()
+            ->withoutGlobalScope('tenant_scope')
+            ->updateOrCreate(
+                [
+                    'tenant_id' => $tenant,
+                    'scope' => 'tenant',
+                    'scope_type' => 'tenant',
+                    'marketplace' => $validated['marketplace'],
+                    'rule_type' => $validated['rule_type'],
+                    'key' => $validated['key'],
+                ],
+                [
+                    'scope_key' => "tenant:{$tenant}",
+                    'value' => $validated['value'],
+                    'priority' => (int) ($validated['priority'] ?? 0),
+                    'is_active' => (bool) ($validated['is_active'] ?? true),
+                    'valid_from' => $validated['valid_from'] ?? null,
+                    'valid_to' => $validated['valid_to'] ?? null,
+                ]
+            );
+
+        return ApiResponse::success($rule, status: 201);
     }
 
     public function reconciliationDetail(int $id)

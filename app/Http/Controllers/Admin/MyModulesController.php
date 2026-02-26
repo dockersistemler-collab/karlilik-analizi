@@ -49,7 +49,7 @@ $daysLeft = $endsAt ? $now->diffInDays($endsAt, false) : null;
 
         $plan = $user->getActivePlan();
         $planModuleCodes = collect($plan?->enabledModules() ?? [])
-            ->filter(fn ($code) => is_string($code) && $code !== '*' && str_starts_with($code, 'feature.'))
+            ->filter(fn ($code) => is_string($code) && $code !== '*')
             ->values();
 
         $existingCodes = $userModules

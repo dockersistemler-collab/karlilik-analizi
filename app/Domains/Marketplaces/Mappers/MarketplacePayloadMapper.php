@@ -8,15 +8,19 @@ use App\Domains\Settlements\Models\Payout;
 use App\Domains\Settlements\Models\PayoutTransaction;
 use App\Domains\Settlements\Models\ReturnRecord;
 use App\Domains\Settlements\Rules\RuleEvaluator;
+use App\Jobs\CalculateOrderProfitJob;
 use App\Models\MarketplaceAccount;
 use App\Models\Order;
+use App\Models\User;
+use App\Services\Modules\ModuleGate;
 
 class MarketplacePayloadMapper
 {
     public function __construct(
         private readonly RuleEvaluator $ruleEvaluator,
         private readonly TrendyolMapper $trendyolMapper,
-        private readonly TrendyolOrderMapper $trendyolOrderMapper
+        private readonly TrendyolOrderMapper $trendyolOrderMapper,
+        private readonly ModuleGate $moduleGate
     )
     {
     }
@@ -93,6 +97,10 @@ class MarketplacePayloadMapper
                     'calculated' => $computed,
                     'raw_payload' => $row,
                 ]);
+            }
+
+            if (!$order->wasRecentlyCreated) {
+                $this->dispatchProfitCalculationForUpsert($order);
             }
         }
     }
@@ -179,5 +187,24 @@ class MarketplacePayloadMapper
         return MarketplaceIntegration::query()
             ->where('code', strtolower($marketplaceCode))
             ->first();
+    }
+
+    private function dispatchProfitCalculationForUpsert(Order $order): void
+    {
+        $userId = (int) $order->user_id;
+        if ($userId <= 0) {
+            return;
+        }
+
+        $user = User::query()->find($userId);
+        if (!$user) {
+            return;
+        }
+
+        if (!$this->moduleGate->isEnabledForUser($user, 'profit_engine')) {
+            return;
+        }
+
+        CalculateOrderProfitJob::dispatch($order->id);
     }
 }

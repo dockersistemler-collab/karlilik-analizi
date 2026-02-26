@@ -7,6 +7,13 @@ use App\Models\User;
 use App\Integrations\Marketplaces\Support\DateRangeFactory;
 use App\Services\Marketplaces\MarketplaceSyncDispatcher;
 use App\Services\Profitability\MartBuilder;
+use App\Jobs\CalculateMarketplaceRiskJob;
+use App\Jobs\DetectMarketplaceShocksJob;
+use App\Jobs\RunActionEngineDailyJob;
+use App\Jobs\RunActionEngineCalibrationJob;
+use App\Jobs\CollectBuyBoxSnapshotsJob;
+use App\Jobs\BuildControlTowerDailySnapshotJob;
+use App\Services\Modules\ModuleGate;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -69,6 +76,164 @@ Schedule::call(function () {
 })
     ->name('marketplace_profitability_mart_daily')
     ->dailyAt((string) config('marketplace_profitability.mart.daily_time', '03:00'))
+    ->timezone('Europe/Istanbul')
+    ->withoutOverlapping();
+
+Schedule::call(function () {
+    $moduleGate = app(ModuleGate::class);
+    $date = now()->subDay()->toDateString();
+
+    User::query()
+        ->where('role', 'client')
+        ->where('is_active', true)
+        ->select('id', 'tenant_id')
+        ->orderBy('id')
+        ->chunk(100, function ($users) use ($moduleGate, $date) {
+            foreach ($users as $user) {
+                if (!$moduleGate->isEnabledForUser($user, 'marketplace_risk')) {
+                    continue;
+                }
+
+                CalculateMarketplaceRiskJob::dispatch((int) $user->id, $date);
+            }
+        });
+})
+    ->name('marketplace_risk_daily')
+    ->dailyAt('02:15')
+    ->timezone('Europe/Istanbul')
+    ->withoutOverlapping();
+
+Schedule::call(function () {
+    $moduleGate = app(ModuleGate::class);
+    $date = now()->subDay()->toDateString();
+
+    User::query()
+        ->where('role', 'client')
+        ->where('is_active', true)
+        ->select('id', 'tenant_id')
+        ->orderBy('id')
+        ->chunk(100, function ($users) use ($moduleGate, $date) {
+            foreach ($users as $user) {
+                if (!$moduleGate->isEnabledForUser($user, 'action_engine')) {
+                    continue;
+                }
+
+                RunActionEngineDailyJob::dispatch((int) $user->id, $date);
+            }
+        });
+})
+    ->name('action_engine_daily')
+    ->dailyAt('03:00')
+    ->timezone('Europe/Istanbul')
+    ->withoutOverlapping();
+
+Schedule::call(function () {
+    $moduleGate = app(ModuleGate::class);
+    $date = now()->subDay()->toDateString();
+
+    User::query()
+        ->where('role', 'client')
+        ->where('is_active', true)
+        ->select('id', 'tenant_id')
+        ->orderBy('id')
+        ->chunk(100, function ($users) use ($moduleGate, $date) {
+            foreach ($users as $user) {
+                if (!$moduleGate->isEnabledForUser($user, 'action_engine')) {
+                    continue;
+                }
+
+                DetectMarketplaceShocksJob::dispatch((int) $user->id, $date, 45);
+            }
+        });
+})
+    ->name('action_engine_detect_shocks')
+    ->dailyAt('03:10')
+    ->timezone('Europe/Istanbul')
+    ->withoutOverlapping();
+
+Schedule::call(function () {
+    $moduleGate = app(ModuleGate::class);
+    $date = now()->subDay()->toDateString();
+
+    User::query()
+        ->where('role', 'client')
+        ->where('is_active', true)
+        ->select('id', 'tenant_id')
+        ->orderBy('id')
+        ->chunk(100, function ($users) use ($moduleGate, $date) {
+            foreach ($users as $user) {
+                if (!$moduleGate->isEnabledForUser($user, 'action_engine')) {
+                    continue;
+                }
+
+                RunActionEngineCalibrationJob::dispatch((int) $user->id, $date, 45);
+            }
+        });
+})
+    ->name('action_engine_calibration_daily')
+    ->dailyAt('03:20')
+    ->timezone('Europe/Istanbul')
+    ->withoutOverlapping();
+
+Schedule::call(function () {
+    $moduleGate = app(ModuleGate::class);
+    $date = now()->subDay()->toDateString();
+    $processedTenants = [];
+
+    User::query()
+        ->where('role', 'client')
+        ->where('is_active', true)
+        ->select('id', 'tenant_id')
+        ->orderBy('id')
+        ->chunk(100, function ($users) use ($moduleGate, $date, &$processedTenants) {
+            foreach ($users as $user) {
+                $tenantId = (int) ($user->tenant_id ?: $user->id);
+                if (isset($processedTenants[$tenantId])) {
+                    continue;
+                }
+                $processedTenants[$tenantId] = true;
+
+                if (!$moduleGate->isEnabledForUser($user, 'buybox_engine')) {
+                    continue;
+                }
+
+                CollectBuyBoxSnapshotsJob::dispatch($tenantId, $date);
+            }
+        });
+})
+    ->name('buybox_engine_daily')
+    ->dailyAt('01:30')
+    ->timezone('Europe/Istanbul')
+    ->withoutOverlapping();
+
+Schedule::call(function () {
+    $moduleGate = app(ModuleGate::class);
+    $date = now()->subDay()->toDateString();
+    $processedTenants = [];
+
+    User::query()
+        ->where('role', 'client')
+        ->where('is_active', true)
+        ->select('id', 'tenant_id')
+        ->orderBy('id')
+        ->chunk(100, function ($users) use ($moduleGate, $date, &$processedTenants) {
+            foreach ($users as $user) {
+                $tenantId = (int) ($user->tenant_id ?: $user->id);
+                if (isset($processedTenants[$tenantId])) {
+                    continue;
+                }
+                $processedTenants[$tenantId] = true;
+
+                if (!$moduleGate->isEnabledForUser($user, 'feature.control_tower')) {
+                    continue;
+                }
+
+                BuildControlTowerDailySnapshotJob::dispatch((int) $user->id, $date);
+            }
+        });
+})
+    ->name('control_tower_daily_snapshot')
+    ->dailyAt('04:00')
     ->timezone('Europe/Istanbul')
     ->withoutOverlapping();
 

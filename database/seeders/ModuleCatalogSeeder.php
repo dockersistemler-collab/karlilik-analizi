@@ -53,6 +53,61 @@ class ModuleCatalogSeeder extends Seeder
                 'sort_order' => 0,
             ]
         );
+        Module::query()->updateOrCreate(
+            ['code' => 'profit_engine'],
+            [
+                'name' => 'Profit Engine',
+                'description' => 'Siparis bazli net karlilik hesaplama modulu.',
+                'type' => 'feature',
+                'billing_type' => 'recurring',
+                'is_active' => true,
+                'sort_order' => 0,
+            ]
+        );
+        Module::query()->updateOrCreate(
+            ['code' => 'marketplace_risk'],
+            [
+                'name' => 'Marketplace Risk',
+                'description' => 'Pazaryeri KPI risk skoru ve alarm modulu.',
+                'type' => 'feature',
+                'billing_type' => 'recurring',
+                'is_active' => true,
+                'sort_order' => 0,
+            ]
+        );
+        Module::query()->updateOrCreate(
+            ['code' => 'action_engine'],
+            [
+                'name' => 'Action Engine',
+                'description' => 'Risk ve karlilik verisinden aksiyon onerileri uretir.',
+                'type' => 'feature',
+                'billing_type' => 'recurring',
+                'is_active' => true,
+                'sort_order' => 0,
+            ]
+        );
+        Module::query()->updateOrCreate(
+            ['code' => 'buybox_engine'],
+            [
+                'name' => 'BuyBox Engine',
+                'description' => 'BuyBox/One Cikan Teklif snapshot, import ve izleme modulu.',
+                'type' => 'feature',
+                'billing_type' => 'recurring',
+                'is_active' => true,
+                'sort_order' => 0,
+            ]
+        );
+        Module::query()->updateOrCreate(
+            ['code' => 'feature.control_tower'],
+            [
+                'name' => 'Marketplace Intelligence Control Tower',
+                'description' => 'CFO + OPS birlesik kontrol ekrani.',
+                'type' => 'feature',
+                'billing_type' => 'recurring',
+                'is_active' => true,
+                'sort_order' => 0,
+            ]
+        );
 
         Module::query()->updateOrCreate(
             ['code' => 'feature.exports'],

@@ -4,6 +4,11 @@ namespace App\Domains\Settlements\Services;
 
 class LossFinderEngine
 {
+    public function __construct(
+        private readonly TenantRuleResolver $tenantRuleResolver
+    ) {
+    }
+
     /**
      * @param  array<string,float>  $expectedByType
      * @param  array<string,float>  $actualByType
@@ -18,44 +23,62 @@ class LossFinderEngine
         array $expectedItems,
         bool $hasOrder,
         bool $hasPayoutRows,
-        float $tolerance = 0.01
+        float $tolerance = 0.01,
+        ?int $tenantId = null,
+        string $marketplace = 'trendyol'
     ): array {
         $findings = [];
+        $commissionPctThreshold = $tenantId
+            ? $this->tenantRuleResolver->lossThreshold($tenantId, $marketplace, 'commission_pct_threshold', 0.05)
+            : 0.05;
 
         if ($hasOrder && !$hasPayoutRows) {
             $findings[] = $this->finding(
                 'LOSS_MISSING_IN_PAYOUT',
-                'Hakedişte Sipariş Satırı Yok',
-                'Sipariş için beklenen kalem var ancak payout içinde satır bulunamadı.',
+                'Hak ediste siparis satiri yok',
+                'Siparis icin beklenen kalem var ancak payout icinde satir bulunamadi.',
                 'high',
                 $this->sum($expectedByType),
                 'missing_in_payout',
-                'MISSING_PAYMENT'
+                'MISSING_PAYMENT',
+                ['evidence_count' => 2, 'row_count' => 0, 'pct_diff' => 1]
             );
         }
 
         if (!$hasOrder && $hasPayoutRows) {
             $findings[] = $this->finding(
                 'LOSS_MISSING_IN_ORDERS',
-                'Sipariş Bulunamadı',
-                'Payout satırı mevcut ancak sipariş kaydı bulunamadı.',
+                'Siparis bulunamadi',
+                'Payout satiri mevcut ancak siparis kaydi bulunamadi.',
                 'high',
                 $this->sum($actualByType),
                 'missing_in_orders',
-                'UNKNOWN_DEDUCTION'
+                'UNKNOWN_DEDUCTION',
+                ['evidence_count' => 2, 'row_count' => count($actualRows), 'pct_diff' => 1]
             );
         }
 
         $commissionDiff = round(($actualByType['commission'] ?? 0.0) - ($expectedByType['commission'] ?? 0.0), 2);
-        if ($commissionDiff < -$tolerance) {
+        $expectedCommission = abs((float) ($expectedByType['commission'] ?? 0));
+        $commissionPctDiff = $expectedCommission > 0 ? abs($commissionDiff) / $expectedCommission : 0.0;
+        if ($commissionDiff < -$tolerance && $commissionPctDiff >= $commissionPctThreshold) {
+            $commissionRows = array_values(array_filter(
+                $actualRows,
+                fn (array $row): bool => ($row['type'] ?? '') === 'commission'
+            ));
             $findings[] = $this->finding(
                 'LOSS_COMMISSION_HIGH',
-                'Yüksek Komisyon Kesintisi',
-                'Komisyon kesintisi beklenenden daha yüksek.',
+                'Yuksek komisyon kesintisi',
+                'Komisyon kesintisi beklenenden daha yuksek.',
                 abs($commissionDiff) >= 10 ? 'high' : 'medium',
                 abs($commissionDiff),
                 'commission',
-                'COMMISSION_DIFF'
+                'COMMISSION_DIFF',
+                [
+                    'evidence_count' => 2,
+                    'row_count' => count($commissionRows),
+                    'pct_diff' => round($commissionPctDiff, 4),
+                ]
             );
         }
 
@@ -63,16 +86,23 @@ class LossFinderEngine
         $shippingRows = array_values(array_filter($actualRows, fn (array $row): bool => ($row['type'] ?? '') === 'shipping'));
         if ($shippingDiff > $tolerance || count($shippingRows) > 1) {
             $detail = $shippingDiff > $tolerance
-                ? 'Kargo tutarı beklenenden yüksek.'
-                : 'Kargo satırı birden fazla kez gözüküyor.';
+                ? 'Kargo tutari beklenenden yuksek.'
+                : 'Kargo satiri birden fazla kez gozukuyor.';
             $findings[] = $this->finding(
                 'LOSS_SHIPPING_DUP_OR_HIGH',
-                'Kargo Farkı',
+                'Kargo farki',
                 $detail,
                 'medium',
                 abs($shippingDiff),
                 'shipping',
-                'SHIPPING_DIFF'
+                'SHIPPING_DIFF',
+                [
+                    'evidence_count' => 2,
+                    'row_count' => count($shippingRows),
+                    'pct_diff' => (float) ($expectedByType['shipping'] ?? 0.0) !== 0.0
+                        ? round(abs($shippingDiff) / max(abs((float) $expectedByType['shipping']), 0.01), 4)
+                        : 1.0,
+                ]
             );
         }
 
@@ -91,12 +121,17 @@ class LossFinderEngine
         if ($vatInconsistent) {
             $findings[] = $this->finding(
                 'LOSS_VAT_MISMATCH',
-                'KDV Uyuşmazlığı',
-                'Satırlarda gross/vat/net toplamları tutarsız.',
+                'KDV uyusmazligi',
+                'Satirlarda gross/vat/net toplamlar tutarsiz.',
                 'medium',
                 round($vatMismatchAmount, 2),
                 'vat',
-                'VAT_DIFF'
+                'VAT_DIFF',
+                [
+                    'evidence_count' => 1,
+                    'row_count' => count($actualRows),
+                    'pct_diff' => round($vatMismatchAmount / max(abs($this->sum($actualByType)), 0.01), 4),
+                ]
             );
         }
 
@@ -110,12 +145,17 @@ class LossFinderEngine
         if ($unknownDeduction > $tolerance) {
             $findings[] = $this->finding(
                 'LOSS_UNKNOWN_DEDUCTION',
-                'Bilinmeyen Kesinti',
-                'Beklenmeyen kesinti satırları tespit edildi.',
+                'Bilinmeyen kesinti',
+                'Beklenmeyen kesinti satirlari tespit edildi.',
                 'medium',
                 round($unknownDeduction, 2),
                 'deduction',
-                'UNKNOWN_DEDUCTION'
+                'UNKNOWN_DEDUCTION',
+                [
+                    'evidence_count' => 1,
+                    'row_count' => count($actualRows),
+                    'pct_diff' => round($unknownDeduction / max(abs($this->sum($actualByType)), 0.01), 4),
+                ]
             );
         }
 
@@ -131,12 +171,18 @@ class LossFinderEngine
         if ($microCount > 1 && $microLossTotal > $tolerance) {
             $findings[] = $this->finding(
                 'MICRO_LOSS_AGGREGATOR',
-                'Mikro Kesinti Kümesi',
-                "Tekrarlayan mikro kesinti tespit edildi ({$microCount} satır).",
+                'Mikro kesinti kumesi',
+                "Tekrarlayan mikro kesinti tespit edildi ({$microCount} satir).",
                 'low',
                 round($microLossTotal, 2),
                 'micro',
-                'UNKNOWN_DEDUCTION'
+                'UNKNOWN_DEDUCTION',
+                [
+                    'evidence_count' => 1,
+                    'row_count' => $microCount,
+                    'pct_diff' => 0.02,
+                    'micro_segment' => true,
+                ]
             );
         }
 
@@ -152,6 +198,7 @@ class LossFinderEngine
     }
 
     /**
+     * @param  array<string,mixed>  $meta
      * @return array<string,mixed>
      */
     private function finding(
@@ -161,7 +208,8 @@ class LossFinderEngine
         string $severity,
         float $amount,
         string $type,
-        string $suggestedDisputeType
+        string $suggestedDisputeType,
+        array $meta = []
     ): array {
         return [
             'code' => $code,
@@ -171,7 +219,7 @@ class LossFinderEngine
             'amount' => round($amount, 2),
             'type' => $type,
             'suggested_dispute_type' => $suggestedDisputeType,
+            'meta' => $meta,
         ];
     }
 }
-

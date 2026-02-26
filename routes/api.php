@@ -42,6 +42,9 @@ Route::prefix('v1')
             Route::patch('tenants/{tenant}/features', [TenantFeaturesController::class, 'update'])
                 ->middleware('permission:features.manage')
                 ->name('tenants.features.update');
+            Route::post('tenants/{tenant}/rules', [SettlementLossFinderController::class, 'upsertTenantScopedRule'])
+                ->middleware('permission:settlement_rules.manage')
+                ->name('tenants.rules.upsert');
         });
 
         Route::middleware('tenant.scope')->group(function () {
@@ -82,6 +85,15 @@ Route::prefix('v1')
                 Route::get('payouts/{payout}/reconciliations', [SettlementLossFinderController::class, 'reconciliations'])
                     ->middleware('permission:payouts.view')
                     ->name('payouts.reconciliations');
+                Route::get('payouts/{payout}/findings', [SettlementLossFinderController::class, 'findings'])
+                    ->middleware('permission:payouts.view')
+                    ->name('payouts.findings');
+                Route::get('payouts/{payout}/patterns', [SettlementLossFinderController::class, 'patterns'])
+                    ->middleware('permission:payouts.view')
+                    ->name('payouts.patterns');
+                Route::get('payouts/{payout}/regression', [SettlementLossFinderController::class, 'regression'])
+                    ->middleware('permission:payouts.view')
+                    ->name('payouts.regression');
                 Route::get('reconciliations/{id}', [SettlementLossFinderController::class, 'reconciliationDetail'])
                     ->middleware('permission:payouts.view')
                     ->name('reconciliations.show');
@@ -101,6 +113,15 @@ Route::prefix('v1')
                 Route::patch('disputes/{id}', [DisputesController::class, 'update'])
                     ->middleware('permission:disputes.manage')
                     ->name('disputes.update');
+                Route::post('disputes/{id}/evidence-pack', [DisputesController::class, 'createEvidencePack'])
+                    ->middleware('permission:disputes.manage')
+                    ->name('disputes.evidence-pack.create');
+                Route::get('disputes/{id}/evidence-pack', [DisputesController::class, 'evidencePack'])
+                    ->middleware('permission:disputes.view')
+                    ->name('disputes.evidence-pack.show');
+                Route::put('reconciliation-rules/tenant-override', [SettlementLossFinderController::class, 'upsertTenantRule'])
+                    ->middleware('permission:settlement_rules.manage')
+                    ->name('reconciliation-rules.tenant-override');
 
                 Route::get('dashboard/settlements', SettlementsDashboardController::class)
                     ->middleware('permission:dashboard.view')

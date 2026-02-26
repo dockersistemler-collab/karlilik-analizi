@@ -32,6 +32,8 @@ class SettlementCenterController extends Controller
         $this->ensureEnabled($tenantId);
 
         $status = (string) $request->string('status', '');
+        $q = trim((string) $request->string('q', ''));
+        $marketplace = trim((string) $request->string('marketplace', ''));
         $summary = app(SettlementDashboardCache::class)->rememberPortalSummary($tenantId, function () use ($tenantId): array {
             $baseQuery = Payout::query()
                 ->withoutGlobalScope('tenant_scope')
@@ -61,16 +63,37 @@ class SettlementCenterController extends Controller
             ];
         });
 
-        $payouts = Payout::query()
+        $basePayouts = Payout::query()
             ->withoutGlobalScope('tenant_scope')
             ->where('tenant_id', $tenantId)
-            ->with(['account:id,store_name', 'integration:id,code,name'])
-            ->when($status !== '', fn ($q) => $q->where('status', $status))
+            ->with(['account:id,store_name', 'integration:id,code,name']);
+
+        $statusCounts = (clone $basePayouts)
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $marketplaces = (clone $basePayouts)
+            ->whereNotNull('marketplace')
+            ->where('marketplace', '!=', '')
+            ->distinct()
+            ->orderBy('marketplace')
+            ->pluck('marketplace');
+
+        $payouts = $basePayouts
+            ->when($status !== '', fn ($query) => $query->where('status', $status))
+            ->when($marketplace !== '', fn ($query) => $query->where('marketplace', $marketplace))
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($inner) use ($q): void {
+                    $inner->where('payout_reference', 'like', '%'.$q.'%')
+                        ->orWhere('marketplace', 'like', '%'.$q.'%');
+                });
+            })
             ->orderByDesc('period_end')
             ->paginate(20)
             ->withQueryString();
 
-        return view('admin.settlements.index', compact('payouts', 'status', 'summary'));
+        return view('admin.settlements.index', compact('payouts', 'status', 'summary', 'q', 'marketplace', 'marketplaces', 'statusCounts'));
     }
 
     public function show(int $payout): View
@@ -93,16 +116,39 @@ class SettlementCenterController extends Controller
         $this->ensureEnabled($tenantId);
 
         $status = (string) $request->string('status', '');
-        $disputes = Dispute::query()
+        $q = trim((string) $request->string('q', ''));
+        $type = trim((string) $request->string('type', ''));
+
+        $baseDisputes = Dispute::query()
             ->withoutGlobalScope('tenant_scope')
             ->where('tenant_id', $tenantId)
-            ->with(['payout:id,payout_reference,period_start,period_end,currency', 'assignee:id,name'])
-            ->when($status !== '', fn ($q) => $q->where('status', $status))
+            ->with(['payout:id,payout_reference,period_start,period_end,currency', 'assignee:id,name']);
+
+        $statusCounts = (clone $baseDisputes)
+            ->selectRaw('LOWER(status) as status_key, COUNT(*) as total')
+            ->groupBy('status_key')
+            ->pluck('total', 'status_key');
+
+        $types = (clone $baseDisputes)
+            ->whereNotNull('dispute_type')
+            ->where('dispute_type', '!=', '')
+            ->distinct()
+            ->orderBy('dispute_type')
+            ->pluck('dispute_type');
+
+        $disputes = $baseDisputes
+            ->when($status !== '', fn ($query) => $query->whereRaw('LOWER(status) = ?', [strtolower($status)]))
+            ->when($type !== '', fn ($query) => $query->where('dispute_type', $type))
+            ->when($q !== '', function ($query) use ($q): void {
+                $query->whereHas('payout', function ($payoutQuery) use ($q): void {
+                    $payoutQuery->where('payout_reference', 'like', '%'.$q.'%');
+                });
+            })
             ->orderByDesc('id')
             ->paginate(20)
             ->withQueryString();
 
-        return view('admin.settlements.disputes', compact('disputes', 'status'));
+        return view('admin.settlements.disputes', compact('disputes', 'status', 'q', 'type', 'types', 'statusCounts'));
     }
 
     public function reconcile(int $payout): RedirectResponse

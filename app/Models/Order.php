@@ -90,5 +90,10 @@ class Order extends Model
     {
         return $this->hasOne(Shipment::class);
     }
+
+    public function profitSnapshot()
+    {
+        return $this->hasOne(OrderProfitSnapshot::class);
+    }
 }
 

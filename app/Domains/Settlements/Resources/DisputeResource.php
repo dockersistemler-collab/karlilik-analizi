@@ -19,10 +19,12 @@ class DisputeResource extends JsonResource
             'status' => $this->status,
             'assigned_user_id' => $this->assigned_user_id,
             'evidence' => $this->evidence,
+            'evidence_json' => $this->evidence_json,
+            'evidence_pack_status' => $this->evidence_pack_status,
+            'evidence_pack_generated_at' => optional($this->evidence_pack_generated_at)->toISOString(),
             'notes' => $this->notes,
             'created_at' => optional($this->created_at)->toISOString(),
             'updated_at' => optional($this->updated_at)->toISOString(),
         ];
     }
 }
-

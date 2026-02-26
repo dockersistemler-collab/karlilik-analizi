@@ -107,7 +107,7 @@
         border-radius: 10px;
         border: 1px solid #e2e8f0;
         background: #f8fafc;
-        color: #64748b;
+        color: #334155;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -295,6 +295,7 @@
         transition: transform .2s ease, background-color .2s ease, border-color .2s ease, opacity .2s ease;
         cursor: pointer;
         position: relative;
+        overflow: visible;
         border: 0;
         border-radius: 10px;
         padding: 4px 2px;
@@ -308,7 +309,7 @@
         gap: 8px;
         width: 100%;
         margin: 0 auto;
-        overflow: hidden;
+        overflow: visible;
     }
     .inventory-market-logo-wrap {
         width: 42px;
@@ -322,7 +323,7 @@
         background: #ffffff;
         transition: border-color .2s ease, background-color .2s ease, transform .2s ease;
         box-sizing: border-box;
-        overflow: hidden;
+        overflow: visible;
     }
     .inventory-market-logo {
         width: 36px;
@@ -372,6 +373,24 @@
     .inventory-market-cell.is-inactive .inventory-market-logo-wrap {
         border-color: #e5e7eb;
         background: #ffffff;
+    }
+    .inventory-market-sleep {
+        position: absolute;
+        right: -16px;
+        top: -10px;
+        z-index: 8;
+        font-size: 9px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: 0.03em;
+        color: #f8fafc;
+        background: #334155;
+        border: 1px solid #1e293b;
+        border-radius: 999px;
+        padding: 2px 5px;
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.24);
+        pointer-events: none;
+        animation: inventorySleepBadge 2.8s ease-in-out infinite;
     }
     .inventory-market-name {
         font-size: 11px;
@@ -453,6 +472,27 @@
     .inventory-market-cell:hover .inventory-market-hint {
         opacity: 1;
         transform: translateX(-50%) translateY(0);
+    }
+    @keyframes inventorySleepBadge {
+        0% {
+            opacity: .62;
+            transform: translateY(0);
+        }
+        50% {
+            opacity: .98;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.34);
+        }
+        100% {
+            opacity: .62;
+            transform: translateY(0);
+        }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .inventory-market-sleep {
+            animation: none;
+            opacity: .9;
+        }
     }
     .inline-edit-box {
         display: flex;
@@ -974,6 +1014,9 @@
                             <span class="inventory-market-cell {{ $marketIsActive ? 'is-active' : 'is-inactive' }}">
                                 <span class="inventory-market-hint">Pazaryerinde açılır</span>
                                 <span class="inventory-market-logo-wrap">
+                                    @unless($marketIsActive)
+                                        <span class="inventory-market-sleep">ZZZ</span>
+                                    @endunless
                                     @if($marketLogoUrl)
                                         <img src="{{ $marketLogoUrl }}" alt="{{ $marketplaceName }}" class="inventory-market-logo">
                                     @else
