@@ -54,6 +54,29 @@
             </div>
         </div>
 
+        @if(!empty($communicationStats))
+            <a href="{{ route('portal.communication-center.questions') }}" class="block rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-slate-900">Bekleyen İletişim</h2>
+                    <span class="text-xs text-slate-500">Detaya git</span>
+                </div>
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div class="rounded-xl bg-slate-50 p-4">
+                        <div class="text-slate-500">Bekleyen</div>
+                        <div class="text-2xl font-bold text-slate-900">{{ number_format((int) $communicationStats['pending']) }}</div>
+                    </div>
+                    <div class="rounded-xl bg-amber-50 p-4">
+                        <div class="text-amber-700">Kritik</div>
+                        <div class="text-2xl font-bold text-amber-800">{{ number_format((int) $communicationStats['critical']) }}</div>
+                    </div>
+                    <div class="rounded-xl bg-sky-50 p-4">
+                        <div class="text-sky-700">Ort. Cevap Süresi (7g)</div>
+                        <div class="text-2xl font-bold text-sky-800">{{ number_format((int) $communicationStats['avg_response_sec']) }} sn</div>
+                    </div>
+                </div>
+            </a>
+        @endif
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
             <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm flex flex-col h-[408px] min-h-0">
                                 <div class="flex flex-col gap-3">

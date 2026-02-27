@@ -15,6 +15,7 @@
 @php
 
     $ownerUser = auth()->user();
+    $isReadOnlyInventory = (bool) ($isReadOnlyInventory ?? false);
 
     $canExport = $ownerUser ? app(\App\Services\Entitlements\EntitlementService::class)->hasModule($ownerUser, 'feature.exports') : false;
     $normalizeMarketplaceKey = static function (?string $marketplaceName): string {
@@ -617,6 +618,7 @@
 <div class="panel-card p-3 mb-4 inventory-top-card">
         @include('admin.products.partials.catalog-tabs', [
             'isInventoryView' => ($isInventoryView ?? false),
+            'isReadOnlyInventory' => $isReadOnlyInventory,
             'inventoryMarketplaces' => ($inventoryMarketplaces ?? collect()),
             'selectedMarketplaceId' => ($selectedMarketplaceId ?? 0),
         ])
@@ -627,6 +629,7 @@
     <div id="inline-toast-stack" class="inline-toast-stack" aria-live="polite"></div>
     @include('admin.products.partials.catalog-tabs', [
         'isInventoryView' => ($isInventoryView ?? false),
+        'isReadOnlyInventory' => $isReadOnlyInventory,
         'inventoryMarketplaces' => ($inventoryMarketplaces ?? collect()),
         'selectedMarketplaceId' => ($selectedMarketplaceId ?? 0),
     ])
@@ -663,6 +666,7 @@
             </div>
 
             <div class="inventory-toolbar-actions">
+                @unless($isReadOnlyInventory)
 
                 @if($canExport)
 
@@ -704,6 +708,9 @@
                     <i class="fas fa-plus mr-2"></i> Yeni &Uuml;r&uuml;n
 
                 </a>
+                @else
+                <span class="inventory-action-pill">Salt okunur stok g&ouml;r&uuml;n&uuml;m&uuml;</span>
+                @endunless
 
             </div>
 
@@ -769,7 +776,9 @@
             <tr>
 
                 <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
-                    <input type="checkbox" id="inventory-select-all" class="rounded border-slate-300 text-[#ff4439] focus:ring-[#ff4439]">
+                    @if(!$isReadOnlyInventory)
+                        <input type="checkbox" id="inventory-select-all" class="rounded border-slate-300 text-[#ff4439] focus:ring-[#ff4439]">
+                    @endif
                 </th>
 
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">G&ouml;rsel</th>
@@ -882,7 +891,9 @@
 
             <tr class="bg-white shadow-sm">
                 <td class="px-4 py-4 whitespace-nowrap">
-                    <input type="checkbox" class="inventory-row-select rounded border-slate-300 text-[#ff4439] focus:ring-[#ff4439]" value="{{ $product->id }}" data-product-id="{{ $product->id }}">
+                    @if(!$isReadOnlyInventory)
+                        <input type="checkbox" class="inventory-row-select rounded border-slate-300 text-[#ff4439] focus:ring-[#ff4439]" value="{{ $product->id }}" data-product-id="{{ $product->id }}">
+                    @endif
                 </td>
 
                 <td class="px-6 py-4 whitespace-nowrap text-center">
@@ -930,47 +941,47 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{{ $product->brand ?? '-' }}</td>
 
                 <td class="px-6 py-4 whitespace-nowrap">
-
-                    <div class="flex items-center gap-2">
-
-                        <div class="inline-edit-box" data-inline-edit-box="{{ $product->id }}">
-                            <input type="number" step="0.01" min="0" class="w-24 text-sm" value="{{ $product->cost_price }}" data-product-cost="{{ $product->id }}" data-inline-edit-input="1">
-                            <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">G&uuml;ncelle</button>
+                    @if($isReadOnlyInventory)
+                        <span class="text-sm text-slate-700">{{ number_format((float) $product->cost_price, 2, ',', '.') }} {{ $product->currency }}</span>
+                    @else
+                        <div class="flex items-center gap-2">
+                            <div class="inline-edit-box" data-inline-edit-box="{{ $product->id }}">
+                                <input type="number" step="0.01" min="0" class="w-24 text-sm" value="{{ $product->cost_price }}" data-product-cost="{{ $product->id }}" data-inline-edit-input="1">
+                                <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">G&uuml;ncelle</button>
+                            </div>
+                            <span class="text-xs text-slate-500">{{ $product->currency }}</span>
                         </div>
-
-                        <span class="text-xs text-slate-500">{{ $product->currency }}</span>
-
-                    </div>
+                    @endif
 
                 </td>
 
                 <td class="px-6 py-4 whitespace-nowrap">
-
-                    <div class="flex items-center gap-2">
-
-                        <div class="inline-edit-box" data-inline-edit-box="{{ $product->id }}">
-                            <input type="number" step="0.01" min="0" class="w-24 text-sm" value="{{ $product->price }}" data-product-price="{{ $product->id }}" data-inline-edit-input="1">
-                            <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">G&uuml;ncelle</button>
+                    @if($isReadOnlyInventory)
+                        <span class="text-sm text-slate-700">{{ number_format((float) $product->price, 2, ',', '.') }} {{ $product->currency }}</span>
+                    @else
+                        <div class="flex items-center gap-2">
+                            <div class="inline-edit-box" data-inline-edit-box="{{ $product->id }}">
+                                <input type="number" step="0.01" min="0" class="w-24 text-sm" value="{{ $product->price }}" data-product-price="{{ $product->id }}" data-inline-edit-input="1">
+                                <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">G&uuml;ncelle</button>
+                            </div>
+                            <span class="text-xs text-slate-500">{{ $product->currency }}</span>
                         </div>
-
-                        <span class="text-xs text-slate-500">{{ $product->currency }}</span>
-
-                    </div>
+                    @endif
 
                 </td>
 
                 <td class="px-6 py-4 whitespace-nowrap">
-
-                    <div class="flex items-center gap-2">
-
-                        <div class="inline-edit-box" data-inline-edit-box="{{ $product->id }}">
-                            <input type="number" min="0" class="w-24 text-sm" value="{{ $product->stock_quantity }}" data-product-stock="{{ $product->id }}" data-inline-edit-input="1">
-                            <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">G&uuml;ncelle</button>
+                    @if($isReadOnlyInventory)
+                        <span class="text-sm text-slate-700">{{ $product->stock_quantity }} <span class="text-xs text-slate-500">adet</span></span>
+                    @else
+                        <div class="flex items-center gap-2">
+                            <div class="inline-edit-box" data-inline-edit-box="{{ $product->id }}">
+                                <input type="number" min="0" class="w-24 text-sm" value="{{ $product->stock_quantity }}" data-product-stock="{{ $product->id }}" data-inline-edit-input="1">
+                                <button type="button" class="inline-update-btn" data-inline-update-product="{{ $product->id }}" data-inline-update-button="1">G&uuml;ncelle</button>
+                            </div>
+                            <span class="text-xs text-slate-500">adet</span>
                         </div>
-
-                        <span class="text-xs text-slate-500">adet</span>
-
-                    </div>
+                    @endif
 
                 </td>
 
@@ -1043,50 +1054,44 @@
                 </td>
 
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    <a href="{{ route('portal.products.show', $product) }}"
-                       class="text-blue-600 hover:text-blue-900 mr-3"
-                       data-product-edit-popup="1"
-                       data-product-name="{{ $product->name }} Detay">
+                    @if($isReadOnlyInventory)
+                        <span class="text-slate-400">-</span>
+                    @else
+                        <a href="{{ route('portal.products.show', $product) }}"
+                           class="text-blue-600 hover:text-blue-900 mr-3"
+                           data-product-edit-popup="1"
+                           data-product-name="{{ $product->name }} Detay">
+                            <i class="fas fa-eye"></i>
+                        </a>
 
-                        <i class="fas fa-eye"></i>
-
-                    </a>
-
-                    <a href="{{ route('portal.products.edit', $product) }}"
-                       class="text-amber-600 hover:text-amber-800 mr-3"
-                       data-product-edit-popup="1"
-                       data-product-name="{{ $product->name }}">
-
-                        <i class="fas fa-edit"></i>
-
-                    </a>
-                    @if($isInventoryView ?? false)
-                    <button type="button"
-                            class="text-violet-600 hover:text-violet-800 mr-3"
-                            data-toggle-marketplace-row="{{ $product->id }}">
-                        <i class="fas fa-store"></i>
-                    </button>
-                    @endif
-
-                    <form action="{{ route('portal.products.destroy', $product) }}" method="POST" class="inline">
-
-                        @csrf
-
-                        @method('DELETE')
-
-                        <button type="submit" class="text-rose-600 hover:text-rose-800" onclick="return confirm('Silmek istedi&#287;inize emin misiniz?')">
-
-                            <i class="fas fa-trash"></i>
-
+                        <a href="{{ route('portal.products.edit', $product) }}"
+                           class="text-amber-600 hover:text-amber-800 mr-3"
+                           data-product-edit-popup="1"
+                           data-product-name="{{ $product->name }}">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        @if($isInventoryView ?? false)
+                        <button type="button"
+                                class="text-violet-600 hover:text-violet-800 mr-3"
+                                data-toggle-marketplace-row="{{ $product->id }}">
+                            <i class="fas fa-store"></i>
                         </button>
+                        @endif
 
-                    </form>
+                        <form action="{{ route('portal.products.destroy', $product) }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-rose-600 hover:text-rose-800" onclick="return confirm('Silmek istedi&#287;inize emin misiniz?')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    @endif
 
                 </td>
 
             </tr>
 
-            @if($isInventoryView ?? false)
+            @if(($isInventoryView ?? false) && !$isReadOnlyInventory)
             <tr class="hidden bg-slate-50" data-marketplace-row="{{ $product->id }}">
                 <td colspan="{{ ($isInventoryView ?? false) ? 11 : 10 }}" class="px-6 py-4">
                     <div class="rounded-xl border border-slate-200 bg-white p-4">
@@ -1208,6 +1213,7 @@
     let searchAbortController;
     const inventoryFlashMessage = @json(session('error') ?? (session('success') ?? ($errors->any() ? $errors->first() : null)));
     const inventoryFlashType = @json(session('error') || $errors->any() ? 'error' : (session('success') ? 'success' : null));
+    const isReadOnlyInventory = @json($isReadOnlyInventory);
 
     const inlineLastSavedState = {};
 
@@ -1729,10 +1735,11 @@
 
                 resultsWrap.innerHTML = nextResults.innerHTML;
 
-                bindQuickSave();
-
-                bindInventoryMarketplaceActions();
-                bindInventorySelection();
+                if (!isReadOnlyInventory) {
+                    bindQuickSave();
+                    bindInventoryMarketplaceActions();
+                    bindInventorySelection();
+                }
                 bindListImagePreview();
 
                 if (searchInput) {
@@ -1787,10 +1794,11 @@
 
 
 
-    bindQuickSave();
-
-    bindInventoryMarketplaceActions();
-    bindInventorySelection();
+    if (!isReadOnlyInventory) {
+        bindQuickSave();
+        bindInventoryMarketplaceActions();
+        bindInventorySelection();
+    }
     bindListImagePreview();
     bindInventoryImportForm();
     if (inventoryFlashMessage) {

@@ -28,7 +28,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $user = $request->user();
+        if (Auth::guard('subuser')->check()) {
+            return redirect()->intended(route('portal.dashboard'));
+        }
+
+        $user = Auth::guard('web')->user();
         $default = $user && $user->isSuperAdmin()
             ? route('super-admin.dashboard')
             : route('portal.dashboard');

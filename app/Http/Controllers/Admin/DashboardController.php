@@ -10,7 +10,9 @@ use App\Models\MarketplaceProduct;
 use App\Models\BillingEvent;
 use App\Models\BillingSubscription;
 use App\Services\Reports\SoldProductsReportService;
+use App\Services\Modules\ModuleGate;
 use App\Support\SupportUser;
+use App\Models\CommunicationThread;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -164,6 +166,29 @@ $failureEvent = BillingEvent::query()
             'total' => 0,
         ])->values();
 
+        $communicationStats = null;
+        if ($user && app(ModuleGate::class)->isEnabledForUser($user, 'customer_communication_center')) {
+            $threadBase = CommunicationThread::query()->forUser($user);
+            $pendingCount = (clone $threadBase)->whereIn('status', ['open', 'pending'])->count();
+            $criticalCount = (clone $threadBase)
+                ->whereIn('status', ['open', 'pending', 'overdue'])
+                ->where(function ($q): void {
+                    $q->where('due_at', '<', now())
+                        ->orWhereBetween('due_at', [now(), now()->addMinutes(30)]);
+                })
+                ->count();
+            $avgResponse = (int) round((float) ((clone $threadBase)
+                ->whereNotNull('response_time_sec')
+                ->where('updated_at', '>=', now()->subDays(7))
+                ->avg('response_time_sec') ?? 0));
+
+            $communicationStats = [
+                'pending' => $pendingCount,
+                'critical' => $criticalCount,
+                'avg_response_sec' => $avgResponse,
+            ];
+        }
+
         $payload = compact(
             'stats',
             'recent_orders',
@@ -175,7 +200,8 @@ $failureEvent = BillingEvent::query()
             'fallbackMarketplaces',
             'range',
             'portalBilling',
-            'isPortal'
+            'isPortal',
+            'communicationStats'
         );
 
         if ($isPortal) {

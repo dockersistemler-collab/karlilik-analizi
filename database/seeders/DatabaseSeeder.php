@@ -20,6 +20,7 @@ public function run(): void
         MarketplaceSeeder::class,
         PlanSeeder::class,
         ModuleCatalogSeeder::class,
+        CommunicationCenterSeeder::class,
         SuperAdminSeeder::class,  // BUNU EKLE
         ProfitEngineDefaultsSeeder::class,
         MarketplaceRiskDefaultsSeeder::class,

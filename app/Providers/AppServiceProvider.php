@@ -17,6 +17,7 @@ use App\Policies\NotificationPolicy;
 use App\Policies\NotificationPreferencePolicy;
 use App\Policies\PayoutPolicy;
 use App\Policies\DisputePolicy;
+use App\Policies\CommunicationThreadPolicy;
 use App\Policies\MarketplaceAccountPolicy;
 use App\Support\SupportUser;
 use App\Support\CorrelationId;
@@ -58,6 +59,7 @@ use App\Domains\Settlements\Repositories\PayoutRepositoryInterface;
 use App\Domains\Settlements\Models\Payout;
 use App\Domains\Settlements\Models\Dispute;
 use App\Models\MarketplaceAccount;
+use App\Models\CommunicationThread;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -123,6 +125,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Payout::class, PayoutPolicy::class);
         Gate::policy(Dispute::class, DisputePolicy::class);
         Gate::policy(MarketplaceAccount::class, MarketplaceAccountPolicy::class);
+        Gate::policy(CommunicationThread::class, CommunicationThreadPolicy::class);
         Order::observe(OrderObserver::class);
 
         Gate::before(function (User $user): ?bool {

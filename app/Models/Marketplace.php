@@ -38,5 +38,15 @@ class Marketplace extends Model
     {
         return $this->hasMany(Order::class);
     }
-}
+
+    public function stores()
+    {
+        return $this->hasMany(MarketplaceStore::class);
+    }
+
+    public function communicationThreads()
+    {
+        return $this->hasMany(CommunicationThread::class);
+    }
+}
 

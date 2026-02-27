@@ -35,6 +35,7 @@ class EnsureSubUserPermission
         'portal.action-engine.' => 'reports.action_engine',
         'portal.buybox.' => 'reports.buybox_engine',
         'portal.control-tower.' => 'control_tower',
+        'portal.communication-center.' => 'communication_center',
         'portal.settlements.reconcile' => 'settlements.manage',
         'portal.settlements.disputes.from-findings' => 'settlements.manage',
         'portal.settlements.disputes.update' => 'settlements.manage',

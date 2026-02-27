@@ -13,6 +13,7 @@ class EntitlementService
     private const EXPLICIT_ASSIGNMENT_MODULES = [
         'feature.sub_users',
         'feature.control_tower',
+        'customer_communication_center',
         'profit_engine',
         'action_engine',
         'marketplace_risk',

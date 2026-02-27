@@ -2077,6 +2077,8 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                     : ($canSeeMarketplaceRisk ? 'marketplace_risk' : 'action_engine');
                 $canCommissionTariffs = $hasModule('feature.reports.commission_tariffs')
                     && (!$subUser || $subPermissions->has('reports') || $subPermissions->has('reports.commission_tariffs'));
+                $canCommunicationCenter = $hasModule('customer_communication_center')
+                    && (!$subUser || $subPermissions->has('communication_center'));
 
                 $canReports = function (string $key) use ($subPermissions, $subUser) {
 
@@ -2383,18 +2385,6 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                             </a>
 
                         @endif
-
-                        @if($canReports('reports.sold_products'))
-
-                            <a href="{{ route('portal.reports.sold-products') }}" class="sidebar-link {{ request()->routeIs('portal.reports.sold-products') ? 'is-active' : '' }}">
-                                <i class="fa-solid fa-receipt w-6"></i>
-
-                                <span class="sidebar-label">Satılan Ürün Listesi</span>
-
-                            </a>
-
-                        @endif
-
                         @if($canReports('reports.orders'))
 
                             <a href="{{ route('portal.reports.index') }}" class="sidebar-link {{ request()->routeIs('portal.reports.index') ? 'is-active' : '' }}">
@@ -2454,20 +2444,6 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                             </a>
 
                         @endif
-
-                        @if($canReports('reports.commission_tariffs'))
-
-                            @if($canCommissionTariffs)
-                            <a href="{{ route('portal.commission-tariffs.index') }}" class="sidebar-link {{ request()->routeIs('portal.commission-tariffs.*') ? 'is-active' : '' }}">
-                                <i class="fa-solid fa-sliders w-6"></i>
-
-                                <span class="sidebar-label">Ürün Komisyon Tarifeleri</span>
-
-                            </a>
-                            @endif
-
-                        @endif
-
                         @if($canReports('reports.stock_value'))
 
                             <a href="{{ route('portal.reports.stock-value') }}" class="sidebar-link {{ request()->routeIs('portal.reports.stock-value') ? 'is-active' : '' }}">
@@ -2481,6 +2457,13 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                     </div>
 
+                @endif
+
+                @if($canCommunicationCenter)
+                    <a href="{{ route('portal.communication-center.questions') }}" class="sidebar-link {{ request()->routeIs('portal.communication-center.*') ? 'is-active' : '' }}">
+                        <i class="fa-solid fa-comments w-6"></i>
+                        <span class="sidebar-label">Müşteri İletişim Merkezi</span>
+                    </a>
                 @endif
 
                 @if($settlementFeatureEnabled)

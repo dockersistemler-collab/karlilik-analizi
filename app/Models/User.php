@@ -172,6 +172,21 @@ class User extends Authenticatable
         return $this->hasMany(Shipment::class);
     }
 
+    public function marketplaceStores()
+    {
+        return $this->hasMany(MarketplaceStore::class);
+    }
+
+    public function communicationTemplates()
+    {
+        return $this->hasMany(CommunicationTemplate::class);
+    }
+
+    public function communicationSetting()
+    {
+        return $this->hasOne(CommunicationSetting::class);
+    }
+
     public function supportAccessLogsAsSuperAdmin()
     {
         return $this->hasMany(SupportAccessLog::class, 'super_admin_id');

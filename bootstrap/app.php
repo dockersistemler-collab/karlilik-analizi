@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'subuser.permission' => \App\Http\Middleware\EnsureSubUserPermission::class,
             'reports.export' => \App\Http\Middleware\EnsureReportExportsEnabled::class,
             'module' => \App\Http\Middleware\EnsureModuleEnabled::class,
+            'module.enabled' => \App\Http\Middleware\CheckModuleEnabled::class,
             'support.readonly' => \App\Http\Middleware\EnsureSupportViewReadOnly::class,
             'feature' => \App\Http\Middleware\EnsureFeatureEnabled::class,
             'correlation' => \App\Http\Middleware\CorrelationIdMiddleware::class,

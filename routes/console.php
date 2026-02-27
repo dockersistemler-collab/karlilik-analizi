@@ -14,6 +14,14 @@ use App\Jobs\RunActionEngineCalibrationJob;
 use App\Jobs\CollectBuyBoxSnapshotsJob;
 use App\Jobs\BuildControlTowerDailySnapshotJob;
 use App\Services\Modules\ModuleGate;
+use App\Models\MarketplaceStore;
+use App\Models\CommunicationSetting;
+use App\Models\CommunicationThread;
+use App\Jobs\SyncCommunicationJob;
+use App\Jobs\ComputeSlaAndPriorityJob;
+use App\Mail\CommunicationOverdueDigestMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -234,6 +242,72 @@ Schedule::call(function () {
 })
     ->name('control_tower_daily_snapshot')
     ->dailyAt('04:00')
+    ->timezone('Europe/Istanbul')
+    ->withoutOverlapping();
+
+Schedule::call(function () {
+    $moduleGate = app(ModuleGate::class);
+    if (!$moduleGate->isActive('customer_communication_center')) {
+        return;
+    }
+    if (!Schema::hasTable('communication_settings') || !Schema::hasTable('marketplace_stores')) {
+        return;
+    }
+
+    $globalSettings = CommunicationSetting::query()->whereNull('user_id')->first();
+    $interval = max(1, (int) ($globalSettings?->cron_interval_minutes ?? 5));
+    if (((int) now()->format('i')) % $interval !== 0) {
+        return;
+    }
+
+    MarketplaceStore::query()
+        ->where('is_active', true)
+        ->select('id')
+        ->chunk(200, function ($stores): void {
+            foreach ($stores as $store) {
+                SyncCommunicationJob::dispatch((int) $store->id);
+            }
+        });
+})
+    ->name('communication_center_sync')
+    ->everyMinute()
+    ->withoutOverlapping();
+
+Schedule::job(new ComputeSlaAndPriorityJob())
+    ->name('communication_center_priority_compute')
+    ->everyFiveMinutes()
+    ->withoutOverlapping();
+
+Schedule::call(function () {
+    $moduleGate = app(ModuleGate::class);
+    if (!$moduleGate->isActive('customer_communication_center')) {
+        return;
+    }
+    if (!Schema::hasTable('communication_settings') || !Schema::hasTable('communication_threads')) {
+        return;
+    }
+
+    $global = CommunicationSetting::query()->whereNull('user_id')->first();
+    $email = trim((string) ($global?->notification_email ?? ''));
+    if ($email === '') {
+        return;
+    }
+
+    $threads = CommunicationThread::query()
+        ->with(['marketplaceStore', 'marketplace'])
+        ->where('status', 'overdue')
+        ->latest('due_at')
+        ->take(100)
+        ->get();
+
+    if ($threads->isEmpty()) {
+        return;
+    }
+
+    Mail::to($email)->send(new CommunicationOverdueDigestMail($threads));
+})
+    ->name('communication_center_overdue_digest')
+    ->dailyAt('09:00')
     ->timezone('Europe/Istanbul')
     ->withoutOverlapping();
 

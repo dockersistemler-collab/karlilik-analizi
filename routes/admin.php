@@ -28,6 +28,7 @@ use App\Http\Controllers\SuperAdmin\NotificationController as SuperAdminNotifica
 use App\Http\Controllers\SuperAdmin\SettlementModuleController as SuperAdminSettlementModuleController;
 use App\Http\Controllers\SuperAdmin\IntelligenceModuleController as SuperAdminIntelligenceModuleController;
 use App\Http\Controllers\Admin\BillingEventController as AdminBillingEventController;
+use App\Http\Controllers\SuperAdmin\CommunicationCenterController as SuperAdminCommunicationCenterController;
 
 Route::middleware(['auth', 'verified', 'role:super_admin'])
     ->name('super-admin.')
@@ -131,6 +132,26 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
                 ->name('index');
             Route::post('clients/{user}/visibility', [SuperAdminSettlementModuleController::class, 'setVisibility'])
                 ->name('visibility');
+        });
+
+        Route::prefix('communication-center')->name('communication-center.')->group(function () {
+            Route::get('settings', [SuperAdminCommunicationCenterController::class, 'settings'])->name('settings');
+            Route::post('settings', [SuperAdminCommunicationCenterController::class, 'updateSettings'])->name('settings.update');
+
+            Route::get('templates', [SuperAdminCommunicationCenterController::class, 'templates'])->name('templates.index');
+            Route::get('templates/create', [SuperAdminCommunicationCenterController::class, 'createTemplate'])->name('templates.create');
+            Route::post('templates', [SuperAdminCommunicationCenterController::class, 'storeTemplate'])->name('templates.store');
+            Route::get('templates/{template}/edit', [SuperAdminCommunicationCenterController::class, 'editTemplate'])->name('templates.edit');
+            Route::put('templates/{template}', [SuperAdminCommunicationCenterController::class, 'updateTemplate'])->name('templates.update');
+            Route::delete('templates/{template}', [SuperAdminCommunicationCenterController::class, 'destroyTemplate'])->name('templates.destroy');
+
+            Route::get('stores', [SuperAdminCommunicationCenterController::class, 'stores'])->name('stores.index');
+            Route::post('stores/{store}', [SuperAdminCommunicationCenterController::class, 'updateStore'])->name('stores.update');
+
+            Route::get('sla', [SuperAdminCommunicationCenterController::class, 'slaIndex'])->name('sla.index');
+            Route::post('sla', [SuperAdminCommunicationCenterController::class, 'slaStore'])->name('sla.store');
+            Route::put('sla/{sla}', [SuperAdminCommunicationCenterController::class, 'slaUpdate'])->name('sla.update');
+            Route::delete('sla/{sla}', [SuperAdminCommunicationCenterController::class, 'slaDestroy'])->name('sla.destroy');
         });
 
         Route::prefix('cargo')->name('cargo.')->group(function () {

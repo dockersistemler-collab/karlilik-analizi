@@ -1,5 +1,6 @@
-﻿@php
+@php
     $isInventoryView = $isInventoryView ?? false;
+    $isReadOnlyInventory = $isReadOnlyInventory ?? false;
     $inventoryMarketplaces = $inventoryMarketplaces ?? collect();
     $selectedMarketplaceId = (int) ($selectedMarketplaceId ?? 0);
 @endphp
@@ -83,6 +84,7 @@
             </div>
 
             <div class="flex items-center gap-2 flex-wrap">
+                @unless($isReadOnlyInventory)
                 <form method="POST"
                       action="{{ route('portal.inventory.admin.sync-marketplace') }}"
                       data-inventory-sync-form
@@ -132,6 +134,9 @@
                         </button>
                     </div>
                 </form>
+                @else
+                <span class="inventory-action-btn">Salt okunur g&ouml;r&uuml;n&uuml;m</span>
+                @endunless
             </div>
         </div>
     @else
@@ -151,3 +156,4 @@
         </a>
     @endif
 </div>
+

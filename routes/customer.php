@@ -52,6 +52,7 @@ use App\Http\Controllers\Admin\ActionEngineController;
 use App\Http\Controllers\Admin\DecisionCenterController;
 use App\Http\Controllers\Admin\BuyBoxController;
 use App\Http\Controllers\Admin\ControlTowerController;
+use App\Http\Controllers\Admin\CommunicationCenterController as AdminCommunicationCenterController;
 use App\Http\Controllers\Customer\TicketController as CustomerTicketController;
 use App\Http\Controllers\SubUser\PasswordController as SubUserPasswordController;
 use App\Http\Controllers\Admin\System\MailLogController as AdminMailLogController;
@@ -450,6 +451,21 @@ Route::middleware(['client_or_subuser', 'verified', 'subscription', 'subuser.per
             Route::get('tickets/{ticket}', [CustomerTicketController::class, 'show'])->name('tickets.show');
             Route::post('tickets/{ticket}/reply', [CustomerTicketController::class, 'reply'])->name('tickets.reply');
         });
+
+        Route::prefix('communication-center')
+            ->name('communication-center.')
+            ->middleware('module.enabled:customer_communication_center')
+            ->group(function () {
+                Route::get('/', [AdminCommunicationCenterController::class, 'index'])->name('index');
+                Route::post('sync-now', [AdminCommunicationCenterController::class, 'syncNow'])->name('sync-now');
+                Route::get('questions', [AdminCommunicationCenterController::class, 'list'])->defaults('channel', 'question')->name('questions');
+                Route::get('messages', [AdminCommunicationCenterController::class, 'list'])->defaults('channel', 'message')->name('messages');
+                Route::get('reviews', [AdminCommunicationCenterController::class, 'list'])->defaults('channel', 'review')->name('reviews');
+                Route::get('thread/{thread}', [AdminCommunicationCenterController::class, 'show'])->name('thread.show');
+                Route::post('thread/{thread}/reply', [AdminCommunicationCenterController::class, 'reply'])->name('thread.reply');
+                Route::post('thread/{thread}/ai-suggest', [AdminCommunicationCenterController::class, 'aiSuggest'])->name('thread.ai-suggest');
+                Route::post('templates', [AdminCommunicationCenterController::class, 'storeTemplate'])->name('templates.store');
+            });
 
         Route::view('help/training', 'admin.help.training')->name('help.training');
         Route::view('help/support', 'admin.help.support')->name('help.support');

@@ -890,6 +890,13 @@
 
 
 
+                <a href="{{ route('super-admin.communication-center.settings') }}" class="sidebar-link {{ request()->routeIs('super-admin.communication-center.*') ? 'is-active' : '' }}">
+
+                    <i class="fa-solid fa-comments w-6"></i>
+
+                    <span class="sidebar-label">İletişim Merkezi</span>
+
+                </a>
                 <a href="{{ route('super-admin.settlements.index') }}" class="sidebar-link {{ request()->routeIs('super-admin.settlements.*') ? 'is-active' : '' }}">
 
                     <i class="fa-solid fa-scale-balanced w-6"></i>

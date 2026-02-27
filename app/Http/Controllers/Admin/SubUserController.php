@@ -32,7 +32,8 @@ class SubUserController extends Controller
         'reports.profit_engine' => 'Raporlar: Profit Engine',
         'reports.marketplace_risk' => 'Raporlar: Marketplace Risk',
         'reports.action_engine' => 'Raporlar: Action Engine',
-                        'control_tower' => 'Control Tower',
+        'control_tower' => 'Control Tower',
+        'communication_center' => 'Müşteri İletişim Merkezi',
         'settlements.view' => 'HakediÃƒâ€¦Ã…Â¸: GÃƒÆ’Ã‚Â¶rÃƒÆ’Ã‚Â¼ntÃƒÆ’Ã‚Â¼leme',
         'settlements.manage' => 'HakediÃƒâ€¦Ã…Â¸: YÃƒÆ’Ã‚Â¶netim',
         'integrations' => 'Entegrasyonlar',
@@ -86,7 +87,7 @@ class SubUserController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => $validated['password'],
-            'is_active' => (bool) ($validated['is_active'] ?? false),
+            'is_active' => (bool) ($validated['is_active'] ?? true),
         ]);
 
         $this->syncPermissions($subUser, $validated['permissions'] ?? []);
@@ -135,7 +136,9 @@ class SubUserController extends Controller
         $subUser->update(['name' => $validated['name'],
             'email' => $validated['email'],
             'password' => $validated['password'] ?? $subUser->password,
-            'is_active' => (bool) ($validated['is_active'] ?? false),
+            'is_active' => array_key_exists('is_active', $validated)
+                ? (bool) $validated['is_active']
+                : (bool) $subUser->is_active,
         ]);
 
         $this->syncPermissions($subUser, $validated['permissions'] ?? []);

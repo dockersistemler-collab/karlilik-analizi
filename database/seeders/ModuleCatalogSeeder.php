@@ -108,6 +108,17 @@ class ModuleCatalogSeeder extends Seeder
                 'sort_order' => 0,
             ]
         );
+        Module::query()->updateOrCreate(
+            ['code' => 'customer_communication_center'],
+            [
+                'name' => 'Müşteri İletişim Merkezi',
+                'description' => 'Trendyol, Hepsiburada, Amazon ve N11 müşteri iletişimlerini tek ekranda toplar.',
+                'type' => 'feature',
+                'billing_type' => 'recurring',
+                'is_active' => true,
+                'sort_order' => 0,
+            ]
+        );
 
         Module::query()->updateOrCreate(
             ['code' => 'feature.exports'],

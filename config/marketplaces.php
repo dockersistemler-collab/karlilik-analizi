@@ -8,6 +8,11 @@ return [
         'timeout' => (int) env('MARKETPLACES_TRENDYOL_TIMEOUT', 20),
         'order_page_size' => (int) env('MARKETPLACES_TRENDYOL_ORDER_PAGE_SIZE', 200),
         'finance_page_size' => (int) env('MARKETPLACES_TRENDYOL_FINANCE_PAGE_SIZE', 500),
+        'communication' => [
+            'threads_endpoint' => env('MARKETPLACES_TRENDYOL_COMM_THREADS_ENDPOINT', '/communication/threads'),
+            'messages_endpoint' => env('MARKETPLACES_TRENDYOL_COMM_MESSAGES_ENDPOINT', '/communication/threads/{external_thread_id}/messages'),
+            'send_reply_endpoint' => env('MARKETPLACES_TRENDYOL_COMM_SEND_REPLY_ENDPOINT', '/communication/threads/{external_thread_id}/reply'),
+        ],
     ],
     'hepsiburada' => [
         'base_url' => env('MARKETPLACES_HEPSIBURADA_BASE_URL', 'https://api.hepsiburada.com'),
@@ -18,6 +23,11 @@ return [
             'returns' => env('MARKETPLACES_HEPSIBURADA_RETURNS_ENDPOINT', '/returns/merchantid/{merchant_id}'),
             'payouts' => env('MARKETPLACES_HEPSIBURADA_PAYOUTS_ENDPOINT', '/finance/merchantid/{merchant_id}/payouts'),
             'payout_transactions' => env('MARKETPLACES_HEPSIBURADA_PAYOUT_TRANSACTIONS_ENDPOINT', '/finance/merchantid/{merchant_id}/payouts/{payout_reference}/transactions'),
+        ],
+        'communication' => [
+            'threads_endpoint' => env('MARKETPLACES_HEPSIBURADA_COMM_THREADS_ENDPOINT', '/communication/threads'),
+            'messages_endpoint' => env('MARKETPLACES_HEPSIBURADA_COMM_MESSAGES_ENDPOINT', '/communication/threads/{external_thread_id}/messages'),
+            'send_reply_endpoint' => env('MARKETPLACES_HEPSIBURADA_COMM_SEND_REPLY_ENDPOINT', '/communication/threads/{external_thread_id}/reply'),
         ],
     ],
     'n11' => [
@@ -30,6 +40,11 @@ return [
             'payouts' => env('MARKETPLACES_N11_PAYOUTS_ENDPOINT', '/finance/payout/list'),
             'payout_transactions' => env('MARKETPLACES_N11_PAYOUT_TRANSACTIONS_ENDPOINT', '/finance/payout/{payout_reference}/transactions'),
         ],
+        'communication' => [
+            'threads_endpoint' => env('MARKETPLACES_N11_COMM_THREADS_ENDPOINT', '/communication/threads'),
+            'messages_endpoint' => env('MARKETPLACES_N11_COMM_MESSAGES_ENDPOINT', '/communication/threads/{external_thread_id}/messages'),
+            'send_reply_endpoint' => env('MARKETPLACES_N11_COMM_SEND_REPLY_ENDPOINT', '/communication/threads/{external_thread_id}/reply'),
+        ],
     ],
     'amazon' => [
         'base_url' => env('MARKETPLACES_AMAZON_BASE_URL', 'https://sellingpartnerapi-eu.amazon.com'),
@@ -41,6 +56,11 @@ return [
             'returns' => env('MARKETPLACES_AMAZON_RETURNS_ENDPOINT', '/orders/v0/returns'),
             'payouts' => env('MARKETPLACES_AMAZON_PAYOUTS_ENDPOINT', '/finances/v0/financialEventGroups'),
             'payout_transactions' => env('MARKETPLACES_AMAZON_PAYOUT_TRANSACTIONS_ENDPOINT', '/finances/v0/financialEventGroups/{payout_reference}/events'),
+        ],
+        'communication' => [
+            'threads_endpoint' => env('MARKETPLACES_AMAZON_COMM_THREADS_ENDPOINT', '/communication/threads'),
+            'messages_endpoint' => env('MARKETPLACES_AMAZON_COMM_MESSAGES_ENDPOINT', '/communication/threads/{external_thread_id}/messages'),
+            'send_reply_endpoint' => env('MARKETPLACES_AMAZON_COMM_SEND_REPLY_ENDPOINT', '/communication/threads/{external_thread_id}/reply'),
         ],
     ],
 ];
