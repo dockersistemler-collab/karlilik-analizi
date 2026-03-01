@@ -281,12 +281,12 @@ class CommunicationAiSuggestService
     private function normalize(string $text): string
     {
         $replace = [
-            '�' => 'i', '�' => 'i',
-            '�' => 'g', '�' => 'g',
-            '�' => 's', '�' => 's',
-            '�' => 'o', '�' => 'o',
-            '�' => 'u', '�' => 'u',
-            '�' => 'c', '�' => 'c',
+            '?' => 'i', '?' => 'i',
+            '?' => 'g', '?' => 'g',
+            '?' => 's', '?' => 's',
+            '?' => 'o', '?' => 'o',
+            '?' => 'u', '?' => 'u',
+            '?' => 'c', '?' => 'c',
         ];
 
         $text = strtr($text, $replace);

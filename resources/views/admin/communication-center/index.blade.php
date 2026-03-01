@@ -324,17 +324,22 @@
         }
 
         .cc-filter-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 1.15rem;
-            background: transparent;
-            box-shadow: 0 16px 34px rgba(15, 23, 42, 0.06);
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            border-radius: 1.25rem;
+            background:
+                radial-gradient(130% 120% at 0% 0%, rgba(219, 234, 254, 0.55) 0%, transparent 52%),
+                linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 16px 34px rgba(15, 23, 42, 0.08);
         }
 
         .cc-filter-card > h3 {
-            margin: 0 0 .25rem 0;
-            padding: .1rem .1rem .75rem;
-            border-bottom: 1px solid #e3eaf3;
-            color: #1e293b;
+            margin: 0 0 .35rem 0;
+            padding: .2rem .25rem .85rem;
+            border-bottom: 1px solid #dbe5f1;
+            color: #0f172a;
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: .01em;
         }
 
         .cc-expand-btn {
@@ -736,14 +741,14 @@
         .cc-filter-title {
             font-size: .75rem;
             font-family: "Inter", "Segoe UI", sans-serif;
-            font-weight: 500;
-            letter-spacing: .04em;
+            font-weight: 700;
+            letter-spacing: .06em;
             text-transform: uppercase;
-            color: #334155;
+            color: #0f172a;
             display: inline-flex;
             align-items: center;
             gap: .4rem;
-            margin-bottom: .5rem;
+            margin-bottom: .6rem;
         }
 
         .cc-status-grid {
@@ -761,44 +766,44 @@
             display: inline-flex;
             align-items: center;
             justify-content: space-between;
-            border: 2px solid #60a5fa;
-            border-radius: .95rem;
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafd 100%);
+            border: 1px solid #d7e2ef;
+            border-radius: .9rem;
+            background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
             color: #0f172a;
-            padding: .64rem .72rem;
+            padding: .62rem .72rem;
             font-size: .8rem;
             font-family: "Inter", "Segoe UI", sans-serif;
-            font-weight: 500;
+            font-weight: 600;
             transition: box-shadow .22s ease, transform .22s ease, background-color .22s ease;
-            min-height: 3.15rem;
+            min-height: 3rem;
             position: relative;
-            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35), 0 8px 18px rgba(15, 23, 42, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.92);
         }
 
         .cc-status-chip::before {
             content: "";
             position: absolute;
             left: 0;
-            top: .3rem;
-            bottom: .3rem;
-            width: 4px;
+            top: .35rem;
+            bottom: .35rem;
+            width: 3px;
             border-radius: 999px;
-            background: #60a5fa;
+            background: #93c5fd;
         }
 
         .cc-status-chip:hover {
-            border-color: #60a5fa;
-            background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
+            border-color: #bfdbfe;
+            background: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
             transform: translateY(-1px);
-            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35), 0 12px 24px rgba(15, 23, 42, 0.14);
+            box-shadow: 0 0 0 1px rgba(191, 219, 254, 0.7), 0 12px 24px rgba(15, 23, 42, 0.10);
             z-index: 2;
         }
 
         .cc-status-chip.is-active {
             border-color: #60a5fa;
-            background: linear-gradient(135deg, #edf4ff 0%, #dceafe 52%, #edf5ff 100%);
-            color: #0f172a;
-            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35), 0 12px 24px rgba(15, 23, 42, 0.14);
+            background: linear-gradient(135deg, #eaf2ff 0%, #dbeafe 52%, #ebf3ff 100%);
+            color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.25), 0 14px 26px rgba(37, 99, 235, 0.15);
         }
 
         .cc-chip-label {
@@ -830,44 +835,44 @@
             display: inline-flex;
             align-items: center;
             justify-content: space-between;
-            border: 2px solid #60a5fa;
-            border-radius: .95rem;
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafd 100%);
+            border: 1px solid #d7e2ef;
+            border-radius: .9rem;
+            background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
             color: #0f172a;
-            padding: .64rem .72rem;
+            padding: .62rem .72rem;
             font-size: .8rem;
             font-family: "Inter", "Segoe UI", sans-serif;
-            font-weight: 500;
+            font-weight: 600;
             transition: box-shadow .22s ease, transform .22s ease, background-color .22s ease;
-            min-height: 3.15rem;
+            min-height: 3rem;
             position: relative;
-            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35), 0 8px 18px rgba(15, 23, 42, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.92);
         }
 
         .cc-store-chip::before {
             content: "";
             position: absolute;
             left: 0;
-            top: .3rem;
-            bottom: .3rem;
-            width: 4px;
+            top: .35rem;
+            bottom: .35rem;
+            width: 3px;
             border-radius: 999px;
-            background: #60a5fa;
+            background: #93c5fd;
         }
 
         .cc-store-chip:hover {
-            border-color: #60a5fa;
-            background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
+            border-color: #bfdbfe;
+            background: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
             transform: translateY(-1px);
-            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35), 0 12px 24px rgba(15, 23, 42, 0.14);
+            box-shadow: 0 0 0 1px rgba(191, 219, 254, 0.7), 0 12px 24px rgba(15, 23, 42, 0.10);
             z-index: 2;
         }
 
         .cc-store-chip.is-active {
             border-color: #60a5fa;
-            background: linear-gradient(135deg, #edf4ff 0%, #dceafe 52%, #edf5ff 100%);
-            color: #0f172a;
-            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35), 0 12px 24px rgba(15, 23, 42, 0.14);
+            background: linear-gradient(135deg, #eaf2ff 0%, #dbeafe 52%, #ebf3ff 100%);
+            color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.25), 0 14px 26px rgba(37, 99, 235, 0.15);
         }
 
         .cc-store-chip.is-active .cc-chip-label i,
@@ -876,13 +881,13 @@
         }
 
         .cc-filter-section {
-            border: 1px solid #d9e3ef;
-            border-radius: 1rem;
-            padding: .75rem;
+            border: 1px solid #d7e2ef;
+            border-radius: 1.05rem;
+            padding: .8rem;
             background:
-                radial-gradient(120% 120% at 0% 0%, rgba(226, 232, 240, 0.45) 0%, transparent 55%),
-                linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 10px 20px rgba(15, 23, 42, 0.05);
+                radial-gradient(120% 120% at 0% 0%, rgba(219, 234, 254, 0.32) 0%, transparent 55%),
+                linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88), 0 10px 20px rgba(15, 23, 42, 0.06);
         }
 
         .cc-store-grid > *,
@@ -1248,8 +1253,8 @@
         </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-6 xl:grid-cols-4">
-            <form method="GET" id="cc-filters-form" class="cc-filter-card p-4 space-y-4 xl:col-span-1">
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-4 xl:items-start">
+            <form method="GET" id="cc-filters-form" class="cc-filter-card p-4 space-y-4 xl:col-span-1 self-start h-fit">
                 <h3 class="text-sm font-semibold text-slate-900">Filtreler</h3>
 
                 <input type="hidden" name="marketplace_id" id="cc-marketplace-input" value="{{ $filters['marketplaceId'] ?: '' }}">
@@ -2071,4 +2076,3 @@
         });
     </script>
 @endsection
-

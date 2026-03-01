@@ -407,7 +407,7 @@ class CommunicationCenterController extends Controller
             ->pluck('id')
             ->each(fn ($id) => SyncCommunicationJob::dispatch((int) $id));
 
-        return back()->with('success', 'Senkronizasyon kuyruÄŸa alÄ±ndÄ±.');
+        return back()->with('success', 'Senkronizasyon kuyruğa alındı.');
     }
 }
 

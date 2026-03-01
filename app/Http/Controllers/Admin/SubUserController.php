@@ -15,33 +15,33 @@ class SubUserController extends Controller
 {
         private const PERMISSIONS = [
         'dashboard' => 'Panel',
-        'products' => 'ÃƒÆ’Ã…â€œrÃƒÆ’Ã‚Â¼nler',
-        'orders' => 'SipariÃƒâ€¦Ã…Â¸ler',
+        'products' => 'Ürünler',
+        'orders' => 'Siparişler',
         'orders.bulk_cargo_label_print' => 'Siparisler: Toplu Kargo Etiket Yazdirma',
-        'customers' => 'MÃƒÆ’Ã‚Â¼Ãƒâ€¦Ã…Â¸teriler',
-        'reports' => 'Raporlar (TÃƒÆ’Ã‚Â¼mÃƒÆ’Ã‚Â¼)',
-        'reports.orders' => 'Raporlar: SipariÃƒâ€¦Ã…Â¸ ve Ciro',
-        'reports.top_products' => 'Raporlar: ÃƒÆ’Ã¢â‚¬Â¡ok Satan ÃƒÆ’Ã…â€œrÃƒÆ’Ã‚Â¼nler',
-        'reports.sold_products' => 'Raporlar: SatÃƒâ€Ã‚Â±lan ÃƒÆ’Ã…â€œrÃƒÆ’Ã‚Â¼n Listesi',
-        'reports.category_sales' => 'Raporlar: Kategori BazlÃƒâ€Ã‚Â± SatÃƒâ€Ã‚Â±Ãƒâ€¦Ã…Â¸',
-        'reports.brand_sales' => 'Raporlar: Marka BazlÃƒâ€Ã‚Â± SatÃƒâ€Ã‚Â±Ãƒâ€¦Ã…Â¸',
+        'customers' => 'Müşteriler',
+        'reports' => 'Raporlar (Tümü)',
+        'reports.orders' => 'Raporlar: Sipariş ve Ciro',
+        'reports.top_products' => 'Raporlar: Çok Satan Ürünler',
+        'reports.sold_products' => 'Raporlar: Sat???�lan Ürün Listesi',
+        'reports.category_sales' => 'Raporlar: Kategori Bazl???� Sat???�ş',
+        'reports.brand_sales' => 'Raporlar: Marka Bazl???� Sat???�ş',
         'reports.vat' => 'Raporlar: KDV Raporu',
         'reports.commission' => 'Raporlar: Komisyon Raporu',
-        'reports.commission_tariffs' => 'Raporlar: ÃƒÆ’Ã…â€œrÃƒÆ’Ã‚Â¼n Komisyon Tarifeleri',
-        'reports.stock_value' => 'Raporlar: Stoktaki ÃƒÆ’Ã…â€œrÃƒÆ’Ã‚Â¼n TutarlarÃƒâ€Ã‚Â±',
-        'reports.profitability' => 'Raporlar: SipariÃƒâ€¦Ã…Â¸ KÃƒÆ’Ã‚Â¢rlÃƒâ€Ã‚Â±lÃƒâ€Ã‚Â±k Analizi',
+        'reports.commission_tariffs' => 'Raporlar: Ürün Komisyon Tarifeleri',
+        'reports.stock_value' => 'Raporlar: Stoktaki Ürün Tutarlar???�',
+        'reports.profitability' => 'Raporlar: Sipariş Kârl???�l???�k Analizi',
         'reports.profit_engine' => 'Raporlar: Profit Engine',
         'reports.marketplace_risk' => 'Raporlar: Marketplace Risk',
         'reports.action_engine' => 'Raporlar: Action Engine',
         'control_tower' => 'Control Tower',
-        'communication_center' => 'Müşteri İletişim Merkezi',
-        'settlements.view' => 'HakediÃƒâ€¦Ã…Â¸: GÃƒÆ’Ã‚Â¶rÃƒÆ’Ã‚Â¼ntÃƒÆ’Ã‚Â¼leme',
-        'settlements.manage' => 'HakediÃƒâ€¦Ã…Â¸: YÃƒÆ’Ã‚Â¶netim',
+        'communication_center' => 'M?steri Iletisim Merkezi',
+        'settlements.view' => 'Hakediş: Görüntüleme',
+        'settlements.manage' => 'Hakediş: Yönetim',
         'integrations' => 'Entegrasyonlar',
-        'addons' => 'Ek ModÃƒÆ’Ã‚Â¼ller',
+        'addons' => 'Ek Modüller',
         'subscription' => 'Paketim',
         'settings' => 'Ayarlar',
-        'help' => 'YardÃƒâ€Ã‚Â±m',
+        'help' => 'Yard???�m',
         'tickets' => 'Ticketlar',
         'invoices' => 'Faturalar',
     ];
@@ -104,7 +104,7 @@ class SubUserController extends Controller
         }
 
         return redirect()->route('portal.sub-users.index')
-            ->with('success', 'Alt kullanÃƒâ€Ã‚Â±cÃƒâ€Ã‚Â± oluÃƒâ€¦Ã…Â¸turuldu.');
+            ->with('success', 'Alt kullan???�c???� oluşturuldu.');
     }
 
     public function edit(Request $request, SubUser $subUser): View
@@ -145,7 +145,7 @@ class SubUserController extends Controller
         $this->syncPermissions($subUser, $validated['permissions'] ?? []);
 
         return redirect()->route('portal.sub-users.index')
-            ->with('success', 'Alt kullanÃƒâ€Ã‚Â±cÃƒâ€Ã‚Â± gÃƒÆ’Ã‚Â¼ncellendi.');
+            ->with('success', 'Alt kullan???�c???� güncellendi.');
     }
 
     public function destroy(Request $request, SubUser $subUser): RedirectResponse
@@ -154,7 +154,7 @@ class SubUserController extends Controller
         $subUser->delete();
 
         return redirect()->route('portal.sub-users.index')
-            ->with('success', 'Alt kullanÃƒâ€Ã‚Â±cÃƒâ€Ã‚Â± silindi.');
+            ->with('success', 'Alt kullan???�c???� silindi.');
     }
 
     private function syncPermissions(SubUser $subUser, array $permissions): void
