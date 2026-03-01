@@ -17,6 +17,7 @@ class SubUserController extends Controller
         'dashboard' => 'Panel',
         'products' => 'ÃƒÆ’Ã…â€œrÃƒÆ’Ã‚Â¼nler',
         'orders' => 'SipariÃƒâ€¦Ã…Â¸ler',
+        'orders.bulk_cargo_label_print' => 'Siparisler: Toplu Kargo Etiket Yazdirma',
         'customers' => 'MÃƒÆ’Ã‚Â¼Ãƒâ€¦Ã…Â¸teriler',
         'reports' => 'Raporlar (TÃƒÆ’Ã‚Â¼mÃƒÆ’Ã‚Â¼)',
         'reports.orders' => 'Raporlar: SipariÃƒâ€¦Ã…Â¸ ve Ciro',

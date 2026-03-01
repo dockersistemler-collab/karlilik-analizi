@@ -229,6 +229,18 @@ class ModuleCatalogSeeder extends Seeder
         );
 
         Module::query()->updateOrCreate(
+            ['code' => 'feature.bulk_cargo_label_print'],
+            [
+                'name' => 'Toplu Kargo Etiket Yazdirma',
+                'description' => 'Gelen ve onaylanan siparisler icin platform bazli toplu/tekli kargo etiketi yazdirma.',
+                'type' => 'feature',
+                'billing_type' => 'recurring',
+                'is_active' => true,
+                'sort_order' => 0,
+            ]
+        );
+
+        Module::query()->updateOrCreate(
             ['code' => 'feature.cargo_webhooks'],
             [
                 'name' => 'Kargo Webhooklari',

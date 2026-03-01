@@ -21,6 +21,9 @@ return [
         'feature.cargo_tracking' => [
             'yearly' => 1490.00,
         ],
+        'feature.bulk_cargo_label_print' => [
+            'yearly' => 990.00,
+        ],
         'feature.cargo_webhooks' => [
             'yearly' => 990.00,
         ],

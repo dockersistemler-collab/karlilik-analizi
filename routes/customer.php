@@ -174,9 +174,15 @@ Route::middleware(['client_or_subuser', 'verified', 'subscription', 'subuser.per
             ->name('products.export');
         Route::get('products-template', [ProductController::class, 'exportTemplate'])->name('products.template');
         Route::post('products-import', [ProductController::class, 'import'])->name('products.import');
+        Route::get('orders/daily-revenue', [OrderController::class, 'dailyRevenue'])
+            ->name('orders.daily-revenue');
         Route::resource('orders', OrderController::class)->only(['index', 'show', 'update']);
         Route::post('orders/bulk-update', [OrderController::class, 'bulkUpdate'])->name('orders.bulk-update');
         Route::post('orders/bulk-ship', [OrderController::class, 'bulkShip'])->name('orders.bulk-ship');
+        Route::middleware('module:feature.bulk_cargo_label_print')->group(function () {
+            Route::post('orders/labels/print', [OrderController::class, 'printLabels'])->name('orders.labels.print');
+            Route::get('orders/{order}/label-print', [OrderController::class, 'printSingleLabel'])->name('orders.labels.single');
+        });
         Route::get('orders-export', [OrderController::class, 'export'])
             ->middleware('module:feature.exports')
             ->name('orders.export');

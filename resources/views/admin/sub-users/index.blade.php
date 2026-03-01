@@ -203,6 +203,7 @@
                             'products' => 'Ürünler',
 
                             'orders' => 'Siparişler',
+                            'orders.bulk_cargo_label_print' => 'Siparişler: Toplu Kargo Etiket Yazdırma',
 
                             'customers' => 'Müşteriler',
 
@@ -305,6 +306,7 @@
         products: 'Ürünler',
 
         orders: 'Siparişler',
+        'orders.bulk_cargo_label_print': 'Siparişler: Toplu Kargo Etiket Yazdırma',
 
         customers: 'Müşteriler',
 
@@ -525,18 +527,3 @@
 </script>
 
 @endpush
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

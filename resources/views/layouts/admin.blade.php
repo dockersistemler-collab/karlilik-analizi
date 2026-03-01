@@ -833,6 +833,47 @@
 
         }
 
+        body.popup-mode .sidebar {
+            display: none !important;
+        }
+
+        body.popup-mode main {
+            padding-left: 0 !important;
+            width: 100% !important;
+        }
+
+        body.popup-mode main > header {
+            display: none !important;
+        }
+        body.popup-mode .menu-modern-hero {
+            display: none !important;
+        }
+        body.popup-mode {
+            min-height: 0 !important;
+            height: auto !important;
+        }
+        body.popup-mode > .min-h-screen {
+            min-height: 0 !important;
+            height: auto !important;
+        }
+        body.popup-mode .min-h-screen {
+            min-height: auto !important;
+        }
+        body.popup-mode .min-h-screen.flex {
+            display: block !important;
+        }
+        body.popup-mode main {
+            min-height: auto !important;
+            height: auto !important;
+            flex: 0 0 auto !important;
+            display: block !important;
+        }
+        body.popup-mode main > .px-6.pb-6.pt-6 {
+            padding-top: 12px !important;
+            padding-bottom: 0 !important;
+            margin-bottom: 0 !important;
+        }
+
         .panel-card {
 
             background: var(--panel-card);
@@ -1980,6 +2021,7 @@
     $isDashboardRoute = request()->routeIs('portal.dashboard');
     $isCommissionTariffsRoute = request()->routeIs('portal.commission-tariffs.*');
     $useModernMenuShell = !$isDashboardRoute && !$isCommissionTariffsRoute;
+    $isPopupMode = request()->boolean('popup');
 
     $resolvedHeader = trim((string) $__env->yieldContent('header'));
     if ($resolvedHeader === '') {
@@ -1991,7 +2033,7 @@
     $heroInlineCards = trim((string) $__env->yieldContent('hero-inline-cards'));
 @endphp
 
-<body class="antialiased {{ $useModernMenuShell ? 'menu-modern-shell' : '' }}">
+<body class="antialiased {{ $useModernMenuShell ? 'menu-modern-shell' : '' }} {{ $isPopupMode ? 'popup-mode' : '' }}">
 
 
 
@@ -2097,6 +2139,9 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                 $showSubscriptionSection = $can('subscription') || $can('invoices');
 
                 $hasCargoTracking = $ownerUser && app(\App\Services\Entitlements\EntitlementService::class)->hasModule($ownerUser, 'feature.cargo_tracking');
+                $canBulkCargoLabelPrint = $ownerUser
+                    && app(\App\Services\Modules\ModuleGate::class)->isEnabledForUser($ownerUser, 'feature.bulk_cargo_label_print')
+                    && (!$subUser || $subPermissions->has('orders.bulk_cargo_label_print') || $subPermissions->has('orders'));
                 $inventoryModuleEnabled = $ownerUser && app(\App\Services\Modules\ModuleGate::class)->isEnabledForUser($ownerUser, 'feature.inventory');
                 $settlementTenantId = $ownerUser ? (int) ($ownerUser->tenant_id ?: $ownerUser->id) : 0;
                 $settlementFeatureEnabled = $settlementTenantId > 0
@@ -2175,50 +2220,30 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                             <span class="sidebar-label">Markalar</span>
 
                         </a>
-
-                        <a href="#" class="sidebar-link" title="Yakında">
-
-                            <i class="fa-solid fa-sliders w-6"></i>
-
-                            <span class="sidebar-label">Seçenekler</span>
-
-                        </a>
-
+                        @if($inventoryModuleEnabled)
+                            @if(auth('subuser')->check())
+                                <a href="{{ route('portal.inventory.user.products.index') }}" class="sidebar-link {{ request()->routeIs('portal.inventory.user.*') ? 'is-active' : '' }}">
+                                    <i class="fa-solid fa-warehouse w-6"></i>
+                                    <span class="sidebar-label">Stok</span>
+                                </a>
+                            @else
+                                <a href="{{ route('portal.inventory.admin.products.index') }}" class="sidebar-link {{ request()->routeIs('portal.inventory.admin.*') ? 'is-active' : '' }}">
+                                    <i class="fa-solid fa-warehouse w-6"></i>
+                                    <span class="sidebar-label">Stok</span>
+                                </a>
+                            @endif
+                        @else
+                            <span class="sidebar-link opacity-60 cursor-not-allowed" title="Stok modülü aktif değil">
+                                <i class="fa-solid fa-warehouse w-6"></i>
+                                <span class="sidebar-label">Stok</span>
+                            </span>
+                        @endif
                     </div>
 
                 @endif
-
-                @if($inventoryModuleEnabled && $can('products'))
-
-                    @if(auth('subuser')->check())
-
-                        <a href="{{ route('portal.inventory.user.products.index') }}" class="sidebar-link {{ request()->routeIs('portal.inventory.user.*') ? 'is-active' : '' }}">
-
-                            <i class="fa-solid fa-warehouse w-6"></i>
-
-                            <span class="sidebar-label">Stok</span>
-
-                        </a>
-
-                    @else
-
-                        <a href="{{ route('portal.inventory.admin.products.index') }}" class="sidebar-link {{ request()->routeIs('portal.inventory.admin.*') ? 'is-active' : '' }}">
-
-                            <i class="fa-solid fa-warehouse w-6"></i>
-
-                            <span class="sidebar-label">Stok</span>
-
-                        </a>
-
-                    @endif
-
-                @endif
-
-
-
                 @if($can('orders'))
 
-                    <a href="{{ route('portal.orders.index') }}" class="sidebar-link {{ request()->routeIs('portal.orders.*') ? 'is-active' : '' }}">
+                    <a href="{{ route('portal.orders.index') }}" class="sidebar-link {{ request()->routeIs('portal.orders.*') && !request()->boolean('label_mode') ? 'is-active' : '' }}">
 
                         <i class="fa-solid fa-cart-shopping w-6"></i>
 
@@ -2458,7 +2483,6 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
                     </div>
 
                 @endif
-
                 @if($canCommunicationCenter)
                     <a href="{{ route('portal.communication-center.questions') }}" class="sidebar-link {{ request()->routeIs('portal.communication-center.*') ? 'is-active' : '' }}">
                         <i class="fa-solid fa-comments w-6"></i>
@@ -2552,10 +2576,6 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 
                 
                         @if($can('addons'))
-                            <a href="{{ route('portal.addons.index') }}" class="sidebar-link {{ request()->routeIs('portal.addons.*') ? 'is-active' : '' }}">
-                                <i class="fa-solid fa-puzzle-piece w-6"></i>
-                                <span class="sidebar-label">Ek Modüller</span>
-                            </a>
                             <a href="{{ route('portal.modules.mine') }}" class="sidebar-link {{ request()->routeIs('portal.modules.mine') ? 'is-active' : '' }}">
                                 <i class="fa-solid fa-cubes w-6"></i>
                                 <span class="sidebar-label">Modüllerim</span>
@@ -3652,32 +3672,3 @@ $hasModule = function (string $moduleKey) use ($ownerUser) {
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

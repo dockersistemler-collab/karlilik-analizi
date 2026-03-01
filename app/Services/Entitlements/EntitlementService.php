@@ -14,6 +14,7 @@ class EntitlementService
         'feature.sub_users',
         'feature.control_tower',
         'customer_communication_center',
+        'feature.bulk_cargo_label_print',
         'profit_engine',
         'action_engine',
         'marketplace_risk',
