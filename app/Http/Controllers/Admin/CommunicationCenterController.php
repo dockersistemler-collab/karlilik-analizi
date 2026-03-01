@@ -34,6 +34,11 @@ class CommunicationCenterController extends Controller
         $user = SupportUser::currentUser();
         abort_unless($user, 401);
         $this->authorize('viewAny', CommunicationThread::class);
+        $allowedPerPage = [10, 25, 50, 100];
+        $perPage = (int) $request->input('per_page', 25);
+        if (!in_array($perPage, $allowedPerPage, true)) {
+            $perPage = 25;
+        }
 
         $marketplaceId = (int) $request->integer('marketplace_id');
         $storeId = (int) $request->integer('store_id');
@@ -76,7 +81,7 @@ class CommunicationCenterController extends Controller
         $threads = $threadsQuery
             ->orderBy('due_at')
             ->orderByDesc('priority_score')
-            ->paginate(20)
+            ->paginate($perPage)
             ->withQueryString();
 
         $channelCounts = CommunicationThread::query()

@@ -1,24 +1,24 @@
 ﻿@extends('layouts.admin')
 
 @section('header')
-    MÃ¼ÅŸteri Ä°letiÅŸim Merkezi
+    Müşteri İletişim Merkezi
 @endsection
 
 @section('content')
     @php
         $statusLabels = [
-            'open' => 'AÃ§Ä±k',
+            'open' => 'Açık',
             'pending' => 'Beklemede',
-            'answered' => 'YanÄ±tlandÄ±',
-            'closed' => 'KapalÄ±',
-            'overdue' => 'GecikmiÅŸ',
+            'answered' => 'Yanıtlandı',
+            'closed' => 'Kapalı',
+            'overdue' => 'Gecikmiş',
         ];
 
         $channelLabels = [
             'question' => 'Soru',
             'message' => 'Mesaj',
             'review' => 'Yorum',
-            'return' => 'Ä°ade',
+            'return' => 'İade',
         ];
 
         $queryBase = request()->except('page');
@@ -27,7 +27,6 @@
         $reviewCount = (int) ($channelCounts['review'] ?? 0);
         $allMarketplaceCount = collect($marketplaceCounts ?? [])->sum();
         $statusTotals = collect($statusCounts ?? []);
-        $allStatusCount = $statusTotals->sum();
         $awaitingStatusCount = (int) (
             ($statusTotals->get('open', 0))
             + ($statusTotals->get('pending', 0))
@@ -93,12 +92,13 @@
             display: inline-flex;
             align-items: center;
             gap: .5rem;
-            padding: .55rem 1rem;
+            padding: .48rem .9rem;
             border-radius: 999px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #d4dce7;
             background: transparent;
             color: #0f172a;
-            font-weight: 700;
+            font-size: .92rem;
+            font-weight: 500;
             transition: .2s ease;
         }
 
@@ -108,10 +108,11 @@
         }
 
         .cc-tab.is-active {
-            border-color: #fb7185;
-            color: #9f1239;
-            background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
-            box-shadow: 0 8px 20px rgba(244, 63, 94, 0.18);
+            border-color: #93c5fd;
+            color: #0f172a;
+            background: transparent;
+            font-weight: 700;
+            box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.35);
         }
 
         .cc-label {
@@ -122,12 +123,12 @@
         }
 
         .cc-label i {
-            font-size: .78rem;
+            font-size: .72rem;
             color: #64748b;
         }
 
         .cc-tab.is-active .cc-label i {
-            color: #be123c;
+            color: #64748b;
         }
 
         .cc-mini {
@@ -191,7 +192,7 @@
 
         .cc-market-grid .cc-market-chip {
             position: relative;
-            width: 104px;
+            width: 92px;
             min-height: 80px;
             display: inline-flex;
             flex-direction: column;
@@ -258,19 +259,20 @@
             display: inline-flex;
             align-items: center;
             gap: .2rem;
-            font-size: .62rem;
+            font-size: .78rem;
             letter-spacing: .01em;
         }
 
         .cc-market-logo-fallback-all i {
-            font-size: .52rem;
+            font-size: .78rem;
             line-height: 1;
         }
 
         .cc-market-chip .cc-badge {
             position: absolute;
-            right: .4rem;
-            top: .35rem;
+            right: -.35rem;
+            top: -.35rem;
+            z-index: 2;
         }
 
         .cc-market-chip:hover .cc-market-logo {
@@ -278,7 +280,7 @@
         }
         .cc-market-cell-card {
             position: relative;
-            width: 96px;
+            width: 88px;
             min-height: 58px;
             display: inline-flex;
             flex-direction: column;
@@ -322,18 +324,17 @@
         }
 
         .cc-filter-card {
-            border: 1px solid #d8e3ef;
+            border: 1px solid #e2e8f0;
             border-radius: 1.15rem;
-            background:
-                radial-gradient(130% 140% at 0% 0%, rgba(219, 234, 254, 0.42) 0%, transparent 56%),
-                linear-gradient(180deg, #ffffff 0%, #f7fafd 100%);
-            box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+            background: transparent;
+            box-shadow: 0 16px 34px rgba(15, 23, 42, 0.06);
         }
 
         .cc-filter-card > h3 {
             margin: 0 0 .25rem 0;
             padding: .1rem .1rem .75rem;
             border-bottom: 1px solid #e3eaf3;
+            color: #1e293b;
         }
 
         .cc-expand-btn {
@@ -360,6 +361,54 @@
 
         .cc-expand-btn.is-open i {
             transform: rotate(180deg);
+        }
+
+        .cc-sync-now-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            border: 1px solid rgba(148, 163, 184, 0.45) !important;
+            border-radius: 999px !important;
+            padding: .58rem 1.05rem !important;
+            color: #fff !important;
+            font-size: .92rem;
+            font-weight: 500;
+            letter-spacing: .01em;
+            background: linear-gradient(135deg, #111827 0%, #374151 55%, #111827 100%) !important;
+            box-shadow: 0 6px 14px rgba(17, 24, 39, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+            transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+        }
+
+        .cc-sync-now-btn::before {
+            content: "";
+            position: absolute;
+            inset: 1px;
+            border-radius: inherit;
+            pointer-events: none;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.20), transparent 48%);
+        }
+
+        .cc-sync-now-btn:hover {
+            border-color: rgba(34, 197, 94, 0.55) !important;
+            transform: translateY(-1px);
+            filter: brightness(1.04);
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.28), 0 0 18px rgba(34, 197, 94, 0.28), 0 8px 18px rgba(17, 24, 39, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        }
+
+        .cc-sync-now-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(17, 24, 39, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .cc-sync-now-btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.28), 0 10px 22px rgba(17, 24, 39, 0.26);
+        }
+
+        .cc-sync-now-btn > * {
+            position: relative;
+            z-index: 1;
         }
 
         .cc-detail-row {
@@ -486,14 +535,16 @@
         .cc-inline-meta-k {
             font-size: .72rem;
             color: #64748b;
-            font-weight: 600;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-weight: 500;
         }
 
         .cc-inline-meta-v {
             margin-top: .15rem;
             font-size: .92rem;
             color: #0f172a;
-            font-weight: 800;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-weight: 500;
             line-height: 1.2;
         }
 
@@ -521,14 +572,14 @@
 
         .cc-inline-msg.in {
             align-self: flex-start;
-            background: #e2e8f0;
+            background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
             color: #0f172a;
         }
 
         .cc-inline-msg.out {
             align-self: flex-end;
-            background: #bfdbfe;
-            color: #1e3a8a;
+            background: linear-gradient(180deg, #dcfce7 0%, #bbf7d0 100%);
+            color: #14532d;
         }
 
         .cc-inline-msg-body {
@@ -684,7 +735,8 @@
 
         .cc-filter-title {
             font-size: .75rem;
-            font-weight: 700;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-weight: 500;
             letter-spacing: .04em;
             text-transform: uppercase;
             color: #334155;
@@ -697,41 +749,56 @@
         .cc-status-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0;
-            border: 1px solid #e7edf5;
-            border-radius: .9rem;
-            overflow: hidden;
-            background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), inset 0 8px 18px rgba(15, 23, 42, 0.02);
+            gap: .55rem;
+            border: 0;
+            border-radius: 0;
+            overflow: visible;
+            background: transparent;
+            box-shadow: none;
         }
 
         .cc-status-chip {
             display: inline-flex;
             align-items: center;
             justify-content: space-between;
-            border: 0;
-            border-radius: 0;
-            background: #ffffff;
+            border: 2px solid #60a5fa;
+            border-radius: .95rem;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafd 100%);
             color: #0f172a;
-            padding: .6rem .68rem;
+            padding: .64rem .72rem;
             font-size: .8rem;
-            font-weight: 700;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-weight: 500;
             transition: box-shadow .22s ease, transform .22s ease, background-color .22s ease;
-            min-height: 3rem;
+            min-height: 3.15rem;
             position: relative;
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35), 0 8px 18px rgba(15, 23, 42, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .cc-status-chip::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: .3rem;
+            bottom: .3rem;
+            width: 4px;
+            border-radius: 999px;
+            background: #60a5fa;
         }
 
         .cc-status-chip:hover {
-            background: #f8fbff;
+            border-color: #60a5fa;
+            background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
             transform: translateY(-1px);
-            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35), 0 12px 24px rgba(15, 23, 42, 0.14);
             z-index: 2;
         }
 
         .cc-status-chip.is-active {
-            background: linear-gradient(135deg, #eef6ff 0%, #dbeafe 65%, #e8f3ff 100%);
+            border-color: #60a5fa;
+            background: linear-gradient(135deg, #edf4ff 0%, #dceafe 52%, #edf5ff 100%);
             color: #0f172a;
-            box-shadow: inset 3px 0 0 #60a5fa;
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35), 0 12px 24px rgba(15, 23, 42, 0.14);
         }
 
         .cc-chip-label {
@@ -739,6 +806,8 @@
             align-items: center;
             gap: .35rem;
             min-width: 0;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-weight: 500;
         }
 
         .cc-chip-label i {
@@ -749,46 +818,61 @@
         .cc-store-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0;
-            border: 1px solid #e7edf5;
-            border-radius: .9rem;
-            overflow: hidden;
-            background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), inset 0 8px 18px rgba(15, 23, 42, 0.02);
+            gap: .55rem;
+            border: 0;
+            border-radius: 0;
+            overflow: visible;
+            background: transparent;
+            box-shadow: none;
         }
 
         .cc-store-chip {
             display: inline-flex;
             align-items: center;
             justify-content: space-between;
-            border: 0;
-            border-radius: 0;
-            background: #ffffff;
+            border: 2px solid #60a5fa;
+            border-radius: .95rem;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafd 100%);
             color: #0f172a;
-            padding: .6rem .68rem;
+            padding: .64rem .72rem;
             font-size: .8rem;
-            font-weight: 700;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-weight: 500;
             transition: box-shadow .22s ease, transform .22s ease, background-color .22s ease;
-            min-height: 3rem;
+            min-height: 3.15rem;
             position: relative;
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35), 0 8px 18px rgba(15, 23, 42, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .cc-store-chip::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: .3rem;
+            bottom: .3rem;
+            width: 4px;
+            border-radius: 999px;
+            background: #60a5fa;
         }
 
         .cc-store-chip:hover {
-            background: #f8fbff;
+            border-color: #60a5fa;
+            background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
             transform: translateY(-1px);
-            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35), 0 12px 24px rgba(15, 23, 42, 0.14);
             z-index: 2;
         }
 
         .cc-store-chip.is-active {
-            background: linear-gradient(135deg, #eef6ff 0%, #dbeafe 65%, #e8f3ff 100%);
+            border-color: #60a5fa;
+            background: linear-gradient(135deg, #edf4ff 0%, #dceafe 52%, #edf5ff 100%);
             color: #0f172a;
-            box-shadow: inset 3px 0 0 #60a5fa;
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35), 0 12px 24px rgba(15, 23, 42, 0.14);
         }
 
         .cc-store-chip.is-active .cc-chip-label i,
         .cc-status-chip.is-active .cc-chip-label i {
-            color: #1d4ed8;
+            color: #2563eb;
         }
 
         .cc-filter-section {
@@ -803,19 +887,9 @@
 
         .cc-store-grid > *,
         .cc-status-grid > * {
-            border-right: 1px solid #d7dee9;
-            border-bottom: 1px solid #d7dee9;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
-        }
-
-        .cc-store-grid > :nth-child(2n),
-        .cc-status-grid > :nth-child(2n) {
             border-right: 0;
-        }
-
-        .cc-store-grid > :nth-last-child(-n+2),
-        .cc-status-grid > :nth-last-child(-n+2) {
             border-bottom: 0;
+            box-shadow: none;
         }
 
         .cc-status-text {
@@ -903,15 +977,22 @@
             filter: brightness(1.02);
         }
 
+        .cc-filter-divider {
+            height: 1px;
+            margin: .65rem .2rem .45rem;
+            background: linear-gradient(90deg, transparent 0%, #cbd5e1 14%, #b6c3d6 50%, #cbd5e1 86%, transparent 100%);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.78), 0 -1px 0 rgba(148, 163, 184, 0.14);
+        }
+
         .cc-template-builder {
-            border: 1px solid #dbe4ef;
+            border: 1px solid #d9e3ef;
             border-radius: 1rem;
             background:
-                radial-gradient(110% 120% at 0% 0%, rgba(224, 242, 254, .55) 0%, transparent 55%),
+                radial-gradient(120% 120% at 0% 0%, rgba(226, 232, 240, 0.45) 0%, transparent 55%),
                 linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-            box-shadow: 0 14px 28px rgba(15, 23, 42, .08);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 10px 20px rgba(15, 23, 42, 0.05);
             padding: .55rem;
-            margin-top: .35rem;
+            margin-top: .45rem;
         }
 
         .cc-template-head {
@@ -1079,10 +1160,10 @@
             <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                     <div class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                        CanlÄ± Operasyon
+                        Canlı Operasyon
                     </div>
-                    <h2 class="mt-3 text-3xl font-bold text-slate-900">MÃ¼ÅŸteri Ä°letiÅŸim Merkezi</h2>
-                    <p class="mt-1 text-sm text-slate-600">Pazaryeri mesajlarÄ±nÄ± tek ekrandan takip edin ve hÄ±zlÄ± yanÄ±tlayÄ±n.</p>
+                    <h2 class="mt-3 text-3xl font-bold text-slate-900">Müşteri İletişim Merkezi</h2>
+                    <p class="mt-1 text-sm text-slate-600">Pazaryeri mesajlarını tek ekrandan takip edin ve hızlı yanıtlayın.</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -1091,7 +1172,7 @@
                         <div class="cc-mini-value text-slate-900">{{ number_format($threads->total()) }}</div>
                     </div>
                     <div class="cc-mini p-3">
-                        <div class="cc-mini-label">AÃ§Ä±k</div>
+                        <div class="cc-mini-label">Açık</div>
                         <div class="cc-mini-value text-blue-700">{{ $threads->getCollection()->where('status', 'open')->count() }}</div>
                     </div>
                     <div class="cc-mini p-3">
@@ -1099,7 +1180,7 @@
                         <div class="cc-mini-value text-amber-700">{{ $threads->getCollection()->filter(fn ($t) => in_array($t->status, ['open', 'pending', 'overdue'], true) && $t->due_at && !$t->due_at->isPast() && now()->diffInMinutes($t->due_at, false) <= $criticalThresholdMinutes)->count() }}</div>
                     </div>
                     <div class="cc-mini p-3">
-                        <div class="cc-mini-label">GecikmiÅŸ</div>
+                        <div class="cc-mini-label">Gecikmiş</div>
                         <div class="cc-mini-value text-rose-700">{{ $threads->getCollection()->filter(fn ($t) => in_array($t->status, ['open', 'pending', 'overdue'], true) && $t->due_at && $t->due_at->isPast())->count() }}</div>
                     </div>
                 </div>
@@ -1107,7 +1188,7 @@
         </section>
 
         <div class="cc-topbar-wrap">
-        <div class="flex flex-wrap items-start justify-between gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('portal.communication-center.questions', $queryBase) }}" class="cc-tab {{ $channel === 'question' ? 'is-active' : '' }}">
                     <span class="cc-label"><i class="fa-regular fa-circle-question"></i><span>Sorular</span></span>
@@ -1127,10 +1208,12 @@
                 <div class="cc-market-grid">
                     <button type="button" class="cc-market-chip {{ $filters['marketplaceId'] === 0 ? 'is-active' : '' }}" data-marketplace-id="">
                         <span class="cc-market-logo-wrap">
-                            <span class="cc-market-logo-fallback cc-market-logo-fallback-all"><i class="fa-solid fa-layer-group"></i><span>TÃœMÃœ</span></span>
+                            <span class="cc-market-logo-fallback cc-market-logo-fallback-all"><i class="fa-solid fa-layer-group"></i><span>TÜMÜ</span></span>
                         </span>
-                        <span class="cc-market-name">TÃ¼mÃ¼</span>
-                        <span class="cc-badge {{ $allMarketplaceCount > 0 ? 'hot' : 'zero' }}">{{ $allMarketplaceCount }}</span>
+                        <span class="cc-market-name">Tümü</span>
+                        @if($allMarketplaceCount > 0)
+                            <span class="cc-badge hot">{{ $allMarketplaceCount }}</span>
+                        @endif
                     </button>
                     @foreach($marketplaces as $marketplace)
                         @php
@@ -1147,7 +1230,9 @@
                                 @endif
                             </span>
                             <span class="cc-market-name">{{ $marketplace->name }}</span>
-                            <span class="cc-badge {{ $marketCount > 0 ? 'hot' : 'zero' }}">{{ $marketCount }}</span>
+                            @if($marketCount > 0)
+                                <span class="cc-badge hot">{{ $marketCount }}</span>
+                            @endif
                         </button>
                     @endforeach
                 </div>
@@ -1155,7 +1240,10 @@
 
             <form method="POST" action="{{ route('portal.communication-center.sync-now') }}">
                 @csrf
-                <button type="submit" class="btn btn-solid-accent">Hemen Senkronize Et</button>
+                <button type="submit" class="btn btn-solid-accent cc-sync-now-btn">
+                    <i class="fa-solid fa-rotate-right text-xs"></i>
+                    <span>Hemen Senkronize Et</span>
+                </button>
             </form>
         </div>
         </div>
@@ -1167,21 +1255,27 @@
                 <input type="hidden" name="marketplace_id" id="cc-marketplace-input" value="{{ $filters['marketplaceId'] ?: '' }}">
 
                 <div class="cc-filter-section">
-                    <label class="cc-filter-title">MaÄŸaza</label>
+                    <label class="cc-filter-title">Mağaza</label>
                     <select name="store_id" class="hidden">
-                        <option value="">TÃ¼mÃ¼</option>
+                        <option value="">Tümü</option>
                         @foreach($stores as $store)
                             <option value="{{ $store->id }}" @selected($filters['storeId'] === $store->id)>{{ $store->store_name }}</option>
                         @endforeach
                     </select>
                     <div class="cc-store-grid mt-2">
                         <button type="button" class="cc-store-chip {{ $filters['storeId'] === 0 ? 'is-active' : '' }}" data-store-value="">
-                            <span class="cc-chip-label"><i class="fa-solid fa-layer-group"></i><span>TÃ¼mÃ¼</span></span><span class="cc-badge {{ $allStoreCount > 0 ? 'hot' : 'zero' }}">{{ $allStoreCount }}</span>
+                            <span class="cc-chip-label"><i class="fa-solid fa-layer-group"></i><span>Tümü</span></span>
+                            @if($allStoreCount > 0)
+                                <span class="cc-badge hot">{{ $allStoreCount }}</span>
+                            @endif
                         </button>
                         @foreach($stores as $store)
                             @php $storeCount = (int) ($storeCounts[$store->id] ?? 0); @endphp
                             <button type="button" class="cc-store-chip {{ $filters['storeId'] === $store->id ? 'is-active' : '' }}" data-store-value="{{ $store->id }}">
-                                <span class="cc-chip-label"><i class="fa-solid fa-shop"></i><span>{{ $store->store_name }}</span></span><span class="cc-badge {{ $storeCount > 0 ? 'hot' : 'zero' }}">{{ $storeCount }}</span>
+                                <span class="cc-chip-label"><i class="fa-solid fa-shop"></i><span>{{ $store->store_name }}</span></span>
+                                @if($storeCount > 0)
+                                    <span class="cc-badge hot">{{ $storeCount }}</span>
+                                @endif
                             </button>
                         @endforeach
                     </div>
@@ -1190,47 +1284,60 @@
                 <div class="cc-filter-section">
                     <label class="cc-filter-title">Durum</label>
                     <select name="status" class="hidden">
-                        <option value="">TÃ¼mÃ¼</option>
-                        @foreach(['open' => 'AÃ§Ä±k', 'pending' => 'Beklemede', 'answered' => 'YanÄ±tlandÄ±', 'overdue' => 'GecikmiÅŸ'] as $value => $label)
+                        <option value="">Tümü</option>
+                        @foreach(['open' => 'Açık', 'pending' => 'Beklemede', 'answered' => 'Yanıtlandı', 'overdue' => 'Gecikmiş'] as $value => $label)
                             <option value="{{ $value }}" @selected($filters['status'] === $value)>{{ $label }}</option>
                         @endforeach
                     </select>
                     <div class="cc-status-grid mt-2">
                         <button type="button" class="cc-status-chip {{ $filters['status'] === '' ? 'is-active' : '' }}" data-status-value="">
-                            <span class="cc-chip-label"><i class="fa-solid fa-layer-group"></i><span>TÃ¼mÃ¼</span></span><span class="cc-badge {{ $allStatusCount <= 0 ? 'zero' : ($awaitingStatusCount > 0 ? 'hot' : 'done') }}">{{ $allStatusCount }}</span>
+                            <span class="cc-chip-label"><i class="fa-solid fa-layer-group"></i><span>Tümü</span></span>
+                            @if($awaitingStatusCount > 0)
+                                <span class="cc-badge hot">{{ $awaitingStatusCount }}</span>
+                            @endif
                         </button>
                         <button type="button" class="cc-status-chip {{ $filters['status'] === 'open' ? 'is-active' : '' }}" data-status-value="open">
-                            <span class="cc-chip-label"><i class="fa-solid fa-folder-open"></i><span>AÃ§Ä±k</span></span><span class="cc-badge {{ ((int) ($statusCounts['open'] ?? 0)) > 0 ? 'hot' : 'zero' }}">{{ (int) ($statusCounts['open'] ?? 0) }}</span>
+                            <span class="cc-chip-label"><i class="fa-solid fa-folder-open"></i><span>Açık</span></span>
+                            @if(((int) ($statusCounts['open'] ?? 0)) > 0)
+                                <span class="cc-badge hot">{{ (int) ($statusCounts['open'] ?? 0) }}</span>
+                            @endif
                         </button>
                         <button type="button" class="cc-status-chip {{ $filters['status'] === 'pending' ? 'is-active' : '' }}" data-status-value="pending">
-                            <span class="cc-chip-label"><i class="fa-regular fa-hourglass-half"></i><span>Beklemede</span></span><span class="cc-badge {{ ((int) ($statusCounts['pending'] ?? 0)) > 0 ? 'hot' : 'zero' }}">{{ (int) ($statusCounts['pending'] ?? 0) }}</span>
+                            <span class="cc-chip-label"><i class="fa-regular fa-hourglass-half"></i><span>Beklemede</span></span>
+                            @if(((int) ($statusCounts['pending'] ?? 0)) > 0)
+                                <span class="cc-badge hot">{{ (int) ($statusCounts['pending'] ?? 0) }}</span>
+                            @endif
                         </button>
                         <button type="button" class="cc-status-chip {{ $filters['status'] === 'answered' ? 'is-active' : '' }}" data-status-value="answered">
-                            <span class="cc-chip-label"><i class="fa-regular fa-circle-check"></i><span>YanÄ±tlandÄ±</span></span><span class="cc-badge {{ $answeredStatusCount > 0 ? 'done' : 'zero' }}">{{ $answeredStatusCount }}</span>
+                            <span class="cc-chip-label"><i class="fa-regular fa-circle-check"></i><span>Yanıtlandı</span></span><span class="cc-badge {{ $answeredStatusCount > 0 ? 'done' : 'zero' }}">{{ $answeredStatusCount }}</span>
                         </button>
                         <button type="button" class="cc-status-chip {{ $filters['status'] === 'overdue' ? 'is-active' : '' }}" data-status-value="overdue">
-                            <span class="cc-chip-label"><i class="fa-regular fa-clock"></i><span>GecikmiÅŸ</span></span><span class="cc-badge {{ ((int) ($statusCounts['overdue'] ?? 0)) > 0 ? 'hot' : 'zero' }}">{{ (int) ($statusCounts['overdue'] ?? 0) }}</span>
+                            <span class="cc-chip-label"><i class="fa-regular fa-clock"></i><span>Gecikmiş</span></span>
+                            @if(((int) ($statusCounts['overdue'] ?? 0)) > 0)
+                                <span class="cc-badge hot">{{ (int) ($statusCounts['overdue'] ?? 0) }}</span>
+                            @endif
                         </button>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="cc-field-label"><i class="fa-regular fa-calendar"></i><span>BaÅŸlangÄ±Ã§</span></label>
+                        <label class="cc-field-label"><i class="fa-regular fa-calendar"></i><span>Başlangıç</span></label>
                         <input type="date" name="date_from" value="{{ $filters['dateFrom'] }}" class="cc-date-input">
                     </div>
                     <div>
-                        <label class="cc-field-label"><i class="fa-regular fa-calendar-check"></i><span>BitiÅŸ</span></label>
+                        <label class="cc-field-label"><i class="fa-regular fa-calendar-check"></i><span>Bitiş</span></label>
                         <input type="date" name="date_to" value="{{ $filters['dateTo'] }}" class="cc-date-input">
                     </div>
                 </div>
 
                 <div>
                     <label class="cc-field-label"><i class="fa-solid fa-magnifying-glass"></i><span>Arama</span></label>
-                    <input type="text" name="search" value="{{ $filters['search'] }}" class="cc-search-input" placeholder="MÃ¼ÅŸteri, Ã¼rÃ¼n, konu">
+                    <input type="text" name="search" value="{{ $filters['search'] }}" class="cc-search-input" placeholder="Müşteri, ürün, konu">
                 </div>
 
                 <button class="cc-apply-btn"><i class="fa-solid fa-sliders"></i><span>Uygula</span></button>
+                <div class="cc-filter-divider" aria-hidden="true"></div>
 
                 <div class="cc-template-builder" data-template-builder data-template-store-url="{{ route('portal.communication-center.templates.store') }}">
                     <button type="button" class="cc-template-head" data-template-toggle>
@@ -1269,14 +1376,14 @@
                     <thead>
                         <tr class="border-b border-slate-200 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
                             <th class="py-3 pr-3">Pazaryeri</th>
-                            <th class="py-3 pr-3">MaÄŸaza</th>
+                            <th class="py-3 pr-3">Mağaza</th>
                             <th class="py-3 pr-3">Kanal</th>
-                            <th class="py-3 pr-3">ÃœrÃ¼n</th>
-                            <th class="py-3 pr-3">MÃ¼ÅŸteri</th>
+                            <th class="py-3 pr-3">Ürün</th>
+                            <th class="py-3 pr-3">Müşteri</th>
                             <th class="py-3 pr-3">Durum</th>
-                            <th class="py-3 pr-3">SÃ¼re</th>
-                            <th class="py-3 pr-3">Ã–ncelik</th>
-                            <th class="py-3 pr-3 text-right">Ä°ÅŸlem</th>
+                            <th class="py-3 pr-3">Süre</th>
+                            <th class="py-3 pr-3">Öncelik</th>
+                            <th class="py-3 pr-3 text-right">İşlem</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1337,9 +1444,9 @@
                                     @if($thread->status === 'answered')
                                         <span class="text-slate-700">{{ optional($thread->last_outbound_at)->format('d.m.Y H:i') ?: '-' }}</span>
                                     @elseif($isOverdue)
-                                        <span class="inline-flex items-center rounded-full bg-rose-100 px-2.5 py-1 text-xs font-bold text-rose-700">GECÄ°KTÄ°</span>
+                                        <span class="inline-flex items-center rounded-full bg-rose-100 px-2.5 py-1 text-xs font-bold text-rose-700">GECİKTİ</span>
                                     @elseif($isCritical)
-                                        <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700">KRÄ°TÄ°K</span>
+                                        <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700">KRİTİK</span>
                                     @else
                                         <span class="text-slate-700">{{ optional($thread->due_at)->format('d.m.Y H:i') ?: '-' }}</span>
                                     @endif
@@ -1347,7 +1454,7 @@
                                 <td class="py-3 pr-3 font-semibold text-slate-900">{{ $thread->priority_score }}</td>
                                 <td class="py-3 pr-3 text-right">
                                     <button type="button" class="cc-expand-btn" data-thread-toggle="{{ $thread->id }}">
-                                        <span>AÃ§</span>
+                                        <span>Aç</span>
                                         <i class="fa-solid fa-chevron-down"></i>
                                     </button>
                                 </td>
@@ -1361,15 +1468,15 @@
                                                 <div class="cc-inline-meta-v">{{ $thread->subject ?: '-' }}</div>
                                             </div>
                                             <div class="cc-inline-meta-item">
-                                                <div class="cc-inline-meta-k"><i class="fa-regular fa-user mr-1"></i>MÃ¼ÅŸteri</div>
+                                                <div class="cc-inline-meta-k"><i class="fa-regular fa-user mr-1"></i>Müşteri</div>
                                                 <div class="cc-inline-meta-v">{{ $thread->customer_name ?: '-' }}</div>
                                             </div>
                                             <div class="cc-inline-meta-item">
-                                                <div class="cc-inline-meta-k"><i class="fa-solid fa-box-open mr-1"></i>ÃœrÃ¼n</div>
+                                                <div class="cc-inline-meta-k"><i class="fa-solid fa-box-open mr-1"></i>Ürün</div>
                                                 <div class="cc-inline-meta-v">{{ $thread->product_name ?: '-' }}</div>
                                             </div>
                                             <div class="cc-inline-meta-item">
-                                                <div class="cc-inline-meta-k"><i class="fa-regular fa-clock mr-1"></i>OluÅŸturma</div>
+                                                <div class="cc-inline-meta-k"><i class="fa-regular fa-clock mr-1"></i>Oluşturma</div>
                                                 <div class="cc-inline-meta-v">{{ optional($thread->created_at)->format('d.m.Y H:i') ?: '-' }}</div>
                                             </div>
                                         </div>
@@ -1386,7 +1493,7 @@
                                                     <div class="cc-inline-time">{{ optional($message->created_at_external ?? $message->created_at)->format('d.m.Y H:i') }}</div>
                                                 </div>
                                             @empty
-                                                <div class="text-sm text-slate-500">HenÃ¼z mesaj yok.</div>
+                                                <div class="text-sm text-slate-500">Henüz mesaj yok.</div>
                                             @endforelse
                                         </div>
 
@@ -1400,13 +1507,13 @@
 
                                                 <div class="cc-inline-tools">
                                                     <select class="w-full" data-inline-template-select="{{ $thread->id }}">
-                                                        <option value="">HazÄ±r ÅŸablon seÃ§in</option>
+                                                        <option value="">Hazır şablon seçin</option>
                                                         @foreach($templates as $template)
                                                             <option value="{{ $template->body }}" data-template-id="{{ $template->id }}">{{ $template->title }}</option>
                                                         @endforeach
                                                     </select>
                                                     <button type="button" class="btn btn-outline inline-flex items-center gap-2" data-inline-ai-btn="{{ $thread->id }}">
-                                                        <i class="fa-solid fa-wand-magic-sparkles"></i><span>AI Ã–ner</span>
+                                                        <i class="fa-solid fa-wand-magic-sparkles"></i><span>AI Öner</span>
                                                     </button>
                                                 </div>
 
@@ -1415,24 +1522,24 @@
                                                 <div class="cc-inline-editing-note" data-inline-edit-note="{{ $thread->id }}"></div>
                                                 @unless($canReply)
                                                     <div class="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
-                                                        MÃ¼ÅŸteri yanÄ±tÄ± bekleniyor. Yeni mesaj gelmeden tekrar cevap veremezsiniz.
+                                                        Müşteri yanıtı bekleniyor. Yeni mesaj gelmeden tekrar cevap veremezsiniz.
                                                     </div>
                                                 @endunless
 
                                                 <div class="cc-inline-box">
                                                     <div class="cc-inline-box-head">
-                                                        <span><i class="fa-regular fa-pen-to-square mr-1"></i>YanÄ±t Metni</span>
+                                                        <span><i class="fa-regular fa-pen-to-square mr-1"></i>Yanıt Metni</span>
                                                         <span data-inline-char="{{ $thread->id }}">0 karakter</span>
                                                     </div>
                                                     <textarea name="body" required data-inline-body="{{ $thread->id }}" @disabled(!$canReply)></textarea>
                                                 </div>
 
                                                 <div class="cc-inline-actions">
-                                                    <button type="submit" class="cc-inline-send" @disabled(!$canReply)><i class="fa-regular fa-paper-plane"></i><span>GÃ¶nder</span></button>
+                                                    <button type="submit" class="cc-inline-send" @disabled(!$canReply)><i class="fa-regular fa-paper-plane"></i><span>Gönder</span></button>
                                                     <button type="button" class="btn btn-outline hidden" data-inline-edit-cancel="{{ $thread->id }}"><i class="fa-solid fa-rotate-left"></i><span>Iptal</span></button>
                                                     <a href="{{ route('portal.communication-center.thread.show', $thread) }}" class="cc-detail-link">
                                                         <i class="fa-solid fa-up-right-from-square"></i>
-                                                        <span>Sayfada AÃ§</span>
+                                                        <span>Sayfada Aç</span>
                                                     </a>
                                                 </div>
                                             </form>
@@ -1442,15 +1549,18 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="py-12 text-center text-sm text-slate-500">KayÄ±t bulunamadÄ±.</td>
+                                <td colspan="9" class="py-12 text-center text-sm text-slate-500">Kayıt bulunamadı.</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
 
-                <div class="mt-4">
-                    {{ $threads->links() }}
-                </div>
+                @include('admin.partials.modern-pagination-bar', [
+                    'paginator' => $threads,
+                    'perPageName' => 'per_page',
+                    'perPageLabel' => 'Sayfa başına',
+                    'perPageOptions' => [10, 25, 50, 100],
+                ])
             </section>
         </div>
     </div>
@@ -1699,7 +1809,7 @@
                             ? data.reason.map((x) => String(x).replace('keyword:', '')).join(', ')
                             : '';
                         const source = data.source ? ` | Kaynak: ${data.source}` : '';
-                        info.textContent = `AI GÃ¼ven: ${data.confidence ?? 0}%${source}${reasons ? ` (${reasons})` : ''}`;
+                        info.textContent = `AI Güven: ${data.confidence ?? 0}%${source}${reasons ? ` (${reasons})` : ''}`;
                         info.classList.remove('hidden');
                     }
                     updateInlineCount(id);
@@ -1815,7 +1925,7 @@
                     form.dataset.submitting = '1';
                     if (submitBtn) {
                         submitBtn.setAttribute('disabled', 'disabled');
-                        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>GÃ¶nderiliyor</span>';
+                        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Gönderiliyor</span>';
                     }
 
                     try {
@@ -1912,7 +2022,7 @@
                             if (aiBtn) aiBtn.setAttribute('disabled', 'disabled');
                             form.dataset.replyLocked = '1';
                         } else {
-                            // Edit sonrasÄ± da tek-yanÄ±t kuralÄ± korunur.
+                            // Edit sonrası da tek-yanıt kuralı korunur.
                             body.setAttribute('disabled', 'disabled');
                             if (templateSelect) templateSelect.setAttribute('disabled', 'disabled');
                             if (aiBtn) aiBtn.setAttribute('disabled', 'disabled');
@@ -1961,5 +2071,4 @@
         });
     </script>
 @endsection
-
 

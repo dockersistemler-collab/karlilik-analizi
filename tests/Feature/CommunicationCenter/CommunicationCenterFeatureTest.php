@@ -134,6 +134,14 @@ class CommunicationCenterFeatureTest extends TestCase
             'external_thread_id' => 'thr-1',
             'customer_name' => 'Alice',
             'status' => 'open',
+            'last_inbound_at' => now()->subMinute(),
+        ]);
+        CommunicationMessage::query()->create([
+            'thread_id' => $thread->id,
+            'direction' => 'inbound',
+            'body' => 'Stokta var mi?',
+            'created_at_external' => now()->subMinute(),
+            'sender_type' => 'customer',
         ]);
 
         $client = Mockery::mock(MarketplaceClientInterface::class);
@@ -158,7 +166,7 @@ class CommunicationCenterFeatureTest extends TestCase
             'sent_by_user_id' => $user->id,
         ]);
 
-        $this->assertSame(1, CommunicationMessage::query()->where('thread_id', $thread->id)->count());
+        $this->assertSame(2, CommunicationMessage::query()->where('thread_id', $thread->id)->count());
     }
 
     private function createClientWithPlan(array $modules): User
