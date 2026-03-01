@@ -669,6 +669,30 @@
             color: #0f172a;
             font-weight: 700;
         }
+        .nk-inline-collapse-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 8px;
+        }
+        .nk-inline-collapse {
+            width: 28px;
+            height: 20px;
+            border: none;
+            background: transparent;
+            color: #1f2937;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: color .2s ease, transform .2s ease;
+        }
+        .nk-inline-collapse:hover {
+            color: #0f172a;
+            transform: translateY(-1px);
+        }
+        .nk-inline-collapse i {
+            font-size: 13px;
+            line-height: 1;
+        }
 
         @media (max-width: 1100px) {
             .nk-inline-summary-grid {
@@ -1332,6 +1356,11 @@
                                                         <div class="nk-inline-metric"><i class="fa-solid fa-receipt nk-inline-metric-icon"></i><div class="nk-inline-metric-content"><span data-nk-inline-label-7>Satis KDV:</span><strong data-nk-inline-line-7>-</strong></div></div>
                                                         <div class="nk-inline-metric"><i class="fa-solid fa-chart-line nk-inline-metric-icon"></i><div class="nk-inline-metric-content"><span data-nk-inline-label-8>KDV Orani:</span><strong data-nk-inline-line-8>-</strong></div></div>
                                                     </div>
+                                                    <div class="nk-inline-collapse-wrap">
+                                                        <button type="button" class="nk-inline-collapse" data-nk-inline-close title="Detayı kapat" aria-label="Detayı kapat">
+                                                            <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1457,6 +1486,11 @@
                                                         <div class="nk-inline-metric"><i class="fa-solid fa-triangle-exclamation nk-inline-metric-icon"></i><div class="nk-inline-metric-content"><span data-nk-inline-label-6>Uyari:</span><strong data-nk-inline-line-6>-</strong></div></div>
                                                         <div class="nk-inline-metric"><i class="fa-solid fa-circle-check nk-inline-metric-icon"></i><div class="nk-inline-metric-content"><span data-nk-inline-label-7>Durum:</span><strong data-nk-inline-line-7>-</strong></div></div>
                                                         <div class="nk-inline-metric"><i class="fa-solid fa-minus nk-inline-metric-icon"></i><div class="nk-inline-metric-content"><span data-nk-inline-label-8>-</span><strong data-nk-inline-line-8>-</strong></div></div>
+                                                    </div>
+                                                    <div class="nk-inline-collapse-wrap">
+                                                        <button type="button" class="nk-inline-collapse" data-nk-inline-close title="Detayı kapat" aria-label="Detayı kapat">
+                                                            <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </td>
@@ -2440,6 +2474,17 @@
                     });
                 });
             };
+
+            document.querySelectorAll('[data-nk-inline-close]').forEach((button) => {
+                if (button.dataset.nkInlineCloseBound === '1') {
+                    return;
+                }
+                button.dataset.nkInlineCloseBound = '1';
+                button.addEventListener('click', () => {
+                    const tbody = button.closest('tbody');
+                    closeInlineRows(tbody || document);
+                });
+            });
 
             bindDetailButtons();
 
