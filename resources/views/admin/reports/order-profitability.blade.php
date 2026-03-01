@@ -14,6 +14,21 @@
             'cancelled' => 'Iptal',
             'returned' => 'Iade',
         ];
+
+        $ramBatchImages = collect(glob(storage_path('app/public/products/ram-batch/*')) ?: [])
+            ->filter(static fn (string $path): bool => is_file($path))
+            ->map(static fn (string $path): string => '/storage/products/ram-batch/' . basename($path))
+            ->values();
+
+        $pickRamBatchImage = static function ($seed) use ($ramBatchImages): ?string {
+            if ($ramBatchImages->isEmpty()) {
+                return null;
+            }
+
+            $index = abs((int) crc32((string) $seed)) % $ramBatchImages->count();
+
+            return $ramBatchImages[$index];
+        };
     @endphp
 
     <style>
@@ -184,6 +199,10 @@
             margin-top: 1px;
             font-weight: 700;
         }
+        .rp-inline-collapse-wrap { display:flex; justify-content:center; margin-top: 8px; }
+        .rp-inline-collapse { width:28px; height:20px; border:none; background:transparent; color:#1f2937; display:inline-flex; align-items:center; justify-content:center; transition: color .2s ease, transform .2s ease; }
+        .rp-inline-collapse:hover { color:#0f172a; transform: translateY(-1px); }
+        .rp-inline-collapse i { font-size: 13px; line-height: 1; }
         .rp-inline-content strong.rp-red { color: #ef4444; }
         .rp-inline-content strong.rp-green { color: #0f9a6f; }
         .rp-detail-btn {
@@ -295,18 +314,16 @@
                         @endphp
                         <tr>
                             @php
+                                $seed = $row['order_number'] ?? $loop->index;
+                                $imageFallback = $pickRamBatchImage('fallback|' . $seed) ?: 'https://placehold.co/96x96/e2e8f0/64748b?text=Urun';
                                 $imageUrl = $row['image_url'] ?? null;
-                                $imageFallback = 'https://placehold.co/96x96/e2e8f0/64748b?text=Urun';
+                                $resolvedImageUrl = $imageUrl ?: ($pickRamBatchImage($seed) ?: $imageFallback);
                             @endphp
                             <td class="py-2 pr-2 text-center"><input type="checkbox" class="rp-row-checkbox"></td>
                             <td class="py-2 pr-2.5 text-left">
-                                @if($imageUrl)
-                                    <span class="rp-thumb-wrap" tabindex="0" role="button" data-rp-preview-src="{{ $imageUrl }}" data-rp-preview-alt="{{ $row['order_number'] }}">
-                                        <img src="{{ $imageUrl }}" alt="{{ $row['order_number'] }}" class="rp-thumb" loading="lazy" data-fallback-src="{{ $imageFallback }}" onerror="if(this.dataset.fallbackApplied==='1'){return;} this.dataset.fallbackApplied='1'; this.src=this.dataset.fallbackSrc;">
-                                    </span>
-                                @else
-                                    <span class="rp-thumb-placeholder">-</span>
-                                @endif
+                                <span class="rp-thumb-wrap" tabindex="0" role="button" data-rp-preview-src="{{ $resolvedImageUrl }}" data-rp-preview-alt="{{ $row['order_number'] }}">
+                                    <img src="{{ $resolvedImageUrl }}" alt="{{ $row['order_number'] }}" class="rp-thumb" loading="lazy" data-fallback-src="{{ $imageFallback }}" onerror="if(this.dataset.fallbackApplied==='1'){return;} this.dataset.fallbackApplied='1'; this.src=this.dataset.fallbackSrc;">
+                                </span>
                             </td>
                             <td class="py-2 pr-2.5 text-slate-600">{{ $row['marketplace_name'] ?? '-' }}</td>
                             <td class="py-2 pr-2.5 text-slate-600">{{ $row['order_number'] }}</td>
@@ -358,6 +375,11 @@
                                         <div class="rp-inline-metric"><span class="rp-inline-icon"><i class="fa-solid fa-receipt"></i></span><div class="rp-inline-content"><span>Satis KDV</span><strong class="rp-red" data-rp-field="sales-vat">-</strong></div></div>
                                         <div class="rp-inline-metric"><span class="rp-inline-icon"><i class="fa-solid fa-chart-line"></i></span><div class="rp-inline-content"><span>KDV Orani</span><strong class="is-neutral" data-rp-field="vat-rate">-</strong></div></div>
                                     </div>
+                                    <div class="rp-inline-collapse-wrap">
+                                        <button type="button" class="rp-inline-collapse" data-rp-inline-close title="Detayı kapat" aria-label="Detayı kapat">
+                                            <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -367,6 +389,13 @@
                 </tbody>
             </table>
         </div>
+
+        @include('admin.partials.modern-pagination-bar', [
+            'paginator' => $orders,
+            'perPageName' => 'per_page',
+            'perPageLabel' => 'Sayfa başına',
+            'perPageOptions' => [10, 25, 50, 100],
+        ])
     </div>
     <div id="rp-image-popover" class="rp-image-popover" aria-hidden="true">
         <img id="rp-image-popover-img" src="" alt="">
@@ -425,6 +454,13 @@
 
             detailRow.classList.remove('is-hidden');
             btn.textContent = 'Detayi Gizle';
+        });
+    });
+
+    document.querySelectorAll('[data-rp-inline-close]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const tbody = btn.closest('tbody');
+            if (tbody) closeAll(tbody);
         });
     });
 

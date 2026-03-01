@@ -20,6 +20,10 @@
         .rp-detail-line { display:flex; justify-content:space-between; align-items:center; font-size: 13px; color:#475569; }
         .rp-detail-line strong { color:#ef4444; font-weight:700; }
         .rp-detail-line strong.is-neutral { color:#475569; }
+        .rp-inline-collapse-wrap { display:flex; justify-content:center; margin-top: 8px; }
+        .rp-inline-collapse { width:28px; height:20px; border:none; background:transparent; color:#1f2937; display:inline-flex; align-items:center; justify-content:center; transition: color .2s ease, transform .2s ease; }
+        .rp-inline-collapse:hover { color:#0f172a; transform: translateY(-1px); }
+        .rp-inline-collapse i { font-size: 13px; line-height: 1; }
     </style>
 
     <div class="panel-card p-3 mb-4">
@@ -114,6 +118,11 @@
                                         <div class="rp-detail-line"><span>Ortalama Sepet</span><strong class="is-neutral" data-detail-field="average">-</strong></div>
                                         <div class="rp-detail-line"><span>Pazaryeri Dagilimi</span><strong class="is-neutral" data-detail-field="marketplace-lines">-</strong></div>
                                     </div>
+                                    <div class="rp-inline-collapse-wrap">
+                                        <button type="button" class="rp-inline-collapse" data-brand-inline-close title="Detayı kapat" aria-label="Detayı kapat">
+                                            <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -172,6 +181,13 @@
 
                     detailRow.classList.remove('is-hidden');
                     btn.textContent = 'Detayi Gizle';
+                });
+            });
+
+            document.querySelectorAll('[data-brand-inline-close]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const tbody = btn.closest('tbody');
+                    if (tbody) closeAll(tbody);
                 });
             });
         })();

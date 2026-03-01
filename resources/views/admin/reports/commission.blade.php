@@ -97,7 +97,11 @@
     .commission-hero-head {
         display: flex;
         align-items: center;
+        justify-content: flex-start;
         gap: 6px;
+        width: 100%;
+        text-align: left;
+        align-self: flex-start;
         position: relative;
         z-index: 2;
     }
@@ -119,15 +123,17 @@
         color: #475569;
     }
     .menu-modern-mini-cards.commission-hero-cards .menu-modern-mini-card-value {
-        margin-top: 4px;
-        font-size: 39px;
-        line-height: 1;
+        margin-top: 8px;
+        font-size: 22px;
+        line-height: 1.05;
         font-weight: 750;
         font-variant-numeric: tabular-nums;
         letter-spacing: -0.02em;
         color: #111827;
         position: relative;
         z-index: 2;
+        display: block;
+        text-align: center;
     }
     .menu-modern-mini-cards.commission-hero-cards .menu-modern-mini-card.is-total {
         border-style: solid;
@@ -253,6 +259,19 @@
         .commission-inline-icon { width: 24px; height: 24px; border-radius: 999px; border: 1px solid #d3dee8; background: #f3f6fa; color: #1e3a5f; display:inline-flex; align-items:center; justify-content:center; font-size: 11px; flex: 0 0 auto; }
         .commission-inline-content span { display:block; font-size: 11px; color: #64748b; line-height: 1.2; }
         .commission-inline-content strong { display:block; font-size: 13px; color: #334155; line-height: 1.2; margin-top: 1px; font-weight: 700; }
+        .commission-inline-collapse-wrap { display:flex; justify-content:center; margin-top: 8px; }
+        .commission-inline-collapse { width:28px; height:20px; border:none; background:transparent; color:#1f2937; display:inline-flex; align-items:center; justify-content:center; transition: color .2s ease, transform .2s ease; }
+        .commission-inline-collapse:hover { color:#0f172a; transform: translateY(-1px); }
+        .commission-inline-collapse i { font-size: 13px; line-height: 1; }
+        .report-detail-btn {
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: #1d4ed8;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 10px;
+        }
         @media (max-width: 1100px) { .commission-inline-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     </style>
 
@@ -347,7 +366,7 @@
                             <td class="py-2 pr-2.5 text-center tabular-nums text-slate-800">{{ number_format($row['total'], 2, ',', '.') }} TL</td>
                             <td class="py-2 pr-2.5 text-center tabular-nums text-emerald-600">{{ number_format($row['ratio'], 2, ',', '.') }} %</td>
                             <td class="py-2 text-right">
-                                <button type="button" class="btn btn-solid-accent px-2.5 py-1 text-[10px]" data-commission-toggle-detail data-name="{{ $row['name'] }}" data-total="{{ number_format($row['total'], 2, ',', '.') }} TL" data-ratio="{{ number_format($row['ratio'], 2, ',', '.') }} %" data-color="{{ $row['color'] }}" data-logo="{{ $row['logo'] ?? '' }}" data-overall="{{ number_format($commissionTotal, 2, ',', '.') }} TL">Detayi Gor</button>
+                                <button type="button" class="report-detail-btn" data-commission-toggle-detail data-name="{{ $row['name'] }}" data-total="{{ number_format($row['total'], 2, ',', '.') }} TL" data-ratio="{{ number_format($row['ratio'], 2, ',', '.') }} %" data-color="{{ $row['color'] }}" data-logo="{{ $row['logo'] ?? '' }}" data-overall="{{ number_format($commissionTotal, 2, ',', '.') }} TL">Detayi Gor</button>
                             </td>
                         </tr>
                         <tr class="commission-inline-row is-hidden" data-commission-inline-row>
@@ -367,6 +386,11 @@
                                         <div class="commission-inline-metric"><span class="commission-inline-icon"><i class="fa-solid fa-wallet"></i></span><div class="commission-inline-content"><span>Toplam Komisyon</span><strong data-commission-field="overall">-</strong></div></div>
                                         <div class="commission-inline-metric"><span class="commission-inline-icon"><i class="fa-solid fa-palette"></i></span><div class="commission-inline-content"><span>Renk Kodu</span><strong data-commission-field="color">-</strong></div></div>
                                         <div class="commission-inline-metric"><span class="commission-inline-icon"><i class="fa-solid fa-calendar"></i></span><div class="commission-inline-content"><span>Donem</span><strong data-commission-field="period">{{ ($filters['date_from'] ?? '-') . ' / ' . ($filters['date_to'] ?? '-') }}</strong></div></div>
+                                    </div>
+                                    <div class="commission-inline-collapse-wrap">
+                                        <button type="button" class="commission-inline-collapse" data-commission-inline-close title="Detayı kapat" aria-label="Detayı kapat">
+                                            <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </td>
@@ -425,6 +449,13 @@
 
             detailRow.classList.remove('is-hidden');
             btn.textContent = 'Detayi Gizle';
+        });
+    });
+
+    document.querySelectorAll('[data-commission-inline-close]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const tbody = btn.closest('tbody');
+            if (tbody) closeAll(tbody);
         });
     });
 })();

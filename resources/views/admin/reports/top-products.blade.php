@@ -160,6 +160,13 @@
                 </tbody>
             </table>
         </div>
+
+        @include('admin.partials.modern-pagination-bar', [
+            'paginator' => $rows,
+            'perPageName' => 'per_page',
+            'perPageLabel' => 'Sayfa başına',
+            'perPageOptions' => [10, 25, 50, 100],
+        ])
     </div>
 
     <div id="tp-image-popover" class="tp-image-popover" aria-hidden="true">

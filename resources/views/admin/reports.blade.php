@@ -21,6 +21,50 @@ $ownerUser = auth()->user();
 
     @endphp
 
+    <style>
+        .or-table-card {
+            border-radius: 16px;
+            border: 1px solid #dbe7f5;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+        }
+        .or-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 860px;
+        }
+        .or-table thead th {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .03em;
+            color: #94a3b8;
+            padding: 10px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+        .or-table tbody td {
+            font-size: 13px;
+            color: #334155;
+            padding: 11px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-variant-numeric: tabular-nums;
+        }
+        .or-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .or-period {
+            font-weight: 600;
+            color: #475569;
+        }
+        .or-total {
+            font-weight: 700;
+            color: #0f172a;
+        }
+    </style>
+
     <div class="panel-card p-6 mb-6 report-filter-panel">
 
         <form method="GET" class="flex flex-wrap lg:flex-nowrap items-end gap-3 report-filter-form">
@@ -112,7 +156,7 @@ $ownerUser = auth()->user();
 
 
 
-    <div class="panel-card p-6 mb-6">
+    <div class="panel-card p-6 mb-6 or-table-card">
 
         <div class="flex items-center justify-between mb-4">
 
@@ -124,7 +168,7 @@ $ownerUser = auth()->user();
 
         <div class="overflow-x-auto">
 
-            <table class="min-w-full text-sm">
+            <table class="or-table">
 
                 <thead class="text-xs uppercase text-slate-400">
 
@@ -150,15 +194,15 @@ $ownerUser = auth()->user();
 
                         <tr>
 
-                            <td class="py-3 pr-4 text-slate-600">{{ $row['period'] }}</td>
+                            <td class="or-period">{{ $row['period'] }}</td>
 
                             @foreach($report['marketplaces'] as $marketplace)
 
-                                <td class="py-3 pr-4 text-right text-slate-700">{{ number_format($row['mp_' . $marketplace->id], 2, ',', '.') }} ?</td>
+                                <td class="text-right">{{ number_format($row['mp_' . $marketplace->id], 2, ',', '.') }} ?</td>
 
                             @endforeach
 
-                            <td class="py-3 text-right text-slate-800 font-semibold">{{ number_format($row['total'], 2, ',', '.') }} ?</td>
+                            <td class="text-right or-total">{{ number_format($row['total'], 2, ',', '.') }} ?</td>
 
                         </tr>
 

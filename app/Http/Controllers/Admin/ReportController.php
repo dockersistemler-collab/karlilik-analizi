@@ -17,6 +17,7 @@ use App\Services\Reports\TopProductsReportService;
 use App\Services\Reports\VatReportService;
 use App\Services\SystemSettings\SettingsRepository;
 use App\Support\SupportUser;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
@@ -40,15 +41,34 @@ class ReportController extends Controller
 
     public function topProducts(Request $request, TopProductsReportService $service): View
     {
+        $allowedPerPage = [10, 25, 50, 100];
+        $perPage = (int) $request->input('per_page', 25);
+        if (!in_array($perPage, $allowedPerPage, true)) {
+            $perPage = 25;
+        }
+
         $filters = ReportFilters::fromRequest($request);
         $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
         $rows = $service->get(SupportUser::currentUser(), $filters, 100);
+
+        $page = LengthAwarePaginator::resolveCurrentPage();
+        $total = $rows->count();
+        $paginatedRows = new LengthAwarePaginator(
+            $rows->forPage($page, $perPage)->values(),
+            $total,
+            $perPage,
+            $page,
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
 
         return view('admin.reports.top-products', [
             'filters' => $filters,
             'marketplaces' => $marketplaces,
             'quickRanges' => $this->quickRanges(),
-            'rows' => $rows,
+            'rows' => $paginatedRows,
             'reportExportsEnabled' => $this->reportExportsEnabled(),
         ]);
     }
@@ -179,9 +199,29 @@ $selectedMarketplaceId = $filters['marketplace_id'] ?? null;
 
     public function stockValue(Request $request, StockValueReportService $service): View
     {
-        $report = $service->get(SupportUser::currentUser());
+        $allowedPerPage = [10, 25, 50, 100];
+        $perPage = (int) $request->input('per_page', 25);
+        if (!in_array($perPage, $allowedPerPage, true)) {
+            $perPage = 25;
+        }
+
+        $allowedSorts = ['stock_desc', 'stock_asc', 'sales_desc', 'cost_desc', 'name_asc'];
+        $sortBy = (string) $request->input('sort_by', 'stock_desc');
+        if (!in_array($sortBy, $allowedSorts, true)) {
+            $sortBy = 'stock_desc';
+        }
+
+        $filters = [
+            'search' => trim((string) $request->input('search', '')),
+            'stock_min' => $request->filled('stock_min') ? max(0, (int) $request->input('stock_min')) : null,
+            'stock_max' => $request->filled('stock_max') ? max(0, (int) $request->input('stock_max')) : null,
+            'sort_by' => $sortBy,
+        ];
+
+        $report = $service->get(SupportUser::currentUser(), $filters, $perPage);
 
         return view('admin.reports.stock-value', [
+            'filters' => $filters,
             'summary' => $report['summary'],
             'rows' => $report['table'],
         ]);
@@ -189,6 +229,12 @@ $selectedMarketplaceId = $filters['marketplace_id'] ?? null;
 
     public function orderProfitability(Request $request, OrderProfitabilityReportService $service): View
     {
+        $allowedPerPage = [10, 25, 50, 100];
+        $perPage = (int) $request->input('per_page', 25);
+        if (!in_array($perPage, $allowedPerPage, true)) {
+            $perPage = 25;
+        }
+
         $filters = ReportFilters::fromRequest($request, true);
         $filters['status'] = $request->input('status');
         $marketplaces = Marketplace::where('is_active', true)->orderBy('name')->get();
@@ -196,9 +242,10 @@ $selectedMarketplaceId = $filters['marketplace_id'] ?? null;
         $user = SupportUser::currentUser();
         $orders = $service->query($user, $filters)
             ->orderByDesc('order_date')
-            ->get();
+            ->paginate($perPage)
+            ->withQueryString();
 
-        $rows = $service->rows($orders);
+        $rows = $service->rows(collect($orders->items()));
         $settings = app(SettingsRepository::class);
         $withholdingRatePercent = (float) $settings->get(
             'ne_kazanirim',
@@ -240,6 +287,7 @@ $selectedMarketplaceId = $filters['marketplace_id'] ?? null;
             'marketplaces' => $marketplaces,
             'quickRanges' => $this->quickRanges(),
             'rows' => $rows,
+            'orders' => $orders,
             'neKazanirimSettings' => [
                 'withholding_rate_percent' => $withholdingRatePercent,
                 'platform_service_amount_trendyol' => $platformServiceAmountTrendyol,
