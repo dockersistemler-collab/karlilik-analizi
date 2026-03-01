@@ -56,7 +56,7 @@
         ],
         "test": [
             "@php artisan config:clear --ansi",
-            "@php artisan test"
+            "@php -d memory_limit=512M artisan test"
         ],
         "fix:utf8-tr": [
             "powershell -ExecutionPolicy Bypass -File scripts/fix-turkish-utf8.ps1 -Root ."
